@@ -11,11 +11,18 @@ namespace EasySave.Views
         {
             String[] saveList = viewModel.GetSaveInfo(saveNb);
         }
-        public void ShowSaveList() { }
+        public static void ShowSaveList()
+        {
+            Console.WriteLine("list");
+        }
         public void ShowSaveError() { }
         public void ShowSaveProgress() { }
         public void GetSaveInput() { }
-        public void GetParametersInput() { }
+        public void GetParametersInput(int step)
+        {
+            
+        }
+
         public bool ValidateInput(string inputType, string input)
         {
             if (inputType.Length == 0)
@@ -43,5 +50,5 @@ namespace EasySave.Views
 
             return true;
         }
-   }
+    }
 }

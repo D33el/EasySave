@@ -23,43 +23,28 @@ namespace EasySave.ViewModels
             return configInstance;
         }
 
-        public void SaveConfig()
+        public static void SaveConfig(string Lang, string TargetDir, string SaveLogDir, string SaveStateDir)
         {
-            
-            string langage = Console.ReadLine();
-
-            
-            string targetDir = Console.ReadLine();
-
-            
-            string saveLogDir = Console.ReadLine();
-
-            
-            string saveStateDir = Console.ReadLine();
-
-            
-            string configInstance = Console.ReadLine();
-
             var myObjet = new
             {
-                langage = langage,
-                targetDir = targetDir,
-                saveLogDir = saveLogDir,
-                saveStateDir = saveStateDir,
-                configInstance = configInstance
+                lang = Lang,
+                targetDir = TargetDir,
+                saveLogDir = SaveLogDir,
+                saveStateDir = SaveStateDir
             };
+            string projectDir = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
+            string JSONtext = JsonSerializer.Serialize(myObjet);
+            string filePath = projectDir + @"/Config/config.json";
 
-            string jsonString = JsonSerializer.Serialize(myObjet);
-            string filePath = "C:\\Users\\DELL\\source\\repos\\EasySave\\EasySave\\Config\\Config.json";
-
-            File.WriteAllText(filePath, jsonString);
+            File.WriteAllText(filePath, JSONtext);
         }
 
-        public int checkConfig()
+        public bool checkConfig()
         {
-            string JSONtext = File.ReadAllText("C:\\Users\\DELL\\source\\repos\\EasySave\\EasySave\\Config\\Config.json");
+            string projectDir = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
+            string JSONtext = File.ReadAllText(projectDir + @"/Config/config.json");
             int fileLength = JSONtext.Length;
-            return fileLength;
+            if (fileLength > 10) { return true; } else { return false; }
         }
 
         public string LoadConfig()
@@ -67,7 +52,7 @@ namespace EasySave.ViewModels
             return "";
         }
 
-        
+
 
     }
 }
