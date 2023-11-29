@@ -4,36 +4,40 @@ using System.Text.Json;
 
 namespace EasySave.ViewModels
 {
-	public class Config
-	{
-		public string langage { get; set; }
+    public sealed class Config
+    {
+        public string langage { get; set; }
         public string targetDir { get; set; }
-		public string saveLogDir { get; set; }
-		public string saveStateDir { get; set; }
-        private Config configInstance;
+        public string saveLogDir { get; set; }
+        public string saveStateDir { get; set; }
+        private static Config configInstance;
 
         private Config()
         {
 
         }
 
+        public static Config getConfig()
+        {
+            if (configInstance == null) { configInstance = new Config(); }
+            return configInstance;
+        }
 
-
-		public void SaveConfig() 
-		{
-            Console.WriteLine("langage");
+        public void SaveConfig()
+        {
+            
             string langage = Console.ReadLine();
 
-            Console.WriteLine("targetDir");
+            
             string targetDir = Console.ReadLine();
 
-            Console.WriteLine("saveLogDir");
+            
             string saveLogDir = Console.ReadLine();
 
-            Console.WriteLine("saveStateDir");
+            
             string saveStateDir = Console.ReadLine();
 
-            Console.WriteLine("configInstance");
+            
             string configInstance = Console.ReadLine();
 
             var myObjet = new
@@ -58,20 +62,13 @@ namespace EasySave.ViewModels
             return fileLength;
         }
 
-        public string LoadConfig() 
+        public string LoadConfig()
         {
-            return ""; 
-        }
-		
-        public Config getConfig() 
-        {
-            if(configInstance == null)
-            {
-                configInstance = new Config();
-            } 
-            return configInstance;
+            return "";
         }
 
-	}
+        
+
+    }
 }
 

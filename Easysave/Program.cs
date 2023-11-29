@@ -13,7 +13,8 @@ namespace EasySave
         public static void Main(string[] args)
         {
 
-            Config obj = getConfig();
+            Config obj = Config.getConfig();
+
             int check = obj.checkConfig();
             if(check == 0 )
             {
@@ -28,4 +29,10 @@ namespace EasySave
         }
     }
 }
+
+
+
+
+
+
 
