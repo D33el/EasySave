@@ -6,38 +6,29 @@ namespace EasySave.ViewModels
 {
     public sealed class Config
     {
-        public string langage { get; set; }
-        public string targetDir { get; set; }
-        public string saveLogDir { get; set; }
-        public string saveStateDir { get; set; }
+        public string Langage { get; set; }
+        public string TargetDir { get; set; }
+        public string SaveLogDir { get; set; }
+        public string SaveStateDir { get; set; }
         private static Config configInstance;
 
         private Config()
         {
-
         }
 
         public static Config getConfig()
         {
-            if (configInstance == null) { configInstance = new Config(); }
+            configInstance ??= new Config();
             return configInstance;
         }
 
 
 
-        public static void SaveConfig(string Lang, string TargetDir, string SaveLogDir, string SaveStateDir)
+        public static void SaveConfig(object parametersInput)
         {
-            var myObjet = new
-            {
-                lang = Lang,
-                targetDir = TargetDir,
-                saveLogDir = SaveLogDir,
-                saveStateDir = SaveStateDir
-            };
             string projectDir = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
-            string JSONtext = JsonSerializer.Serialize(myObjet);
+            string JSONtext = JsonSerializer.Serialize(parametersInput);
             string filePath = projectDir + @"/Config/config.json";
-
             File.WriteAllText(filePath, JSONtext);
         }
 
