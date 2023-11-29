@@ -7,22 +7,21 @@ using EasySave.ViewModels;
 
 
 namespace EasySave
-{
+{ 
     class Program
     {
         public static void Main(string[] args)
         {
-
-            Config obj = Config.getConfig();
-
-            int check = obj.checkConfig();
-            if(check == 0 )
+            Config configObj = Config.getConfig();
+            bool configExists = configObj.checkConfig();
+            if(configExists)
             {
-                obj.SaveConfig();
+                Navigation.ShowMainMenu(); 
             }
             else
             {
-                Console.WriteLine("hello");
+                Navigation.ShowFirstLaunchMenu();
+                View.GetParametersInput();
             }
 
 
