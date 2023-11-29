@@ -23,8 +23,7 @@ namespace EasySave.ViewModels
             return configInstance;
         }
 
-        public void SaveConfig()
-        }
+
 
         public static void SaveConfig(string Lang, string TargetDir, string SaveLogDir, string SaveStateDir)
         {
@@ -55,7 +54,6 @@ namespace EasySave.ViewModels
             return "";
         }
 
-        
     }
 }
 
