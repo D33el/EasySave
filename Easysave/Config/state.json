@@ -1,15 +1,16 @@
 ﻿[
   {
-    "saveId": "",
-    "saveName": "",
-    "time": "",
-    "type" : "",
-    "saveState": "",
-    "saveFilesNumber": "",
-    "saveSize": "",
-    "remainingFiles": "",
-    "remainingFilesSize": "",
-    "sourcePath": "",
-    "destinationPath": ""
+    "SaveId": "", // int
+    "SaveName": "", //string 
+    "Time": "", //string 
+    "Type": "", //string 
+    "SaveState": "", //bool 
+    "SourcePath": "", //string 
+    "TargetPath": "", //string 
+    "FilesNumber": "", //int 
+    "FilesSize": "", //long 
+    "Progress": "", //float 
+    "RemainingFiles": "", //int 
+    "RemainingFilesSize": "" //long 
   }
 ]
