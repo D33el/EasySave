@@ -1,67 +1,15 @@
 ﻿[
   {
     "saveId": "",
+    "saveName": "",
     "time": "",
+    "type" : "",
     "saveState": "",
     "saveFilesNumber": "",
     "saveSize": "",
-    "progress": {
-      "remainingFiles": "",
-      "remainingFilesSize": "",
-      "sourcePath": "",
-      "destinationPath": ""
-    }
-  },
-  {
-    "saveId": "",
-    "time": "",
-    "saveState": "",
-    "saveFilesNumber": "",
-    "saveSize": "",
-    "progress": {
-      "remainingFiles": "",
-      "remainingFilesSize": "",
-      "sourcePath": "",
-      "destinationPath": ""
-    }
-  },
-  {
-    "saveId": "",
-    "time": "",
-    "saveState": "",
-    "saveFilesNumber": "",
-    "saveSize": "",
-    "progress": {
-      "remainingFiles": "",
-      "remainingFilesSize": "",
-      "sourcePath": "",
-      "destinationPath": ""
-    }
-  },
-  {
-    "saveId": "",
-    "time": "",
-    "saveState": "",
-    "saveFilesNumber": "",
-    "saveSize": "",
-    "progress": {
-      "remainingFiles": "",
-      "remainingFilesSize": "",
-      "sourcePath": "",
-      "destinationPath": ""
-    }
-  },
-  {
-    "saveId": "",
-    "time": "",
-    "saveState": "",
-    "saveFilesNumber": "",
-    "saveSize": "",
-    "progress": {
-      "remainingFiles": "",
-      "remainingFilesSize": "",
-      "sourcePath": "",
-      "destinationPath": ""
-    }
+    "remainingFiles": "",
+    "remainingFilesSize": "",
+    "sourcePath": "",
+    "destinationPath": ""
   }
 ]
