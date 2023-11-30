@@ -4,7 +4,7 @@ using EasySave.ViewModels;
 
 namespace EasySave.Models
 {
-    public class Save
+    public class Save 
     {
         public string SaveId;
         public string SaveName { get; set; }
@@ -16,46 +16,42 @@ namespace EasySave.Models
 
         public void CreateSave()
         {
-<<<<<<< Updated upstream
             Config configObj = Config.getConfig();
             try
             {
                 // Combine the saveSourcePath and saveName to get the full path of the save folder
-                string saveFolderPath = Path.Combine(configObj.targetDir, saveName);
+                string saveFolderPath = Path.Combine(configObj.TargetDir, SaveName);
 
                 // Check if the source directory exists before creating a save
-                if (Directory.Exists(saveSourcePath))
+                if (Directory.Exists(SaveSourcePath))
                 {
                     // Check if the destination directory exists; if not, create it
                     if (!Directory.Exists(saveFolderPath))
                     {
                         Directory.CreateDirectory(saveFolderPath);
-                        Console.WriteLine($"Save folder '{saveName}' created successfully.");
+                        Console.WriteLine($"Save folder '{SaveName}' created successfully.");
                     }
 
                     // Copy files from the source directory to the destination directory
-                    string[] filesToCopy = Directory.GetFiles(saveSourcePath);
+                    string[] filesToCopy = Directory.GetFiles(SaveSourcePath);
                     foreach (string file in filesToCopy)
                     {
                         string destinationFile = Path.Combine(saveFolderPath, Path.GetFileName(file));
                         File.Copy(file, destinationFile, true);
                     }
 
-                    Console.WriteLine($"Save '{saveName}' created successfully.");
+                    Console.WriteLine($"Save '{SaveName}' created successfully.");
                 }
                 else
                 {
-                    Console.WriteLine($"Source directory '{saveSourcePath}' not found.");
+                    Console.WriteLine($"Source directory '{SaveSourcePath}' not found.");
                 }
             }
             catch (Exception ex)
             {
                 // Handle exceptions, e.g., if there are permission issues
-                Console.WriteLine($"Error creating save '{saveName}': {ex.Message}");
+                Console.WriteLine($"Error creating save '{SaveName}': {ex.Message}");
             }
-=======
-         
->>>>>>> Stashed changes
         }
 
         public void DeleteSave()
@@ -63,24 +59,24 @@ namespace EasySave.Models
             try
             {
                 // Combine the saveSourcePath and saveName to get the full path of the save file
-                string saveFilePath = Path.Combine(saveSourcePath, saveName);
+                string saveFilePath = Path.Combine(SaveSourcePath, SaveName);
 
                 // Check if the file exists before attempting to delete it
                 if (File.Exists(saveFilePath))
                 {
                     // Delete the save file
                     File.Delete(saveFilePath);
-                    Console.WriteLine($"Save file '{saveName}' deleted successfully.");
+                    Console.WriteLine($"Save file '{SaveName}' deleted successfully.");
                 }
                 else
                 {
-                    Console.WriteLine($"Save file '{saveName}' not found.");
+                    Console.WriteLine($"Save file '{SaveName}' not found.");
                 }
             }
             catch (Exception ex)
             {
                 // Handle exceptions, e.g., if there are permission issues
-                Console.WriteLine($"Error deleting save file '{saveName}': {ex.Message}");
+                Console.WriteLine($"Error deleting save file '{SaveName}': {ex.Message}");
             }
         }
 
@@ -92,11 +88,10 @@ namespace EasySave.Models
 
         public string[] GetFileNames()
         {
-<<<<<<< Updated upstream
             try
             {
                 // Combine the saveSourcePath and saveName to get the full path of the save folder
-                string saveFolderPath = Path.Combine(saveSourcePath, saveName);
+                string saveFolderPath = Path.Combine(SaveSourcePath, SaveName);
 
                 // Check if the directory exists
                 if (Directory.Exists(saveFolderPath))
@@ -108,26 +103,16 @@ namespace EasySave.Models
                 }
                 else
                 {
-                    Console.WriteLine($"Save folder '{saveName}' not found.");
+                    Console.WriteLine($"Save folder '{SaveName}' not found.");
                     return Array.Empty<string>();
                 }
             }
             catch (Exception ex)
             {
                 // Handle exceptions, e.g., if there are permission issues
-                Console.WriteLine($"Error getting file names for save '{saveName}': {ex.Message}");
+                Console.WriteLine($"Error getting file names for save '{SaveName}': {ex.Message}");
                 return Array.Empty<string>();
             }
-=======
-            string[] arr = { };
-            return arr;
->>>>>>> Stashed changes
         }
-
-
     }
-
-
-   
-  
 }
