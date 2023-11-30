@@ -1,3 +1,6 @@
 {
-
+  "Language": "fr",
+  "TargetDir": "path",
+  "SaveLogDir": "/Config/log.json",
+  "SaveStateDir": "/Config/state.json"
 }

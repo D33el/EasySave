@@ -1,19 +1,31 @@
 ﻿using System;
 using System.IO;
 using System.Text.Json;
+using Easysave.ViewModels;
 
 namespace EasySave.ViewModels
 {
-    public sealed class Config
+    public sealed class Config 
     {
-        public string Langage { get; set; }
+        public string Language { get; set; }
         public string TargetDir { get; set; }
         public string SaveLogDir { get; set; }
         public string SaveStateDir { get; set; }
+
+        public DataConfig DataConfig { get; set; }
+
         private static Config configInstance;
 
         private Config()
         {
+            if (checkConfig())
+            {
+                DataConfig configObj = LoadConfig();
+                Language = configObj.Language;
+                TargetDir = configObj.TargetDir;
+                SaveLogDir = configObj.SaveLogDir;
+                SaveStateDir = configObj.SaveStateDir;
+            }
         }
 
         public static Config getConfig()
@@ -40,9 +52,14 @@ namespace EasySave.ViewModels
             if (fileLength > 10) { return true; } else { return false; }
         }
 
-        public string LoadConfig()
+        public DataConfig LoadConfig()
         {
-            return "";
+            string projectDir = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
+            string JSONtext = File.ReadAllText(projectDir + @"/Config/config.json");
+            DataConfig configObj = JsonSerializer.Deserialize<DataConfig>(JSONtext);
+            Console.WriteLine(configObj);
+
+            return configObj;
         }
 
     }
