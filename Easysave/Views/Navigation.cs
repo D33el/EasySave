@@ -3,19 +3,21 @@ namespace EasySave.Views
 {
     public class Navigation : View
     {
+        
+
         public static void ShowFirstLaunchMenu()
         {
-            Console.WriteLine("|==(EasySave V1.0)======================================================|");
-            Console.WriteLine("|======================= Bienvenue / Welcome ===========================|");
-            Console.WriteLine("|=======================================================================|");
-            Console.WriteLine("|=*=*=                Merci d'avoir choisi EasySave                =*=*=|");
-            Console.WriteLine("|=*=*=               Thank you for choosing EasySave               =*=*=|");
-            Console.WriteLine("|=======================================================================|");
-            Console.WriteLine("|=*=*= Configurez l'application avant de commencer les sauvegardes =*=*=|");
-            Console.WriteLine("|=*=*=            Setup the app before starting backups            =*=*=|");
-            Console.WriteLine("|=======================================================================|");
+            Console.WriteLine("|==(EasySave V1.0)====================================================|");
+            Console.WriteLine("|====================== Bienvenue / Welcome ==========================|");
+            Console.WriteLine("|=====================================================================|");
+            Console.WriteLine("|===                 Merci d'avoir choisi EasySave                 ===|");
+            Console.WriteLine("|===                Thank you for choosing EasySave                ===|");
+            Console.WriteLine("|=====================================================================|");
+            Console.WriteLine("|===  Configurez l'application avant de commencer les sauvegardes  ===|");
+            Console.WriteLine("|===             Setup the app before starting backups             ===|");
+            Console.WriteLine("|=====================================================================|");
+            
         }
-
 
         public static void ShowParameters()
         {
@@ -46,6 +48,7 @@ namespace EasySave.Views
                 Console.WriteLine("|=====================================================================|");
             }
         }
+
         public static void ShowMainMenu()
         {
             string lang = "";
@@ -78,6 +81,7 @@ namespace EasySave.Views
             }
 
         }
+
         public static void ShowSaveMenu(int step, string type)
         {
             string lang = "";
@@ -176,6 +180,7 @@ namespace EasySave.Views
 
             }
         }
+
         public static void ShowDeleteMenu(int step)
         {
             string lang = "";
@@ -216,6 +221,7 @@ namespace EasySave.Views
             }
 
         }
+
     }
 }
 
