@@ -85,12 +85,12 @@ namespace Easysave.Models
 
         }
 
-        public DataState[] GetStateList()
+        public DataState[] GetStateArr()
         {
             string jsonString = File.ReadAllText(ProjectDir + configObj.SaveStateDir);
-            DataState[] dataStateList = JsonSerializer.Deserialize<DataState[]>(jsonString);
+            DataState[] dataStateArr = JsonSerializer.Deserialize<DataState[]>(jsonString);
 
-            return dataStateList;
+            return dataStateArr;
         }
 
     }
