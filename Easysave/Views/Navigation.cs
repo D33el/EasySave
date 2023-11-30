@@ -1,5 +1,5 @@
 ﻿using System;
-namespace EasySave.Views
+namespace Easysave.Views
 {
     public class Navigation : View
     {

@@ -2,9 +2,9 @@
 using System.IO;
 using System.Text.Json;
 
-using EasySave.Views;
+using Easysave.Views;
 
-namespace EasySave.ViewModels
+namespace Easysave.ViewModels
 {
     public class ViewModel
     {

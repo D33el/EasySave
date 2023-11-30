@@ -1,7 +1,7 @@
 ﻿using System;
-using EasySave.ViewModels;
+using Easysave.ViewModels;
 
-namespace EasySave.Views
+namespace Easysave.Views
 {
     public class View
     {
