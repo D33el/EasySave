@@ -6,23 +6,17 @@ namespace EasySave.Models
 {
     public class Save
     {
-        public string saveId;
-        public string saveName { get; set; }
-        public string saveSourcePath { get; set; }
-        public int saveFilesNumber { get; set; }
-        public string type { get; } 
+        public string SaveId;
+        public string SaveName { get; set; }
+        public string SaveSourcePath { get; set; }
+        public int SaveFilesNumber { get; set; }
+        public string Type { get; set; } 
 
-        public Save(string SaveId, string SaveName, string SaveSourcePath, int SaveFilesNumber, string Type)
-        {
-            saveId = SaveId;
-            saveName = SaveName;
-            saveSourcePath = SaveSourcePath;
-            saveFilesNumber = SaveFilesNumber;
-            type = Type;
-        }
+        public Save() { }
 
         public void CreateSave()
         {
+<<<<<<< Updated upstream
             Config configObj = Config.getConfig();
             try
             {
@@ -59,6 +53,9 @@ namespace EasySave.Models
                 // Handle exceptions, e.g., if there are permission issues
                 Console.WriteLine($"Error creating save '{saveName}': {ex.Message}");
             }
+=======
+         
+>>>>>>> Stashed changes
         }
 
         public void DeleteSave()
@@ -90,12 +87,12 @@ namespace EasySave.Models
         public string[] GetSaveProgress()
         {
             string[] arr = { };
-
-            return arr ;
+            return arr;
         }
 
         public string[] GetFileNames()
         {
+<<<<<<< Updated upstream
             try
             {
                 // Combine the saveSourcePath and saveName to get the full path of the save folder
@@ -121,6 +118,10 @@ namespace EasySave.Models
                 Console.WriteLine($"Error getting file names for save '{saveName}': {ex.Message}");
                 return Array.Empty<string>();
             }
+=======
+            string[] arr = { };
+            return arr;
+>>>>>>> Stashed changes
         }
 
 
