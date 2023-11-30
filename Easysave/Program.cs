@@ -2,38 +2,38 @@
 using System.IO;
 using System.Reflection;
 using System.Text.Json;
-using EasySave.Views;
-using EasySave.Models;
-using EasySave.ViewModels;
+using Easysave.Views;
+using Easysave.Models;
+using Easysave.ViewModels;
 
 
-namespace EasySave
+namespace Easysave
 {
     class Program
     {
 
         public static void Main(string[] args)
         {
-            var view = new View();
             Config configObj = Config.getConfig();
-
-            Console.WriteLine(configObj.TargetDir);
-
+            View view = new View();
             State state = new State();
-            state.UpdateStatefile(2,"testSave","01/01/2025 00:00","full",false,"path", configObj.TargetDir,10,100,0,0,0);
-            //state.CreateState();
-
-            return;
+            ViewModel viewmodel  = new ViewModel();
 
             bool configExists = configObj.checkConfig();
+
             if (configExists)
             {
                 Navigation.ShowMainMenu();
+                var Input = view.GetInput(0);
+                viewmodel.NavigateTo(Input);
+
             }
+
             else
+            
             {
                 Navigation.ShowFirstLaunchMenu();
-                var parametersInput = view.GetParametersInput(true, 0);
+                var parametersInput = view.GetParametersInput(true);
                 Config.SaveConfig(parametersInput);
             }
         }
