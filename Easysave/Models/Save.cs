@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
-using EasySave.ViewModels;
+using Easysave.ViewModels;
 
-namespace EasySave.Models
+namespace Easysave.Models
 {
     public class Save 
     {
