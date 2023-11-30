@@ -7,15 +7,10 @@ namespace EasySave.Models
     public class State
     {
         private string ProjectDir = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
-
         public DataState DataState { get; set; }
-
         private Config configObj = Config.getConfig();
 
         public State() { }
-
-
-
         public void CreateState(int id)
         {
             string stateFilePath = ProjectDir + configObj.SaveStateDir;
