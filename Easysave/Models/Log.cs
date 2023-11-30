@@ -1,23 +1,20 @@
 ﻿using System;
+using EasySave.Models;
 
 namespace EasySave.Models
 {
     public class Log
     {
-        public string saveName;
-        public string sourceDir;
-        public string targetDir;
-        public string saveSize;
-        public long saveDuration;
+        public string saveName { get; set; }
+        public string sourceDir {get;set;}
+        public string targetDir {get;set;}
+        public string saveSize {get;set;}
+        public long saveDuration {get;set;}
+        private DataLog logObj;
 
-
-        public Log(string SaveName, string SourceDir, string TargetDir, string SaveSize, long SaveDuration)
+        public Log()
         {
-            saveName = SaveName;
-            sourceDir = SourceDir;
-            targetDir = TargetDir;
-            saveSize = SaveSize;
-            saveDuration = SaveDuration;
+            
         }
 
 
