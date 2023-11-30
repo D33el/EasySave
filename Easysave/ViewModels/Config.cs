@@ -1,9 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Text.Json;
-using Easysave.ViewModels;
 
-namespace EasySave.ViewModels
+namespace Easysave.ViewModels
 {
     public sealed class Config 
     {

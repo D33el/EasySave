@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace EasySave.Models
+namespace Easysave.Models
 {
     public class DataState
     {

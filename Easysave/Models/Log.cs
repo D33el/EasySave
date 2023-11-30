@@ -1,16 +1,12 @@
 ﻿using System;
-using EasySave.Models;
+using Easysave.ViewModels;
 
-namespace EasySave.Models
+namespace Easysave.Models
 {
     public class Log
     {
-        public string saveName { get; set; }
-        public string sourceDir {get;set;}
-        public string targetDir {get;set;}
-        public string saveSize {get;set;}
-        public long saveDuration {get;set;}
-        private DataLog logObj;
+
+        public DataLog LogObj { get; set; }
 
         public Log()
         {
@@ -22,7 +18,7 @@ namespace EasySave.Models
         {
 
         }
-
+        
         public void WriteLog()
         {
 

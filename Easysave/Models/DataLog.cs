@@ -3,14 +3,16 @@ namespace Easysave.Models
 {
 	public class DataLog
 	{
-        public string saveName;
-        public string sourceDir;
-        public string targetDir;
-        public string saveSize;
-        public long saveDuration;
+        public string Timestamp;
+        public string SavedFileName;
+        public string SourceDir;
+        public string TargetDir;
+        public string SaveSize;
+        public long SaveDuration;
 
-        public DataLog()
+        public DataLog(string timestamp)
 		{
+            Timestamp = timestamp;
 		}
 	}
 }

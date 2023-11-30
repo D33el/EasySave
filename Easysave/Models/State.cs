@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Text.Json;
-using EasySave.ViewModels;
+using Easysave.ViewModels;
 
-namespace EasySave.Models
+namespace Easysave.Models
 {
     public class State
     {
@@ -11,6 +11,7 @@ namespace EasySave.Models
         private Config configObj = Config.getConfig();
 
         public State() { }
+
         public void CreateState(int id)
         {
             string stateFilePath = ProjectDir + configObj.SaveStateDir;
