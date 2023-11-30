@@ -8,11 +8,8 @@ namespace EasySave.ViewModels
 {
     public class ViewModel
     {
-        View view = new View();
 
-        public ViewModel()
-        {
-        }
+        public ViewModel(){ }
 
         public void InitializeSave() { }
 
@@ -25,10 +22,9 @@ namespace EasySave.ViewModels
             string[] save = { };
 
 
-
-
             return save;
         }
+
         public String[] GetSavelist()
         {
             string JSONtext = File.ReadAllText(@"../Config/state.json");

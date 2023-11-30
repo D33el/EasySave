@@ -66,6 +66,7 @@ namespace EasySave.Views
                 Console.WriteLine("| [4] Paramétres                                                      |");
                 Console.WriteLine("| [5] Quitter                                                         |");
                 Console.WriteLine("|=====================================================================|");
+                Console.WriteLine("|===                  Veuillez inserer un chiffre                  ===|");
             }
             else
             {
@@ -78,6 +79,7 @@ namespace EasySave.Views
                 Console.WriteLine("| [4] Settings                                                        |");
                 Console.WriteLine("| [5] Exit                                                            |");
                 Console.WriteLine("|=====================================================================|");
+                Console.WriteLine("|===                    Please insert a number                     ===|");
             }
 
         }

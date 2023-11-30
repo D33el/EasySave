@@ -20,10 +20,10 @@ namespace EasySave.Views
         public void GetSaveInput() { }
         public object GetParametersInput(bool isFirstTime, int step)
         {
-            string Lang = "";
-            string TargetDir = "";
-            string SaveLogDir = "";
-            string SaveStateDir = "";
+            string lang = "";
+            string targetDir = "";
+            string saveLogDir = "";
+            string saveStateDir = "";
             if (isFirstTime)
             {
                 Console.WriteLine("");
@@ -36,22 +36,25 @@ namespace EasySave.Views
                 Console.WriteLine("|===            Veuillez choisir une langue [eng / fr]               ===|");
                 Console.WriteLine("|===                 Choose a language [eng / fr]                    ===|");
                 Console.WriteLine("|=======================================================================|");
-                Lang = Console.ReadLine() ?? "";
+                lang = Console.ReadLine() ?? "";
+
                 Console.WriteLine("|=======================================================================|");
                 Console.WriteLine("|===           Veuillez choisir le chemin des sauvegarde             ===|");
                 Console.WriteLine("|===                Choose the path of the backups                   ===|");
                 Console.WriteLine("|=======================================================================|");
-                TargetDir = Console.ReadLine() ?? "";
+                targetDir = Console.ReadLine() ?? "";
+
                 Console.WriteLine("|=======================================================================|");
                 Console.WriteLine("|===        Veuillez choisir le chemin du fichier log.json           ===|");
                 Console.WriteLine("|===             Choose the path of the log.json file                ===|");
                 Console.WriteLine("|=======================================================================|");
-                SaveLogDir = Console.ReadLine() ?? "";
+                saveLogDir = Console.ReadLine() ?? "";
+
                 Console.WriteLine("|=======================================================================|");
                 Console.WriteLine("|===        Veuillez choisir le chemin du fichier state.json         ===|");
                 Console.WriteLine("|===            Choose the path of the state.json file               ===|");
                 Console.WriteLine("|=======================================================================|");
-                SaveStateDir = Console.ReadLine() ?? "";
+                saveStateDir = Console.ReadLine() ?? "";
             }
             else
             {
@@ -69,7 +72,7 @@ namespace EasySave.Views
                             Console.WriteLine("|=====================================================================|");
                             Console.WriteLine("|===                 Choose a language [eng / fr]                  ===|");
                         }
-                        Lang = Console.ReadLine() ?? "";
+                        lang = Console.ReadLine() ?? "";
                         break;
                     case 2:
                         if (selectedLang == "fr")
@@ -82,7 +85,7 @@ namespace EasySave.Views
                             Console.WriteLine("|=====================================================================|");
                             Console.WriteLine("|===                Choose the path of the backups                 ===|");
                         }
-                        TargetDir = Console.ReadLine() ?? "";
+                        targetDir = Console.ReadLine() ?? "";
                         break;
                     case 3:
                         if (selectedLang == "fr")
@@ -95,7 +98,7 @@ namespace EasySave.Views
                             Console.WriteLine("|=====================================================================|");
                             Console.WriteLine("|===             Choose the path of the log.json file              ===|");
                         }
-                        SaveLogDir = Console.ReadLine() ?? "";
+                        saveLogDir = Console.ReadLine() ?? "";
                         break;
                     case 4:
                         if (selectedLang == "fr")
@@ -108,7 +111,7 @@ namespace EasySave.Views
                             Console.WriteLine("|=====================================================================|");
                             Console.WriteLine("|===            Choose the path of the state.json file             ===|");
                         }
-                        SaveStateDir = Console.ReadLine() ?? "";
+                        saveStateDir = Console.ReadLine() ?? "";
                         break;
                     default:
                         Console.WriteLine("Error : Unrecognized step");
@@ -118,10 +121,10 @@ namespace EasySave.Views
 
             object inputObj = new
             {
-                lang = Lang,
-                targetDir = TargetDir,
-                saveLogDir = SaveLogDir,
-                saveStateDir = SaveStateDir
+                Language = lang,
+                TargetDir = targetDir,
+                SaveLogDir = saveLogDir,
+                SaveStateDir = saveStateDir
             };
 
             return inputObj;
