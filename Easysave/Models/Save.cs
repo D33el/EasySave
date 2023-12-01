@@ -19,6 +19,7 @@ namespace Easysave.Models
 
         public void CreateSave()
         {
+            string lang = configObj.Language;
             try
             {
                 string saveFolderPath = Path.Combine(configObj.TargetDir, SaveName);
@@ -28,10 +29,7 @@ namespace Easysave.Models
                     if (!Directory.Exists(saveFolderPath))
                     {
                         Directory.CreateDirectory(saveFolderPath);
-                        Console.WriteLine($"Dossier de sauvegarde '{SaveName}' créé avec succès.");
                     }
-
-
                     if (Type == "full")
                     {
                         string[] filesToCopy = Directory.GetFiles(SaveSourcePath);
@@ -40,35 +38,38 @@ namespace Easysave.Models
                             string destinationFile = Path.Combine(saveFolderPath, Path.GetFileName(file));
                             File.Copy(file, destinationFile, true);
                         }
-                        Console.WriteLine($"Sauvegarde complète '{SaveName}' créée avec succès.");
                     }
-                    else if (Type == "differential")
+                    else if (Type == "diff")
                     {
-
                         string[] destinationFiles = Directory.GetFiles(saveFolderPath);
                         string[] sourceFiles = Directory.GetFiles(SaveSourcePath);
-
-
                         string[] newModifiedFiles = CompareFiles(sourceFiles, destinationFiles, saveFolderPath);
-
 
                         foreach (string file in newModifiedFiles)
                         {
                             string destinationFile = Path.Combine(saveFolderPath, Path.GetFileName(file));
                             File.Copy(file, destinationFile, true);
                         }
-                        Console.WriteLine($"Sauvegarde différentielle '{SaveName}' créée avec succès.");
+                    }
+                    if (lang == "fr")
+                    {
+                    Console.WriteLine($"Sauvegarde '{SaveName}' créée avec succès.");
                     }
                     else
                     {
-                        Console.WriteLine($"Type de sauvegarde invalide '{Type}'.");
+                    Console.WriteLine($"Backup '{SaveName}' created with success.");
                     }
-
-                    Console.WriteLine($"Sauvegarde '{SaveName}' créée avec succès.");
                 }
                 else
                 {
-                    Console.WriteLine($"Répertoire source '{SaveSourcePath}' introuvable.");
+                    if (lang == "fr")
+                    {
+                        Console.WriteLine($"Répertoire source '{SaveSourcePath}' introuvable.");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Source directory '{SaveSourcePath}' not found.");
+                    }
                 }
             }
             catch (Exception ex)
