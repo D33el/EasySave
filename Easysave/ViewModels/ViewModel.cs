@@ -9,7 +9,8 @@ namespace Easysave.ViewModels
     public class ViewModel
     {
         Save save = new Save();
-        Config ConfigObj = Config.getConfig(); 
+        State state = new State();
+        Config configObj = Config.getConfig(); 
 
         public  ViewModel(){
         
@@ -24,29 +25,39 @@ namespace Easysave.ViewModels
 
         public void InitializeDeleteSave() { }
 
-        public String[] GetSaveInfo(int saveNb)
+
+
+        public DataState[] GetSavelist()
         {
-
-            string[] saveList = GetSavelist();
-            string[] save = { };
-
-
-            return save;
+            DataState[] myResult = state.GetStateArr();
+            return myResult;
         }
 
-        public String[] GetSavelist()
+        public DataState GetSaveInfo(int saveNb)
         {
-            string JSONtext = File.ReadAllText(@"../Config/state.json");
-            //var save = JsonSerializer.Deserialize<State>(JSONtext);
+            
+            DataState[] list = GetSavelist();
+            DataState result = new DataState(saveNb);
+
+            foreach (DataState save in list)
+            {
+                if(save.SaveId == saveNb)
+                {
+                    result = save;
+                }
+                
+            }
 
 
-            string[] saveList = { };
-
-            return saveList;
+            return result;
         }
+
+
 
         public void deleteSave(int saveId)
         {
+            DataState saveInfo = GetSaveInfo(saveId);
+            save.SaveName = saveInfo.SaveName;
             save.DeleteSave(saveId);
         }
 
@@ -71,9 +82,19 @@ namespace Easysave.ViewModels
                     break;
 
                 case 4: // Configuration
-                    DataConfig data = view.GetParametersInput(false);
-                    ConfigObj.DataConfig = data;
-                    ConfigObj.SaveConfig();
+                    int step = navigation.ShowParameters();
+                    if(step == 5)
+                    {
+                        navigation.ShowMainMenu();
+                    }
+                    else
+                    {
+                        DataConfig data = view.GetParametersInput(false,step);
+                        configObj.DataConfig = data;
+                        configObj.SaveConfig();
+                        NavigateTo(4);
+                    }
+
                     break;
 
                 case 5: // Exit
