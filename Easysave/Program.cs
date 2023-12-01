@@ -17,15 +17,14 @@ namespace Easysave
             Config configObj = Config.getConfig();
             View view = new View();
             State state = new State();
+            Navigation navigation = new Navigation();
             ViewModel viewmodel  = new ViewModel();
 
             bool configExists = configObj.checkConfig();
 
             if (configExists)
             {
-                Navigation.ShowMainMenu();
-                var Input = view.GetInput(0);
-                viewmodel.NavigateTo(Input);
+                navigation.ShowMainMenu();
 
             }
 
@@ -33,7 +32,7 @@ namespace Easysave
             
             {
                 Navigation.ShowFirstLaunchMenu();
-                DataConfig data = view.GetParametersInput(false);
+                DataConfig data = view.GetParametersInput(false, 0);
                 configObj.DataConfig = data;
                 configObj.SaveConfig();
             }

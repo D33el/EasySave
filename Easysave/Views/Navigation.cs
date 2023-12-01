@@ -5,8 +5,8 @@ namespace Easysave.Views
 {
     public class Navigation : View
     {
-        
-        
+
+
 
         public static void ShowFirstLaunchMenu()
         {
@@ -22,9 +22,10 @@ namespace Easysave.Views
             
         }
 
-        public static void ShowParameters()
+        public int ShowParameters()
         {
-            string lang = "";
+            Config ConfigObj = Config.getConfig();
+            string lang = ConfigObj.Language;
 
             Console.Clear();
 
@@ -33,29 +34,42 @@ namespace Easysave.Views
                 Console.WriteLine("|==(EasySave V1.0)====================================================|");
                 Console.WriteLine("|=========================== Paramétres ==============================|");
                 Console.WriteLine("|=====================================================================|");
+                Console.WriteLine("| [0] Tout reconfigurer                                               |");
                 Console.WriteLine("| [1] Changer la langue                                               |");
                 Console.WriteLine("| [2] Configurer l'emplacement dossier de destination des sauvegardes |");
                 Console.WriteLine("| [3] Configurer l'emplacement du fichier de log                      |");
                 Console.WriteLine("| [4] Configurer l'emplacement du fichier state                       |");
                 Console.WriteLine("|=====================================================================|");
+                Console.WriteLine("| [5] Revenir au menu principal                                       |");
+                Console.WriteLine("|=====================================================================|");
+
             }
             else
             {
                 Console.WriteLine("|==(EasySave V1.0)====================================================|");
                 Console.WriteLine("|============================ Settings ===============================|");
                 Console.WriteLine("|=====================================================================|");
+                Console.WriteLine("| [0] Reset All                                                       |");
                 Console.WriteLine("| [1] Change language                                                 |");
                 Console.WriteLine("| [2] Set backup destination path                                     |");
                 Console.WriteLine("| [3] Set log file path                                               |");
                 Console.WriteLine("| [4] Set state file path                                             |");
                 Console.WriteLine("|=====================================================================|");
+                Console.WriteLine("| [5] Go back to main menu                                            |");
+                Console.WriteLine("|=====================================================================|");
             }
+
+            int step = int.Parse(Console.ReadLine());
+            return step;
+
         }
 
-        public static void ShowMainMenu()
+        public void ShowMainMenu()
         {
-            
-            string lang = "";
+            ViewModel viewmodel = new ViewModel();
+            Config ConfigObj = Config.getConfig();
+
+            string lang = ConfigObj.Language;
 
             Console.Clear();
 
@@ -70,7 +84,7 @@ namespace Easysave.Views
                 Console.WriteLine("| [4] Paramétres                                                      |");
                 Console.WriteLine("| [5] Quitter                                                         |");
                 Console.WriteLine("|=====================================================================|");
-                Console.WriteLine("|===                  Veuillez inserer un chiffre                  ===|");
+                Console.WriteLine("|=====>               Veuillez inserer un chiffre               <=====|");
 
             }
             else
@@ -84,18 +98,24 @@ namespace Easysave.Views
                 Console.WriteLine("| [4] Settings                                                        |");
                 Console.WriteLine("| [5] Exit                                                            |");
                 Console.WriteLine("|=====================================================================|");
-                Console.WriteLine("|===                    Please insert a number                     ===|");
+                Console.WriteLine("|=====>                 Please insert a number                  <=====|");
             }
+
+
+            int page = int.Parse(Console.ReadLine());
+            viewmodel.NavigateTo(page);
 
         }
 
         public void ShowSaveMenu()
         {
             ViewModel viewmodel = new ViewModel();
+            Config ConfigObj = Config.getConfig();
+
+            string lang = ConfigObj.Language;
 
             Console.Clear();
 
-            string lang = "";
             string type = "";
             string saveName = "";
             string sourcePath = "";
@@ -200,10 +220,11 @@ namespace Easysave.Views
         {
 
             ViewModel viewmodel = new ViewModel();
+            Config ConfigObj = Config.getConfig();
+            string lang = ConfigObj.Language;
 
-            string lang = "";
             int userChoice = 0;
-            string userConfirm = "";
+            ConsoleKeyInfo userConfirm;
 
             Console.Clear();
 
@@ -219,7 +240,7 @@ namespace Easysave.Views
             }
 
             ShowSaveList();
-            userChoice = Console.Read();
+            userChoice = int.Parse(Console.ReadLine());
 
             if (lang == "fr")
             {
@@ -228,16 +249,17 @@ namespace Easysave.Views
             }
             else
             {
-                Console.WriteLine("==== Step 1 of 2");
+                Console.WriteLine("==== Step 2 of 2");
                 Console.WriteLine("==== Are you sure you want to delete this backup ? (Y / N)");
             }
 
-            userConfirm = Console.ReadLine();
-            if(userConfirm == "O" ||  userConfirm == "Y")
+            userConfirm = Console.ReadKey();
+
+            if(userConfirm.Key == ConsoleKey.Y ||  userConfirm.Key == ConsoleKey.O)
             {
                 viewmodel.deleteSave(userChoice);
             }
-            else if(userConfirm == "N")
+            else if(userConfirm.Key == ConsoleKey.N)
             {
                 switch (lang)
                 {
@@ -249,6 +271,7 @@ namespace Easysave.Views
                         break;
                 }
             }
+
         }
 
     }
