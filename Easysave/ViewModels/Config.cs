@@ -35,10 +35,10 @@ namespace Easysave.ViewModels
 
 
 
-        public static void SaveConfig(object parametersInput)
+        public void SaveConfig()
         {
             string projectDir = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
-            string JSONtext = JsonSerializer.Serialize(parametersInput);
+            string JSONtext = JsonSerializer.Serialize(DataConfig);
             string filePath = projectDir + @"/Config/config.json";
             File.WriteAllText(filePath, JSONtext);
         }

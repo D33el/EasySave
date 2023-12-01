@@ -11,16 +11,19 @@ namespace Easysave.Models
         public string SaveSourcePath { get; set; }
         public int SaveFilesNumber { get; set; }
         public string Type { get; set; } 
+        public DataState DataState { get; set; }
+
 
         public Save() { }
 
-        public void CreateSave()
+        public void CreateSave() // Ajouter un paramètre (objet)
         {
             Config configObj = Config.getConfig();
             try
             {
                 // Combine the saveSourcePath and saveName to get the full path of the save folder
                 string saveFolderPath = Path.Combine(configObj.TargetDir, SaveName);
+                
 
                 // Check if the source directory exists before creating a save
                 if (Directory.Exists(SaveSourcePath))
@@ -54,7 +57,7 @@ namespace Easysave.Models
             }
         }
 
-        public void DeleteSave()
+        public void DeleteSave(int saveId) // Ajouter un paramètre (id)
         {
             try
             {

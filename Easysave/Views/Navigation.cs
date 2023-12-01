@@ -1,8 +1,11 @@
-﻿using System;
+﻿using Easysave.Models;
+using Easysave.ViewModels;
+using System;
 namespace Easysave.Views
 {
     public class Navigation : View
     {
+        
         
 
         public static void ShowFirstLaunchMenu()
@@ -51,6 +54,7 @@ namespace Easysave.Views
 
         public static void ShowMainMenu()
         {
+            
             string lang = "";
 
             Console.Clear();
@@ -67,6 +71,7 @@ namespace Easysave.Views
                 Console.WriteLine("| [5] Quitter                                                         |");
                 Console.WriteLine("|=====================================================================|");
                 Console.WriteLine("|===                  Veuillez inserer un chiffre                  ===|");
+
             }
             else
             {
@@ -84,144 +89,166 @@ namespace Easysave.Views
 
         }
 
-        public static void ShowSaveMenu(int step, string type)
+        public void ShowSaveMenu()
         {
-            string lang = "";
+            ViewModel viewmodel = new ViewModel();
 
             Console.Clear();
 
-            if (type == "")
+            string lang = "";
+            string type = "";
+            string saveName = "";
+            string sourcePath = "";
+            int Id = 0;
+
+
+            if (lang == "fr")
             {
-                if (lang == "fr")
-                {
-                    Console.WriteLine("==== Etape 1");
-                    Console.WriteLine("==== Veuillez saisir le type de sauvegarde");
-                    Console.WriteLine("==== [1] Complete");
-                    Console.WriteLine("==== [2] Différentielle");
-                }
-                else
-                {
-                    Console.WriteLine("==== Step 1");
-                    Console.WriteLine("==== Please enter the type of backup");
-                    Console.WriteLine("==== [1] Full");
-                    Console.WriteLine("==== [2] Differential");
-                }
+                Console.WriteLine("==== Veuillez saisir le type de sauvegarde");
+                Console.WriteLine("==== [1] Complete");
+                Console.WriteLine("==== [2] Différentielle");
             }
             else
             {
-                if (type == "full")
+                Console.WriteLine("==== Please enter the type of backup");
+                Console.WriteLine("==== [1] Full");
+                Console.WriteLine("==== [2] Differential");
+            }
+
+            type = Console.ReadLine();
+
+
+            if (type == "1")
+            {
+                if (lang == "fr")
                 {
-                    switch (step)
-                    {
-                        case 1: // Save name
-                            if (lang == "fr")
-                            {
-                                Console.WriteLine("==== Etape 2 sur 3");
-                                Console.WriteLine("==== Veuillez saisir le nom de la sauvegarde :");
-                            }
-                            else
-                            {
-                                Console.WriteLine("==== Step 2 of 3");
-                                Console.WriteLine("==== Please enter the name of the backup :");
-                            }
-                            break;
 
-                        case 2: // Save source path
-                            if (lang == "fr")
-                            {
-                                Console.WriteLine("==== Etape 3 sur 3");
-                                Console.WriteLine("==== Veuillez saisir le chemin source des fichiers :");
-                            }
-                            else
-                            {
-                                Console.WriteLine("==== Step 3 of 3");
-                                Console.WriteLine("==== Please enter the source path of the files :");
-                            }
-                            break;
+                    Console.WriteLine("==== Etape 2 sur 3");
+                    Console.WriteLine("==== Veuillez saisir le nom de la sauvegarde :");
+                    saveName = Console.ReadLine();
 
-                        default:
-                            Console.WriteLine("Error : Unrecognized step");
-                            break;
-                    }
+
+                    Console.WriteLine("==== Etape 3 sur 3");
+                    Console.WriteLine("==== Veuillez saisir le chemin source du fichier :");
+                    sourcePath = Console.ReadLine();
+
                 }
-                else // differential backup
+                else
                 {
-                    switch (step)
-                    {
-                        case 1: // select save
-                            if (lang == "fr")
-                            {
-                                Console.WriteLine("==== Etape 2 sur 3");
-                                Console.WriteLine("==== Veuillez selectionner la sauvegarde a modifier :");
-                            }
-                            else
-                            {
-                                Console.WriteLine("==== Step 2 of 3");
-                                Console.WriteLine("==== Please select the save to be changed :");
-                            }
-                            ShowSaveList();
-                            break;
-                        case 2: // Save source path
-                            if (lang == "fr")
-                            {
-                                Console.WriteLine("==== Etape 3 sur 3");
-                                Console.WriteLine("==== Veuillez saisir le chemin source des fichiers :");
-                            }
-                            else
-                            {
-                                Console.WriteLine("==== Step 3 of 3");
-                                Console.WriteLine("==== Please enter the source path of the files :");
-                            }
-                            break;
 
-                        default:
-                            Console.WriteLine("Error : Unrecognized step");
-                            break;
-                    }
+                    Console.WriteLine("==== Step 2 of 3");
+                    Console.WriteLine("==== Please enter the name of the backup :");
+                    saveName = Console.ReadLine();
+
+                    Console.WriteLine("==== Step 3 of 3");
+                    Console.WriteLine("==== Please enter the source path of the files :");
+                    sourcePath = Console.ReadLine();
                 }
+
+               
+
+               DataState inputObj = new DataState(Id)
+                {
+                    SaveName = saveName,
+                    SourcePath = sourcePath,
+                    Type = type,
+
+                };
+
+                viewmodel.InitializeSave(inputObj);
+
+            }
+            else // differential backup
+            {
+
+                if (lang == "fr")
+                {
+                    Console.WriteLine("==== Etape 2 sur 3");
+                    Console.WriteLine("==== Veuillez selectionner une sauvegarde :");
+                }
+                else
+                {
+                    Console.WriteLine("==== Step 2 of 3");
+                    Console.WriteLine("==== Please select a save  :");
+                }
+                ShowSaveList();
+
+                if (lang == "fr")
+                {
+                    Console.WriteLine("==== Etape 3 sur 3");
+                    Console.WriteLine("==== Veuillez saisir le chemin source des fichiers :");
+                    sourcePath = Console.ReadLine();
+                }
+                else
+                {
+                    Console.WriteLine("==== Step 3 of 3");
+                    Console.WriteLine("==== Please enter the source path of the files :");
+                    sourcePath = Console.ReadLine();
+                }
+
+                object inputObj = new
+                {
+                    sourcePath = sourcePath
+                };
 
             }
         }
 
-        public static void ShowDeleteMenu(int step)
+    
+
+        public void ShowDeleteMenu()
         {
+
+            ViewModel viewmodel = new ViewModel();
+
             string lang = "";
+            int userChoice = 0;
+            string userConfirm = "";
 
             Console.Clear();
 
-            switch (step)
+            if (lang == "fr")
             {
-                case 1:
-                    if (lang == "fr")
-                    {
-                        Console.WriteLine("==== Etape 1 sur 2");
-                        Console.WriteLine("==== Veuillez selectionner la sauvegarde a supprimer");
-                    }
-                    else
-                    {
-                        Console.WriteLine("==== Step 1 of 2");
-                        Console.WriteLine("==== Please select the save to delete");
-                    }
-                    ShowSaveList();
-                    break;
-                case 2:
-                    if (lang == "fr")
-                    {
-                        Console.WriteLine("==== Etape 2 sur 2");
-                        Console.WriteLine("==== Êtes-vous sûr de vouloir supprimer cette sauvegarde ? (O / N)");
-                    }
-                    else
-                    {
-                        Console.WriteLine("==== Step 1 of 2");
-                        Console.WriteLine("==== Are you sure you want to delete this backup ? (Y / N)");
-                    }
-                    break;
-
-                default:
-                    Console.WriteLine("Error : Unrecognized step");
-                    break;
+                Console.WriteLine("==== Etape 1 sur 2");
+                Console.WriteLine("==== Veuillez selectionner la sauvegarde a supprimer");
+            }
+            else
+            {
+                Console.WriteLine("==== Step 1 of 2");
+                Console.WriteLine("==== Please select the save to delete");
             }
 
+            ShowSaveList();
+            userChoice = Console.Read();
+
+            if (lang == "fr")
+            {
+                Console.WriteLine("==== Etape 2 sur 2");
+                Console.WriteLine("==== Êtes-vous sûr de vouloir supprimer cette sauvegarde ? (O / N)");
+            }
+            else
+            {
+                Console.WriteLine("==== Step 1 of 2");
+                Console.WriteLine("==== Are you sure you want to delete this backup ? (Y / N)");
+            }
+
+            userConfirm = Console.ReadLine();
+            if(userConfirm == "O" ||  userConfirm == "Y")
+            {
+                viewmodel.deleteSave(userChoice);
+            }
+            else if(userConfirm == "N")
+            {
+                switch (lang)
+                {
+                    case "fr":
+                        Console.WriteLine("Suppression annulée !");
+                        break;
+                    case "eng":
+                         Console.WriteLine("Deletion canceled !");
+                        break;
+                }
+            }
         }
 
     }

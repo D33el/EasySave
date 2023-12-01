@@ -33,8 +33,9 @@ namespace Easysave
             
             {
                 Navigation.ShowFirstLaunchMenu();
-                var parametersInput = view.GetParametersInput(true);
-                Config.SaveConfig(parametersInput);
+                DataConfig data = view.GetParametersInput(false);
+                configObj.DataConfig = data;
+                configObj.SaveConfig();
             }
         }
     }
