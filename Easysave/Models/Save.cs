@@ -13,12 +13,12 @@ namespace Easysave.Models
         public string Type { get; set; } 
         public DataState DataState { get; set; }
 
+        Config configObj = Config.getConfig();
 
         public Save() { }
 
         public void CreateSave() // Ajouter un paramètre (objet)
         {
-            Config configObj = Config.getConfig();
             try
             {
                 // Combine the saveSourcePath and saveName to get the full path of the save folder
@@ -59,10 +59,11 @@ namespace Easysave.Models
 
         public void DeleteSave(int saveId) // Ajouter un paramètre (id)
         {
+                
             try
             {
-                // Combine the saveSourcePath and saveName to get the full path of the save file
-                string saveFilePath = Path.Combine(SaveSourcePath, SaveName);
+                // Combine the TargetPath and saveName to get the full path of the save file
+                string saveFilePath = Path.Combine(configObj.TargetDir, SaveName);
 
                 // Check if the file exists before attempting to delete it
                 if (File.Exists(saveFilePath))
@@ -80,7 +81,7 @@ namespace Easysave.Models
             {
                 // Handle exceptions, e.g., if there are permission issues
                 Console.WriteLine($"Error deleting save file '{SaveName}': {ex.Message}");
-            }
+            }           
         }
 
         public string[] GetSaveProgress()
