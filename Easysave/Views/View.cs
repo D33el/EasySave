@@ -18,13 +18,14 @@ namespace Easysave.Views
             DataState[] resultArr = viewModel.GetSavelist();
 
             foreach (var result in resultArr)
-            {     
+            {
                 Console.WriteLine($"==== [{result.SaveId}] {result.SaveName}  {result.Time} ====");
             }
         }
         public void ShowSaveError() { }
         public void ShowSaveProgress() { }
-        public void GetSaveInput() {
+        public void GetSaveInput()
+        {
             // formulaire de sauvegarde 
         }
         public DataConfig GetParametersInput(bool isFirstTime, int step)
@@ -41,7 +42,7 @@ namespace Easysave.Views
                 Console.WriteLine("|===               Paramétrage initial / Initial Setup               ===|");
                 Console.WriteLine("|=======================================================================|");
                 Console.WriteLine("");
-                
+
                 Console.WriteLine("|=======================================================================|");
                 Console.WriteLine("|===            Veuillez choisir une langue [eng / fr]               ===|");
                 Console.WriteLine("|===                 Choose a language [eng / fr]                    ===|");
@@ -72,7 +73,7 @@ namespace Easysave.Views
                 lang = selectedLang;
                 targetDir = configObj.TargetDir;
                 saveStateDir = configObj.SaveStateDir;
-                saveLogDir= configObj.SaveLogDir;
+                saveLogDir = configObj.SaveLogDir;
 
 
                 switch (step)
@@ -89,8 +90,8 @@ namespace Easysave.Views
                             Console.WriteLine("|===                 Choose a language [eng / fr]                  ===|");
                         }
                         lang = Console.ReadLine();
-                        break; 
-                    
+                        break;
+
                     case 2:
                         if (selectedLang == "fr")
                         {
@@ -105,7 +106,7 @@ namespace Easysave.Views
 
                         targetDir = Console.ReadLine();
                         break;
-                       
+
                     case 3:
                         if (selectedLang == "fr")
                         {
@@ -119,7 +120,7 @@ namespace Easysave.Views
                         }
                         saveLogDir = Console.ReadLine();
                         break;
-                        
+
                     case 4:
                         if (selectedLang == "fr")
                         {
@@ -134,8 +135,8 @@ namespace Easysave.Views
                         saveStateDir = Console.ReadLine();
                         break;
                 }
-                
-                
+
+
             }
 
             DataConfig inputObj = new DataConfig();
@@ -145,7 +146,7 @@ namespace Easysave.Views
             inputObj.SaveLogDir = saveLogDir;
 
             return inputObj;
-            
+
         }
 
         public bool ValidateInput(string inputType, string input)
