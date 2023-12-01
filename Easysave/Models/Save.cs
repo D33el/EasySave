@@ -4,13 +4,13 @@ using Easysave.ViewModels;
 
 namespace Easysave.Models
 {
-    public class Save 
+    public class Save
     {
         public string SaveId;
         public string SaveName { get; set; }
         public string SaveSourcePath { get; set; }
         public int SaveFilesNumber { get; set; }
-        public string Type { get; set; } 
+        public string Type { get; set; }
         public DataState DataState { get; set; }
 
         Config configObj = Config.getConfig();
@@ -19,8 +19,6 @@ namespace Easysave.Models
 
         public void CreateSave()
         {
-            Config configObj = Config.getConfig();
-
             try
             {
                 string saveFolderPath = Path.Combine(configObj.TargetDir, SaveName);
@@ -33,10 +31,9 @@ namespace Easysave.Models
                         Console.WriteLine($"Dossier de sauvegarde '{SaveName}' créé avec succès.");
                     }
 
-                    
-                    if (Type.Equals("complete", StringComparison.OrdinalIgnoreCase))
+
+                    if (Type == "full")
                     {
-                        
                         string[] filesToCopy = Directory.GetFiles(SaveSourcePath);
                         foreach (string file in filesToCopy)
                         {
@@ -45,16 +42,16 @@ namespace Easysave.Models
                         }
                         Console.WriteLine($"Sauvegarde complète '{SaveName}' créée avec succès.");
                     }
-                    else if (Type.Equals("differential", StringComparison.OrdinalIgnoreCase))
+                    else if (Type == "differential")
                     {
-                       
+
                         string[] destinationFiles = Directory.GetFiles(saveFolderPath);
                         string[] sourceFiles = Directory.GetFiles(SaveSourcePath);
 
-                        
-                        var newModifiedFiles = DetermineNewOrModifiedFiles(sourceFiles, destinationFiles);
 
-                        
+                        string[] newModifiedFiles = CompareFiles(sourceFiles, destinationFiles, saveFolderPath);
+
+
                         foreach (string file in newModifiedFiles)
                         {
                             string destinationFile = Path.Combine(saveFolderPath, Path.GetFileName(file));
@@ -83,7 +80,7 @@ namespace Easysave.Models
 
         public void DeleteSave(int saveId) // Ajouter un paramètre (id)
         {
-                
+
             try
             {
                 // Combine the TargetPath and saveName to get the full path of the save file
@@ -105,7 +102,7 @@ namespace Easysave.Models
             {
                 // Handle exceptions, e.g., if there are permission issues
                 Console.WriteLine($"Error deleting save file '{SaveName}': {ex.Message}");
-            }           
+            }
         }
 
         public string[] GetSaveProgress()
@@ -141,6 +138,26 @@ namespace Easysave.Models
                 Console.WriteLine($"Error getting file names for save '{SaveName}': {ex.Message}");
                 return Array.Empty<string>();
             }
+        }
+
+        private string[] CompareFiles(string[] sourceFiles, string[] destinationFiles, string saveFolderPath)
+        {
+            List<string> newModifiedFiles = new List<string>();
+
+            foreach (string sourceFile in sourceFiles)
+            {
+                string sourceFileName = Path.GetFileName(sourceFile);
+
+                foreach (var destinationFile in destinationFiles)
+                {
+                    string destinationFileName = Path.GetFileName(sourceFile);
+                    if (sourceFileName != destinationFileName || File.GetLastWriteTimeUtc(sourceFile) > File.GetLastWriteTimeUtc(destinationFile))
+                    {
+                        newModifiedFiles.Add(sourceFile);
+                    }
+                }
+            }
+            return newModifiedFiles.ToArray();
         }
     }
 }
