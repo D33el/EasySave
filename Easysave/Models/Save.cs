@@ -17,45 +17,69 @@ namespace Easysave.Models
 
         public Save() { }
 
-        public void CreateSave() // Ajouter un paramètre (objet)
+        public void CreateSave()
         {
+            Config configObj = Config.getConfig();
+
             try
             {
-                // Combine the saveSourcePath and saveName to get the full path of the save folder
                 string saveFolderPath = Path.Combine(configObj.TargetDir, SaveName);
-                
 
-                // Check if the source directory exists before creating a save
                 if (Directory.Exists(SaveSourcePath))
                 {
-                    // Check if the destination directory exists; if not, create it
                     if (!Directory.Exists(saveFolderPath))
                     {
                         Directory.CreateDirectory(saveFolderPath);
-                        Console.WriteLine($"Save folder '{SaveName}' created successfully.");
+                        Console.WriteLine($"Dossier de sauvegarde '{SaveName}' créé avec succès.");
                     }
 
-                    // Copy files from the source directory to the destination directory
-                    string[] filesToCopy = Directory.GetFiles(SaveSourcePath);
-                    foreach (string file in filesToCopy)
+                    
+                    if (Type.Equals("complete", StringComparison.OrdinalIgnoreCase))
                     {
-                        string destinationFile = Path.Combine(saveFolderPath, Path.GetFileName(file));
-                        File.Copy(file, destinationFile, true);
+                        
+                        string[] filesToCopy = Directory.GetFiles(SaveSourcePath);
+                        foreach (string file in filesToCopy)
+                        {
+                            string destinationFile = Path.Combine(saveFolderPath, Path.GetFileName(file));
+                            File.Copy(file, destinationFile, true);
+                        }
+                        Console.WriteLine($"Sauvegarde complète '{SaveName}' créée avec succès.");
+                    }
+                    else if (Type.Equals("differential", StringComparison.OrdinalIgnoreCase))
+                    {
+                       
+                        string[] destinationFiles = Directory.GetFiles(saveFolderPath);
+                        string[] sourceFiles = Directory.GetFiles(SaveSourcePath);
+
+                        
+                        var newModifiedFiles = DetermineNewOrModifiedFiles(sourceFiles, destinationFiles);
+
+                        
+                        foreach (string file in newModifiedFiles)
+                        {
+                            string destinationFile = Path.Combine(saveFolderPath, Path.GetFileName(file));
+                            File.Copy(file, destinationFile, true);
+                        }
+                        Console.WriteLine($"Sauvegarde différentielle '{SaveName}' créée avec succès.");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Type de sauvegarde invalide '{Type}'.");
                     }
 
-                    Console.WriteLine($"Save '{SaveName}' created successfully.");
+                    Console.WriteLine($"Sauvegarde '{SaveName}' créée avec succès.");
                 }
                 else
                 {
-                    Console.WriteLine($"Source directory '{SaveSourcePath}' not found.");
+                    Console.WriteLine($"Répertoire source '{SaveSourcePath}' introuvable.");
                 }
             }
             catch (Exception ex)
             {
-                // Handle exceptions, e.g., if there are permission issues
-                Console.WriteLine($"Error creating save '{SaveName}': {ex.Message}");
+                Console.WriteLine($"Erreur lors de la création de la sauvegarde '{SaveName}': {ex.Message}");
             }
         }
+
 
         public void DeleteSave(int saveId) // Ajouter un paramètre (id)
         {
