@@ -15,7 +15,7 @@ namespace Easysave.Models
         public string TargetPath { get; set; }
         public int FilesNumber { get; set; }
         public long FilesSize { get; set; }
-        public float Progress { get; set; }
+        public double Progress { get; set; }
         public long RemainingFiles { get; set; }
         public long RemainingFilesSize { get; set; }
 
