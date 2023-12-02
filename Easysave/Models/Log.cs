@@ -4,7 +4,7 @@ using Easysave.ViewModels;
 
 namespace Easysave.Models
 {
-    public class Log
+    public sealed class Log
     {
         private readonly string ProjectDir = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
         private Config configObj = Config.getConfig();
