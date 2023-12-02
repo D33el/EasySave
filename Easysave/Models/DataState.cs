@@ -19,9 +19,9 @@ namespace Easysave.Models
         public long RemainingFiles { get; set; }
         public long RemainingFilesSize { get; set; }
 
-        public DataState(int saveId)
+        public DataState()
         {
-            SaveId = saveId;
+
         }
     }
 }
