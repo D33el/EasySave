@@ -14,6 +14,7 @@ namespace Easysave.ViewModels
         Save save = new Save();
         State state = new State();
         Config configObj = Config.getConfig();
+        Log logObj = Log.getLog();
 
         public ViewModel()
         {
@@ -26,7 +27,7 @@ namespace Easysave.ViewModels
             {
                 DataState[] saveArr = GetSavelist();
                 int MaxId = 0;
-                
+
                 foreach (var item in saveArr)
                 {
                     if (item.SaveId > MaxId)
@@ -104,18 +105,18 @@ namespace Easysave.ViewModels
             switch (page)
             {
                 case 1: // Show the saves
-                    if (saveNumber == 0) { Console.ForegroundColor = ConsoleColor.Red;  if (lang == "en") { Console.Clear(); Console.WriteLine(" No backup available !"); } else { Console.Clear();  Console.WriteLine(" Aucune sauvegarde disponible !"); } } else {  navigation.ShowSaveList(); }
+                    if (saveNumber == 0) { Console.ForegroundColor = ConsoleColor.Red; if (lang == "en") { Console.Clear(); Console.WriteLine(" No backup available !"); } else { Console.Clear(); Console.WriteLine(" Aucune sauvegarde disponible !"); } } else { navigation.ShowSaveList(); }
                     Console.ForegroundColor = ConsoleColor.White;
                     navigation.ShowMainMenu();
                     break;
                 case 2: // Create a new save
-                    if(saveNumber < 5) { navigation.ShowSaveMenu(); } else { Console.ForegroundColor = ConsoleColor.Red; if (lang == "en") { Console.Clear(); Console.WriteLine(" Error. There are 5 saves!"); } else { Console.Clear(); Console.WriteLine(" Erreur. Il existe 5 sauvegardes !"); }}
+                    if (saveNumber < 5) { navigation.ShowSaveMenu(); } else { Console.ForegroundColor = ConsoleColor.Red; if (lang == "en") { Console.Clear(); Console.WriteLine(" Error. There are 5 saves!"); } else { Console.Clear(); Console.WriteLine(" Erreur. Il existe 5 sauvegardes !"); } }
                     Console.ForegroundColor = ConsoleColor.White;
                     navigation.ShowMainMenu();
                     break;
 
                 case 3: // Delete a save
-                    if(saveNumber == 0) { if (lang == "en") { Console.Clear(); Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine(" No backup available !"); } else { Console.Clear(); Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine(" Aucune sauvegarde disponible !"); } } else { navigation.ShowDeleteMenu(); }
+                    if (saveNumber == 0) { if (lang == "en") { Console.Clear(); Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine(" No backup available !"); } else { Console.Clear(); Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine(" Aucune sauvegarde disponible !"); } } else { navigation.ShowDeleteMenu(); }
                     Console.ForegroundColor = ConsoleColor.White;
                     navigation.ShowMainMenu();
                     break;
@@ -138,6 +139,8 @@ namespace Easysave.ViewModels
                     break;
 
                 case 5: // Exit
+                    FileInfo file = new(logObj.LogFilePath);
+                    if (file.Length <= 30) { file.Delete(); }
                     Environment.Exit(0);
                     break;
 
