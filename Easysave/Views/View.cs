@@ -15,6 +15,7 @@ namespace Easysave.Views
         }
         public void ShowSaveList()
         {
+            Console.ForegroundColor = ConsoleColor.Green;
             DataState[] resultArr = viewModel.GetSavelist();
 
             foreach (var result in resultArr)

@@ -66,7 +66,7 @@ namespace Easysave.Views
         public void ShowMainMenu()
         {
             ViewModel viewmodel = new ViewModel();
-
+            Console.ForegroundColor = ConsoleColor.White;
             string lang = ConfigObj.Language;
             Console.WriteLine();
             Console.WriteLine();
@@ -111,8 +111,9 @@ namespace Easysave.Views
         public void ShowSaveMenu()
         {
             ViewModel viewmodel = new ViewModel();
-
             string lang = ConfigObj.Language;
+
+            int res = viewmodel.checkSavesNumber();
 
             Console.Clear();
 
@@ -126,17 +127,23 @@ namespace Easysave.Views
             {
                 Console.WriteLine("==== Veuillez saisir le type de sauvegarde");
                 Console.WriteLine("==== [1] Complete");
-                Console.WriteLine("==== [2] Différentielle");
+                if(res !=  0)
+                {
+                    Console.WriteLine("==== [2] Différentielle");
+                }
             }
             else
             {
                 Console.WriteLine("==== Please enter the type of backup");
                 Console.WriteLine("==== [1] Full");
-                Console.WriteLine("==== [2] Differential");
+                if (res != 0)
+                {
+                    Console.WriteLine("==== [2] Differential");
+                }
             }
 
             type = Console.ReadLine();
-            if (type == "1") { type = "full"; } else { type = "diff"; };
+            if (type == "1") { type = "full"; } else if (type == "2" && res != 0) { type = "diff"; } else { type = "autre"; }
 
             if (type == "full")
             {
@@ -178,8 +185,10 @@ namespace Easysave.Views
                 viewmodel.InitializeSave(inputObj);
 
             }
-            else // differential backup
+            else if(type == "diff")// differential backup
             {
+
+            
 
                 if (lang == "fr")
                 {
@@ -192,6 +201,9 @@ namespace Easysave.Views
                     Console.WriteLine("==== Please select a save  :");
                 }
                 ShowSaveList();
+                Console.ForegroundColor = ConsoleColor.White;
+                Id = int.Parse(Console.ReadLine());
+                DataState saveInfo = viewmodel.GetSaveInfo(Id);
 
                 if (lang == "fr")
                 {
@@ -206,11 +218,27 @@ namespace Easysave.Views
                     sourcePath = Console.ReadLine();
                 }
 
-                object inputObj = new
+                DataState inputObj = new DataState()
                 {
-                    sourcePath = sourcePath
+                    SaveId = saveInfo.SaveId,
+                    SaveName = saveInfo.SaveName,
+                    SourcePath = sourcePath,
+                    Type = type
                 };
 
+                viewmodel.InitializeSave(inputObj);
+
+
+
+            }
+            else
+            {
+                Console.Clear();
+                Console.ForegroundColor = ConsoleColor.Red;
+                if (lang == "fr") { Console.WriteLine("Veuillez resaisir votre choix !"); } else { Console.WriteLine("Please re-enter your choice!"); }
+                Thread.Sleep(3000);
+                Console.ForegroundColor= ConsoleColor.White;
+                ShowSaveMenu();
             }
         }
 
