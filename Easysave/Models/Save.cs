@@ -7,12 +7,14 @@ namespace Easysave.Models
 {
     public class Save
     {
-        public string SaveId;
+        public int SaveId;
         public string SaveName { get; set; }
         public string SaveSourcePath { get; set; }
         public int SaveFilesNumber { get; set; }
         public string Type { get; set; }
-        public DataState DataState { get; set; }
+
+        private DataState saveDataState = new();
+
 
         Config configObj = Config.getConfig();
 
@@ -20,11 +22,19 @@ namespace Easysave.Models
 
         public void CreateSave()
         {
+            string saveFolderPath = Path.Combine(configObj.TargetDir, SaveName);
             string lang = configObj.Language;
+            saveDataState.SaveId = SaveId;
+            saveDataState.SaveName = SaveName;
+            saveDataState.Time = DateTime.Now.ToString("dd-MM-yyyy HH:mm:ss");
+            saveDataState.SourcePath = SaveSourcePath;
+            saveDataState.TargetPath = saveFolderPath;
+            saveDataState.Type = Type;
+            saveDataState.FilesSize = DirSize(new DirectoryInfo(SaveSourcePath));
+            saveDataState.FilesNumber = Directory.GetFiles(SaveSourcePath).Length;
+
             try
             {
-                string saveFolderPath = Path.Combine(configObj.TargetDir, SaveName);
-
                 if (Directory.Exists(SaveSourcePath))
                 {
                     if (!Directory.Exists(saveFolderPath))
@@ -34,11 +44,18 @@ namespace Easysave.Models
                     if (Type == "full")
                     {
                         string[] filesToCopy = Directory.GetFiles(SaveSourcePath);
+                        saveDataState.FilesNumber = filesToCopy.Length;
                         foreach (string file in filesToCopy)
                         {
                             string destinationFile = Path.Combine(saveFolderPath, Path.GetFileName(file));
                             File.Copy(file, destinationFile, true);
                         }
+                        // Updating state.json file by adding a new entry
+                        State stateObj = new State
+                        {
+                            DataState = saveDataState
+                        };
+                        stateObj.CreateState();
                     }
                     else if (Type == "diff")
                     {
@@ -51,15 +68,23 @@ namespace Easysave.Models
                             string destinationFile = Path.Combine(saveFolderPath, Path.GetFileName(file));
                             File.Copy(file, destinationFile, true);
                         }
+                        // Updating state.json file by adding a new entry
+                        State stateObj = new State
+                        {
+                            DataState = saveDataState
+                        };
+                        stateObj.UpdateState();
                     }
                     if (lang == "fr")
                     {
-                    Console.WriteLine($"Sauvegarde '{SaveName}' créée avec succès.");
+                        Console.WriteLine($"Sauvegarde '{SaveName}' créée avec succès.");
                     }
                     else
                     {
-                    Console.WriteLine($"Backup '{SaveName}' created with success.");
+                        Console.WriteLine($"Backup '{SaveName}' created with success.");
                     }
+
+                    
                 }
                 else
                 {
@@ -75,35 +100,82 @@ namespace Easysave.Models
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Erreur lors de la création de la sauvegarde '{SaveName}': {ex.Message}");
+                if (lang == "fr")
+                {
+                    Console.WriteLine($"Erreur lors de la création de la sauvegarde '{SaveName}': {ex.Message}");
+                }
+                else
+                {
+                    Console.WriteLine($"Error creating '{SaveName}' backup : {ex.Message}");
+                }
+
             }
         }
 
 
-        public void DeleteSave(int saveId) // Ajouter un paramètre (id)
+        public void DeleteSave()
         {
-
+            string lang = configObj.Language;
             try
             {
                 // Combine the TargetPath and saveName to get the full path of the save file
                 string saveFilePath = Path.Combine(configObj.TargetDir, SaveName);
 
-                // Check if the file exists before attempting to delete it
-                if (File.Exists(saveFilePath))
+                // Check if the directory exists before attempting to delete it
+                if (Directory.Exists(saveFilePath))
                 {
-                    // Delete the save file
-                    File.Delete(saveFilePath);
-                    Console.WriteLine($"Save file '{SaveName}' deleted successfully.");
+                    // Empty the directory before deleting it
+                    string[] files = Directory.GetFiles(saveFilePath);
+
+                    foreach (string file in files)
+                    {
+                        File.Delete(file);
+                        Console.WriteLine($"Deleted file: {file}");
+                    }
+
+                    // Delete the save directory
+                    Directory.Delete(saveFilePath);
+
+                    // Updating state.json file
+
+                    saveDataState.SaveId = SaveId;
+                    State stateObj = new()
+                    {
+                        DataState = saveDataState
+                    };
+                    stateObj.DeleteState();
+
+                    if (lang == "fr")
+                    {
+                        Console.WriteLine($"Sauvegarde '{SaveName}' supprimée avec succés");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Backup '{SaveName}' deleted successfully.");
+                    }
                 }
                 else
                 {
-                    Console.WriteLine($"Save file '{SaveName}' not found.");
+                    if (lang == "fr")
+                    {
+                        Console.WriteLine($"Sauvegarde '{SaveName}' introuvable.");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Backup '{SaveName}' not found");
+                    }
                 }
             }
             catch (Exception ex)
             {
-                // Handle exceptions, e.g., if there are permission issues
-                Console.WriteLine($"Error deleting save file '{SaveName}': {ex.Message}");
+                if (lang == "fr")
+                {
+                    Console.WriteLine($"Erreur lors de la suppression de '{SaveName}': {ex.Message}");
+                }
+                else
+                {
+                    Console.WriteLine($"Error deleting save file '{SaveName}': {ex.Message}");
+                }
             }
         }
 
@@ -153,35 +225,6 @@ namespace Easysave.Models
 }
 
 
-        public string[] GetFileNames()
-        {
-            try
-            {
-                // Combine the saveSourcePath and saveName to get the full path of the save folder
-                string saveFolderPath = Path.Combine(SaveSourcePath, SaveName);
-
-                // Check if the directory exists
-                if (Directory.Exists(saveFolderPath))
-                {
-                    // Get the names of all files in the save folder
-                    string[] fileNames = Directory.GetFiles(saveFolderPath).Select(Path.GetFileName).ToArray();
-
-                    return fileNames;
-                }
-                else
-                {
-                    Console.WriteLine($"Save folder '{SaveName}' not found.");
-                    return Array.Empty<string>();
-                }
-            }
-            catch (Exception ex)
-            {
-                // Handle exceptions, e.g., if there are permission issues
-                Console.WriteLine($"Error getting file names for save '{SaveName}': {ex.Message}");
-                return Array.Empty<string>();
-            }
-        }
-
         private string[] CompareFiles(string[] sourceFiles, string[] destinationFiles, string saveFolderPath)
         {
             List<string> newModifiedFiles = new List<string>();
@@ -200,6 +243,24 @@ namespace Easysave.Models
                 }
             }
             return newModifiedFiles.ToArray();
+        }
+
+        private static long DirSize(DirectoryInfo d)
+        {
+            long size = 0;
+            // Add file sizes.
+            FileInfo[] fis = d.GetFiles();
+            foreach (FileInfo fi in fis)
+            {
+                size += fi.Length;
+            }
+            // Add subdirectory sizes.
+            DirectoryInfo[] dis = d.GetDirectories();
+            foreach (DirectoryInfo di in dis)
+            {
+                size += DirSize(di);
+            }
+            return size;
         }
     }
 }
