@@ -19,7 +19,6 @@ namespace Easysave.Views
             Console.WriteLine("|===  Configurez l'application avant de commencer les sauvegardes  ===|");
             Console.WriteLine("|===             Setup the app before starting backups             ===|");
             Console.WriteLine("|=====================================================================|");
-
         }
 
         public int ShowParameters()
@@ -236,7 +235,7 @@ namespace Easysave.Views
                 Console.Clear();
                 Console.ForegroundColor = ConsoleColor.Red;
                 if (lang == "fr") { Console.WriteLine("Veuillez resaisir votre choix !"); } else { Console.WriteLine("Please re-enter your choice!"); }
-                Thread.Sleep(3000);
+                Thread.Sleep(1500);
                 Console.ForegroundColor= ConsoleColor.White;
                 ShowSaveMenu();
             }
