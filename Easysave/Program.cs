@@ -15,21 +15,20 @@ namespace Easysave
         public static void Main(string[] args)
         {
             Config configObj = Config.getConfig();
+            Log logObg = Log.getLog();
+
             View view = new View();
-            State state = new State();
             Navigation navigation = new Navigation();
-            ViewModel viewmodel  = new ViewModel();
+
+            logObg.CreateLogFile();
 
             bool configExists = configObj.checkConfig();
 
             if (configExists)
             {
                 navigation.ShowMainMenu();
-
             }
-
             else
-            
             {
                 Navigation.ShowFirstLaunchMenu();
                 DataConfig data = view.GetParametersInput(false, 0);
@@ -39,10 +38,3 @@ namespace Easysave
         }
     }
 }
-
-
-
-
-
-
-
