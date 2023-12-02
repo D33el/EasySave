@@ -260,14 +260,12 @@ namespace Easysave.Views
             }
             else if (userConfirm.Key == ConsoleKey.N)
             {
-                switch (lang)
+                if (lang == "fr")
                 {
-                    case "fr":
-                        Console.WriteLine("Suppression annulée !");
-                        break;
-                    case "eng":
-                        Console.WriteLine("Deletion canceled !");
-                        break;
+                    Console.WriteLine("Suppression annulée");
+                } else
+                {
+                    Console.WriteLine("deletion canceled");
                 }
             }
 
