@@ -5,7 +5,7 @@ namespace Easysave.Views
 {
     public class Navigation : View
     {
-
+        Config ConfigObj = Config.getConfig();
 
 
         public static void ShowFirstLaunchMenu()
@@ -19,12 +19,11 @@ namespace Easysave.Views
             Console.WriteLine("|===  Configurez l'application avant de commencer les sauvegardes  ===|");
             Console.WriteLine("|===             Setup the app before starting backups             ===|");
             Console.WriteLine("|=====================================================================|");
-            
+
         }
 
         public int ShowParameters()
         {
-            Config ConfigObj = Config.getConfig();
             string lang = ConfigObj.Language;
 
             Console.Clear();
@@ -67,11 +66,13 @@ namespace Easysave.Views
         public void ShowMainMenu()
         {
             ViewModel viewmodel = new ViewModel();
-            Config ConfigObj = Config.getConfig();
 
             string lang = ConfigObj.Language;
-
-            Console.Clear();
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine("|=====================================================================|");
+            Console.WriteLine();
+            Console.WriteLine();
 
             if (lang == "fr")
             {
@@ -110,7 +111,6 @@ namespace Easysave.Views
         public void ShowSaveMenu()
         {
             ViewModel viewmodel = new ViewModel();
-            Config ConfigObj = Config.getConfig();
 
             string lang = ConfigObj.Language;
 
@@ -136,9 +136,9 @@ namespace Easysave.Views
             }
 
             type = Console.ReadLine();
+            if (type == "1") { type = "full"; } else { type = "diff"; };
 
-
-            if (type == "1")
+            if (type == "full")
             {
                 if (lang == "fr")
                 {
@@ -165,14 +165,14 @@ namespace Easysave.Views
                     sourcePath = Console.ReadLine();
                 }
 
-               
 
-               DataState inputObj = new DataState(Id)
+
+                DataState inputObj = new DataState()
                 {
+                    SaveId = Id,
                     SaveName = saveName,
                     SourcePath = sourcePath,
                     Type = type,
-
                 };
 
                 viewmodel.InitializeSave(inputObj);
@@ -214,13 +214,12 @@ namespace Easysave.Views
             }
         }
 
-    
+
 
         public void ShowDeleteMenu()
         {
 
             ViewModel viewmodel = new ViewModel();
-            Config ConfigObj = Config.getConfig();
             string lang = ConfigObj.Language;
 
             int userChoice = 0;
@@ -255,11 +254,11 @@ namespace Easysave.Views
 
             userConfirm = Console.ReadKey();
 
-            if(userConfirm.Key == ConsoleKey.Y ||  userConfirm.Key == ConsoleKey.O)
+            if (userConfirm.Key == ConsoleKey.Y || userConfirm.Key == ConsoleKey.O)
             {
-                viewmodel.deleteSave(userChoice);
+                viewmodel.InitializeDeleteSave(userChoice);
             }
-            else if(userConfirm.Key == ConsoleKey.N)
+            else if (userConfirm.Key == ConsoleKey.N)
             {
                 switch (lang)
                 {
@@ -267,7 +266,7 @@ namespace Easysave.Views
                         Console.WriteLine("Suppression annulée !");
                         break;
                     case "eng":
-                         Console.WriteLine("Deletion canceled !");
+                        Console.WriteLine("Deletion canceled !");
                         break;
                 }
             }

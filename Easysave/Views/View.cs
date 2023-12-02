@@ -19,10 +19,12 @@ namespace Easysave.Views
 
             foreach (var result in resultArr)
             {
-                Console.WriteLine($"==== [{result.SaveId}] {result.SaveName}  {result.Time} ====");
+                Console.WriteLine($"|==== [{result.SaveId}] {result.SaveName}  {result.Time}");
             }
         }
-        public void ShowSaveError() { }
+        public void ShowSaveError()
+        {
+        }
         public void ShowSaveProgress() { }
         public void GetSaveInput()
         {
