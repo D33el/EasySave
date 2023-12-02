@@ -1,5 +1,6 @@
-﻿using System;
-using System.IO;
+﻿using System;//bibliothéque (classes,methodes...)
+using System.IO;// bibliotheque pour lire ou ecrire pour avoir acces a un file ou directories
+using System.Linq.Expressions;
 using Easysave.ViewModels;
 
 namespace Easysave.Models
@@ -106,11 +107,51 @@ namespace Easysave.Models
             }
         }
 
-        public string[] GetSaveProgress()
-        {
-            string[] arr = { };
-            return arr;
-        }
+       public DataState GetSaveProgress()
+{
+    try
+    {
+        // Retrieve the list of full paths for all files in the source directory
+        string[] filesToCopy = Directory.GetFiles(SaveSourcePath);
+
+        // Create the full path of the destination directory
+        string saveFolderPath = Path.Combine(configObj.TargetDir, SaveName);
+
+        // Calculate the total number of files and the number of remaining files to be copied
+        int totalFiles = filesToCopy.Length;
+        int remainingFiles = totalFiles - Directory.GetFiles(saveFolderPath).Length;
+
+        // Calculate the total size of files to be copied
+        long totalSize = filesToCopy.Sum(file => new FileInfo(file).Length);
+
+        // Calculate the remaining size to be copied
+        long remainingSize = filesToCopy
+            .Where(file => !File.Exists(Path.Combine(saveFolderPath, Path.GetFileName(file))))
+            .Sum(file => new FileInfo(file).Length);
+
+        // Calculate the progress percentage
+        double progress = 100.0 * (totalFiles - remainingFiles) / totalFiles;
+
+        // Create a DataState object with progress details
+        DataState progressDetails = new DataState() {
+            Progress = progress,
+            RemainingFiles = remainingFiles,
+            RemainingFilesSize = remainingSize
+        };
+
+        // Return the DataState object with progress details
+        return progressDetails;
+    }
+    catch (Exception ex)
+    {
+        // Handle errors and print an error message in case of failure
+        Console.WriteLine($"Error calculating save progress: {ex.Message}");
+
+        // Return a new DataState object in case of an exception
+        return new DataState();
+    }
+}
+
 
         public string[] GetFileNames()
         {
