@@ -1,6 +1,6 @@
-﻿using System;//bibliothéque (classes,methodes...)
-using System.IO;// bibliotheque pour lire ou ecrire pour avoir acces a un file ou directories
-using System.Linq.Expressions;
+﻿using System;
+using System.IO;
+using System.Diagnostics;
 using Easysave.ViewModels;
 
 namespace Easysave.Models
@@ -17,11 +17,14 @@ namespace Easysave.Models
 
 
         Config configObj = Config.getConfig();
+        Log logObj = Log.getLog();
 
         public Save() { }
 
         public void CreateSave()
         {
+            DataLog dataLog = new();
+
             string saveFolderPath = Path.Combine(configObj.TargetDir, SaveName);
             string lang = configObj.Language;
             saveDataState.SaveId = SaveId;
@@ -35,6 +38,7 @@ namespace Easysave.Models
 
             try
             {
+                Stopwatch duration = new();
                 if (Directory.Exists(SaveSourcePath))
                 {
                     if (!Directory.Exists(saveFolderPath))
@@ -47,8 +51,21 @@ namespace Easysave.Models
                         saveDataState.FilesNumber = filesToCopy.Length;
                         foreach (string file in filesToCopy)
                         {
+                            FileInfo fileInfo = new(file);
+                            duration.Restart();
                             string destinationFile = Path.Combine(saveFolderPath, Path.GetFileName(file));
                             File.Copy(file, destinationFile, true);
+                            duration.Stop();
+
+                            dataLog.SaveDuration = duration.ElapsedMilliseconds;
+                            dataLog.SavedFileName = file;
+                            dataLog.SaveSize = fileInfo.Length;
+                            dataLog.SourceDir = SaveSourcePath;
+                            dataLog.TargetDir = destinationFile;
+                            dataLog.Timestamp = DateTime.Now.ToString("dd-MM-yyyy hh:mm:ss");
+
+                            logObj.LogObj = dataLog;
+                            logObj.WriteLog();
                         }
                         // Updating state.json file by adding a new entry
                         State stateObj = new State
@@ -65,8 +82,25 @@ namespace Easysave.Models
 
                         foreach (string file in newModifiedFiles)
                         {
-                            string destinationFile = Path.Combine(saveFolderPath, Path.GetFileName(file));
+
+                            FileInfo fileInfo = new(file);
+                            duration.Restart();
+
+                            string fileName = Path.GetFileName(file);
+                            string destinationFile = Path.Combine(saveFolderPath, fileName);
                             File.Copy(file, destinationFile, true);
+                            duration.Stop();
+
+                            dataLog.SaveDuration = duration.ElapsedMilliseconds;
+                            dataLog.SavedFileName = file;
+                            dataLog.SaveSize = fileInfo.Length;
+                            dataLog.SourceDir = SaveSourcePath;
+                            dataLog.TargetDir = destinationFile;
+                            dataLog.Timestamp = DateTime.Now.ToString("dd-MM-yyyy hh:mm:ss");
+
+                            logObj.LogObj = dataLog;
+                            logObj.WriteLog();
+
                         }
                         // Updating state.json file by adding a new entry
                         State stateObj = new State
@@ -83,8 +117,6 @@ namespace Easysave.Models
                     {
                         Console.WriteLine($"Backup '{SaveName}' created with success.");
                     }
-
-                    
                 }
                 else
                 {
@@ -179,51 +211,51 @@ namespace Easysave.Models
             }
         }
 
-       public DataState GetSaveProgress()
-{
-    try
-    {
-        // Retrieve the list of full paths for all files in the source directory
-        string[] filesToCopy = Directory.GetFiles(SaveSourcePath);
+        public DataState GetSaveProgress()
+        {
+            try
+            {
+                // Retrieve the list of full paths for all files in the source directory
+                string[] filesToCopy = Directory.GetFiles(SaveSourcePath);
 
-        // Create the full path of the destination directory
-        string saveFolderPath = Path.Combine(configObj.TargetDir, SaveName);
+                // Create the full path of the destination directory
+                string saveFolderPath = Path.Combine(configObj.TargetDir, SaveName);
 
-        // Calculate the total number of files and the number of remaining files to be copied
-        int totalFiles = filesToCopy.Length;
-        int remainingFiles = totalFiles - Directory.GetFiles(saveFolderPath).Length;
+                // Calculate the total number of files and the number of remaining files to be copied
+                int totalFiles = filesToCopy.Length;
+                int remainingFiles = totalFiles - Directory.GetFiles(saveFolderPath).Length;
 
-        // Calculate the total size of files to be copied
-        long totalSize = filesToCopy.Sum(file => new FileInfo(file).Length);
+                // Calculate the total size of files to be copied
+                long totalSize = filesToCopy.Sum(file => new FileInfo(file).Length);
 
-        // Calculate the remaining size to be copied
-        long remainingSize = filesToCopy
-            .Where(file => !File.Exists(Path.Combine(saveFolderPath, Path.GetFileName(file))))
-            .Sum(file => new FileInfo(file).Length);
+                // Calculate the remaining size to be copied
+                long remainingSize = filesToCopy
+                    .Where(file => !File.Exists(Path.Combine(saveFolderPath, Path.GetFileName(file))))
+                    .Sum(file => new FileInfo(file).Length);
 
-        // Calculate the progress percentage
-        double progress = 100.0 * (totalFiles - remainingFiles) / totalFiles;
+                // Calculate the progress percentage
+                double progress = 100.0 * (totalFiles - remainingFiles) / totalFiles;
 
-        // Create a DataState object with progress details
-        DataState progressDetails = new DataState() {
-            Progress = progress,
-            RemainingFiles = remainingFiles,
-            RemainingFilesSize = remainingSize
-        };
+                // Create a DataState object with progress details
+                DataState progressDetails = new DataState()
+                {
+                    Progress = progress,
+                    RemainingFiles = remainingFiles,
+                    RemainingFilesSize = remainingSize
+                };
 
-        // Return the DataState object with progress details
-        return progressDetails;
-    }
-    catch (Exception ex)
-    {
-        // Handle errors and print an error message in case of failure
-        Console.WriteLine($"Error calculating save progress: {ex.Message}");
+                // Return the DataState object with progress details
+                return progressDetails;
+            }
+            catch (Exception ex)
+            {
+                // Handle errors and print an error message in case of failure
+                Console.WriteLine($"Error calculating save progress: {ex.Message}");
 
-        // Return a new DataState object in case of an exception
-        return new DataState();
-    }
-}
-
+                // Return a new DataState object in case of an exception
+                return new DataState();
+            }
+        }
 
         private string[] CompareFiles(string[] sourceFiles, string[] destinationFiles, string saveFolderPath)
         {
