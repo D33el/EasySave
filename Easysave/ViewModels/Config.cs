@@ -56,8 +56,10 @@ namespace Easysave.ViewModels
             string projectDir = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
             string JSONtext = File.ReadAllText(projectDir + @"/Config/config.json");
             DataConfig configObj = JsonSerializer.Deserialize<DataConfig>(JSONtext);
-            Console.WriteLine(configObj);
-
+            Language = configObj.Language;
+            TargetDir = configObj.TargetDir;
+            SaveLogDir = configObj.SaveLogDir;
+            SaveStateDir = configObj.SaveStateDir;
             return configObj;
         }
 
