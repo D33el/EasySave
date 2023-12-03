@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using Easysave.Models;
 using Easysave.ViewModels;
 
@@ -25,6 +26,7 @@ namespace Easysave.Views
         public int ShowParameters()
         {
             string lang = configObj.Language;
+            int step = 0;
 
             Console.Clear();
 
@@ -58,9 +60,30 @@ namespace Easysave.Views
                 Console.WriteLine("|=====================================================================|");
             }
 
-            int step = int.Parse(Console.ReadLine());
-            return step;
+            string choice = Console.ReadLine();
+            if(string.IsNullOrWhiteSpace(choice)) {
+                showErrorInput(); 
+                ShowParameters();
+            }
+            else 
+            {
+                if(int.TryParse(choice,out int result)) 
+                { 
+                    step = result; 
 
+                    if(step <= 5)
+                    {
+                         return step;
+                    }
+                    else
+                    {
+                        showErrorInput(); 
+                        ShowParameters(); 
+                    }
+                }
+            }
+
+            return step;
         }
 
         public void ShowMainMenu()
@@ -102,10 +125,39 @@ namespace Easysave.Views
                 Console.WriteLine("|=====>                 Please insert a number                  <=====|");
             }
 
+            string pageString = Console.ReadLine();
+            if(string.IsNullOrWhiteSpace(pageString))
+            {
+                showErrorInput();
+                ShowMainMenu();
+            }
+            else 
+            { 
+                int page = int.Parse(pageString);
+                if(page > 5) { showErrorInput(); ShowMainMenu(); }
+                viewmodel.NavigateTo(page); 
+            }
 
-            int page = int.Parse(Console.ReadLine());
-            viewmodel.NavigateTo(page);
 
+        }
+
+        public void showErrorInput()
+        {
+            string lang = configObj.Language;
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Red;
+            if (lang == "fr")
+            {
+                Console.WriteLine("Veuillez choisir une option !");
+            }
+            else
+            {
+                Console.WriteLine("Please re-enter an option !");
+            }
+
+            Thread.Sleep(1500);
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.White;
         }
 
         public void ShowSaveMenu()
@@ -143,7 +195,9 @@ namespace Easysave.Views
             }
 
             type = Console.ReadLine();
-            if (type == "1") { type = "full"; } else if (type == "2" && res != 0) { type = "diff"; } else { type = "autre"; }
+            if (type == "1") { type = "full"; } else if (type == "2" && res != 0) { type = "diff"; } else { type = ""; }
+
+            if(string.IsNullOrWhiteSpace(type)) { showErrorInput(); ShowSaveMenu(); }
 
             if (type == "full")
             {
@@ -225,15 +279,6 @@ namespace Easysave.Views
 
                 viewmodel.InitializeSave(inputObj);
             }
-            else
-            {
-                Console.Clear();
-                Console.ForegroundColor = ConsoleColor.Red;
-                if (lang == "fr") { Console.WriteLine("Veuillez resaisir votre choix !"); } else { Console.WriteLine("Please re-enter your choice!"); }
-                Thread.Sleep(1500);
-                Console.ForegroundColor = ConsoleColor.White;
-                ShowSaveMenu();
-            }
         }
 
         public void ShowDeleteMenu()
@@ -259,7 +304,10 @@ namespace Easysave.Views
             }
 
             ShowSaveList();
-            userChoice = int.Parse(Console.ReadLine());
+            string choice = Console.ReadLine();
+            if (string.IsNullOrWhiteSpace(choice)) { showErrorInput(); ShowDeleteMenu(); }
+            userChoice = int.Parse(choice);
+
 
             if (lang == "fr")
             {
