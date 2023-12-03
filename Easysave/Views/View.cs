@@ -307,7 +307,8 @@ namespace Easysave.Views
             string choice = Console.ReadLine();
             if (string.IsNullOrWhiteSpace(choice)) { showErrorInput(); ShowDeleteMenu(); }
             userChoice = int.Parse(choice);
-
+            DataState data = viewmodel.GetSaveInfo(userChoice);
+            if(data.SaveId != userChoice) { showErrorInput(); ShowDeleteMenu(); }
 
             if (lang == "fr")
             {
