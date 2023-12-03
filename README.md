@@ -29,8 +29,6 @@ Merci de faire partie de notre communauté !
 
 ---
 
-# EasySave
-
 A backup software designed to allow you to create backups of your data with simplicity and security.
 
 ---
