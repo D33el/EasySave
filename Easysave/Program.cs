@@ -15,26 +15,20 @@ namespace Easysave
         public static void Main(string[] args)
         {
             Config configObj = Config.getConfig();
-            Log logObg = Log.getLog();
-
-            View view = new View();
-            Navigation navigation = new Navigation();
-
-            logObg.CreateLogFile();
+            View view = new();
+            Navigation navigation = new();
 
             bool configExists = configObj.checkConfig();
 
-            if (configExists)
-            {
-                navigation.ShowMainMenu();
-            }
-            else
+            if (!configExists)
             {
                 Navigation.ShowFirstLaunchMenu();
                 DataConfig data = view.GetParametersInput(false, 0);
                 configObj.DataConfig = data;
                 configObj.SaveConfig();
+                configObj.LoadConfig();
             }
+            navigation.ShowMainMenu();
         }
     }
 }
