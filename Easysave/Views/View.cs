@@ -75,7 +75,7 @@ namespace Easysave.Views
                     {
                          return step;
                     }
-                    else
+                    else 
                     {
                         showErrorInput(); 
                         ShowParameters(); 
