@@ -12,9 +12,9 @@ namespace Easysave.ViewModels
     public class ViewModel
     {
         Save save = new Save();
-        State state = new State();
+        
         Config configObj = Config.getConfig();
-        Log logObj = Log.getLog();
+        
 
         public ViewModel()
         {
@@ -61,6 +61,7 @@ namespace Easysave.ViewModels
 
         public DataState[] GetSavelist()
         {
+            State state = new State();
             DataState[] myResult = state.GetStateArr();
             return myResult;
         }
@@ -97,7 +98,7 @@ namespace Easysave.ViewModels
 
             View view = new View();
             Navigation navigation = new Navigation();
-
+            Log logObj = Log.getLog();
             string lang = configObj.Language;
 
             int saveNumber = checkSavesNumber();
