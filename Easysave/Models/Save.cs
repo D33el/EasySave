@@ -17,12 +17,12 @@ namespace Easysave.Models
 
 
         Config configObj = Config.getConfig();
-        Log logObj = Log.getLog();
 
         public Save() { }
 
         public void CreateSave()
         {
+            Log logObj = Log.getLog();
             DataLog dataLog = new();
 
             string saveFolderPath = Path.Combine(configObj.TargetDir, SaveName);

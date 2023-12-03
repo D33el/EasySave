@@ -6,7 +6,6 @@ namespace Easysave.Models
 {
     public sealed class Log
     {
-        private readonly string ProjectDir = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
         private Config configObj = Config.getConfig();
         public string LogFilePath;
 
@@ -27,6 +26,7 @@ namespace Easysave.Models
 
         public void CreateLogFile()
         {
+            configObj = Config.getConfig();
             string currentDate = DateTime.Now.ToString("yyyy-MM-dd_HHmmss");
             LogFilePath = configObj.SaveLogDir + $"/log_{currentDate}.json";
             File.Create(LogFilePath).Close();
