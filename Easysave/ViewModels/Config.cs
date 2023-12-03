@@ -4,8 +4,9 @@ using System.Text.Json;
 
 namespace Easysave.ViewModels
 {
-    public sealed class Config 
+    public sealed class Config
     {
+        private readonly string FilePath = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName + @"/config.json";
         public string Language { get; set; }
         public string TargetDir { get; set; }
         public string SaveLogDir { get; set; }
@@ -33,28 +34,29 @@ namespace Easysave.ViewModels
             return configInstance;
         }
 
-
-
         public void SaveConfig()
         {
-            string projectDir = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
             string JSONtext = JsonSerializer.Serialize(DataConfig);
-            string filePath = projectDir + @"/Config/config.json";
-            File.WriteAllText(filePath, JSONtext);
+            File.WriteAllText(FilePath, JSONtext);
         }
 
         public bool checkConfig()
         {
-            string projectDir = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
-            string JSONtext = File.ReadAllText(projectDir + @"/Config/config.json");
+            if (!File.Exists(FilePath))
+            {
+                File.Create(FilePath).Close();
+                using StreamWriter sw = File.CreateText(FilePath);
+                sw.Write("[]");
+                return false;
+            }
+            string JSONtext = File.ReadAllText(FilePath);
             int fileLength = JSONtext.Length;
-            if (fileLength > 10) { return true; } else { return false; }
+            if (fileLength > 32) { return true; } else { return false; }
         }
 
         public DataConfig LoadConfig()
         {
-            string projectDir = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
-            string JSONtext = File.ReadAllText(projectDir + @"/Config/config.json");
+            string JSONtext = File.ReadAllText(FilePath);
             DataConfig configObj = JsonSerializer.Deserialize<DataConfig>(JSONtext);
             Language = configObj.Language;
             TargetDir = configObj.TargetDir;
