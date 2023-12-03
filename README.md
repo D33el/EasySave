@@ -23,8 +23,10 @@ Un logiciel de sauvegarde, conçu pour vous permettre de creer des sauvegardes d
    Vous permet de quitter l'application.
 
 ---
-<center>Sauvegardez vos données avec confiance et simplicité grâce à notre logiciel de sauvegarde efficace. </center>
-<center>Merci de faire partie de notre communauté !</center>
+
+Sauvegardez vos données avec confiance et simplicité grâce à notre logiciel de sauvegarde efficace. </center>
+Merci de faire partie de notre communauté !
+
 ---
 
 # EasySave
@@ -55,6 +57,8 @@ A backup software designed to allow you to create backups of your data with simp
    Allows you to exit the application.
 
 ---
-<center>Back up your data with confidence and simplicity using our efficient backup software.</center>
-<center>Thank you for being part of our community!</center>
+
+Back up your data with confidence and simplicity using our efficient backup software.
+Thank you for being part of our community!
+
 ---
