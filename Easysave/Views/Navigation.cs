@@ -10,15 +10,15 @@ namespace Easysave.Views
 
         public static void ShowFirstLaunchMenu()
         {
-            Console.WriteLine("|==(EasySave V1.0)====================================================|");
-            Console.WriteLine("|====================== Bienvenue / Welcome ==========================|");
-            Console.WriteLine("|=====================================================================|");
-            Console.WriteLine("|===                 Merci d'avoir choisi EasySave                 ===|");
-            Console.WriteLine("|===                Thank you for choosing EasySave                ===|");
-            Console.WriteLine("|=====================================================================|");
-            Console.WriteLine("|===  Configurez l'application avant de commencer les sauvegardes  ===|");
-            Console.WriteLine("|===             Setup the app before starting backups             ===|");
-            Console.WriteLine("|=====================================================================|");
+                Console.WriteLine("|==(EasySave V1.0)======================================================|");
+                Console.WriteLine("|======================= Bienvenue / Welcome ===========================|");
+                Console.WriteLine("|=======================================================================|");
+                Console.WriteLine("|===                  Merci d'avoir choisi EasySave                  ===|");
+                Console.WriteLine("|===                 Thank you for choosing EasySave                 ===|");
+                Console.WriteLine("|=======================================================================|");
+                Console.WriteLine("|===   Configurez l'application avant de commencer les sauvegardes   ===|");
+                Console.WriteLine("|===              Setup the app before starting backups              ===|");
+                Console.WriteLine("|=======================================================================|");
         }
 
         public int ShowParameters()

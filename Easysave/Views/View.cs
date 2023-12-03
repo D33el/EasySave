@@ -53,14 +53,14 @@ namespace Easysave.Views
                 lang = Console.ReadLine() ?? "";
 
                 Console.WriteLine("|=======================================================================|");
-                Console.WriteLine("|===           Veuillez choisir le chemin des sauvegarde             ===|");
+                Console.WriteLine("|===          Veuillez choisir le chemin des sauvegardes             ===|");
                 Console.WriteLine("|===                Choose the path of the backups                   ===|");
                 Console.WriteLine("|=======================================================================|");
                 targetDir = Console.ReadLine() ?? "";
 
                 Console.WriteLine("|=======================================================================|");
-                Console.WriteLine("|===        Veuillez choisir le chemin du fichier log.json           ===|");
-                Console.WriteLine("|===             Choose the path of the log.json file                ===|");
+                Console.WriteLine("|===   Veuillez choisir le chemin du dossier ou iront les logs       ===|");
+                Console.WriteLine("|===            Choose the path of the logs directory                ===|");
                 Console.WriteLine("|=======================================================================|");
                 saveLogDir = Console.ReadLine() ?? "";
 
