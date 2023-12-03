@@ -12,23 +12,24 @@ namespace Easysave
     class Program
     {
 
+
+
         public static void Main(string[] args)
         {
             Config configObj = Config.getConfig();
             View view = new();
-            Navigation navigation = new();
 
             bool configExists = configObj.checkConfig();
 
             if (!configExists)
             {
-                Navigation.ShowFirstLaunchMenu();
+                View.ShowFirstLaunchMenu();
                 DataConfig data = view.GetParametersInput(false, 0);
                 configObj.DataConfig = data;
                 configObj.SaveConfig();
                 configObj.LoadConfig();
             }
-            navigation.ShowMainMenu();
+            view.ShowMainMenu();
         }
     }
 }
