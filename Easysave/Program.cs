@@ -7,7 +7,7 @@ namespace EasySave
     {
         public static void Main(string[] args)
         {
-            Config configObj = Config.getConfig();
+            Config configObj = Config.GetConfig();
             View view = new();
 
             bool configExists = configObj.CheckConfig();
