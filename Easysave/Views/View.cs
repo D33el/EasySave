@@ -6,7 +6,7 @@ namespace EasySave.Views
     public class View
     {
         private SaveViewModel _saveViewModel = new();
-        private Config _config = Config.getConfig();
+        private Config _config = Config.GetConfig();
 
         public void Navigate(int page)
         {
