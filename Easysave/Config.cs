@@ -11,18 +11,18 @@ namespace EasySave
         public string StateFilePath { get; set; }
         public string LogsType { get; set; }
 
-        private static Config configInstance;
+        private static Config ConfigInstance;
 
         private Config()
         {
             
         }
 
-        public static Config getConfig()
+        public static Config GetConfig()
         {
-            configInstance ??= new Config();
-            if (configInstance.CheckConfig()) { configInstance.LoadConfig(); }
-            return configInstance;
+            ConfigInstance ??= new Config();
+            if (ConfigInstance.CheckConfig()) { ConfigInstance.LoadConfig(); }
+            return ConfigInstance;
         }
 
         public void SaveConfig()

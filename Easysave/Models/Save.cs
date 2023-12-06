@@ -5,13 +5,13 @@ namespace EasySave.Models
 {
     public class Save
     {
-        public int SaveId;
+        public int SaveId { get; set; }
         public string SaveName { get; set; }
         public string SaveSourcePath { get; set; }
         public string Type { get; set; }
 
-        private Config _config = Config.getConfig();
-        private Log _log = Log.getLog();
+        private Config _config = Config.GetConfig();
+        private Log _log = Log.GetLog();
         private State _state = new();
         private Stopwatch Duration = new();
 
@@ -56,8 +56,6 @@ namespace EasySave.Models
             }
         }
 
-
-
         private void FullSave(string folderPath)
         {
             if (Directory.Exists(folderPath) && Directory.GetFiles(folderPath).Length != 0)
@@ -95,7 +93,7 @@ namespace EasySave.Models
         {
             string[] destinationFiles = Directory.GetFiles(folderPath);
             string[] sourceFiles = Directory.GetFiles(SaveSourcePath);
-            string[] newModifiedFiles = CompareFiles(sourceFiles, destinationFiles, folderPath);
+            string[] newModifiedFiles = CompareFiles(sourceFiles, destinationFiles);
 
             foreach (string file in newModifiedFiles)
             {
@@ -190,7 +188,7 @@ namespace EasySave.Models
             }
         }
 
-        private static string[] CompareFiles(string[] sourceFiles, string[] destinationFiles, string saveFolderPath)
+        private static string[] CompareFiles(string[] sourceFiles, string[] destinationFiles)
         {
             List<string> newModifiedFiles = new List<string>();
 

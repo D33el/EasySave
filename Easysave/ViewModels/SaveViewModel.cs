@@ -51,7 +51,7 @@ namespace EasySave.ViewModels
         public static int[] ShowSaveList()
         {
 
-            Config ConfigObj = Config.getConfig();
+            Config ConfigObj = Config.GetConfig();
             State[] statesArr = State.GetStateArr();
             List<int> savesIds = new();
 

@@ -13,14 +13,14 @@ namespace EasySave.Models
         public long FileSaveDuration { get; set; }
         private static readonly string LogFilePath;
 
-        private Config ConfigObj = Config.getConfig();
-        private static Log logInstance;
+        private Config _config = Config.GetConfig();
+        private static Log LogInstance;
 
         static Log()
         {
-            string logFileType = Config.getConfig().LogsType;
+            string logFileType = Config.GetConfig().LogsType;
             string currentTimestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
-            LogFilePath = Config.getConfig().LogsDir + $"/log_{currentTimestamp}.{logFileType}";
+            LogFilePath = Config.GetConfig().LogsDir + $"/log_{currentTimestamp}.{logFileType}";
 
             File.Create(LogFilePath).Close();
 
@@ -40,15 +40,15 @@ namespace EasySave.Models
         {
         }
 
-        public static Log getLog()
+        public static Log GetLog()
         {
-            logInstance ??= new Log();
-            return logInstance;
+            LogInstance ??= new Log();
+            return LogInstance;
         }
 
         public void WriteLog()
         {
-            string logFileType = ConfigObj.LogsType;
+            string logFileType = _config.LogsType;
             if (logFileType == "json") { WriteJsonLog(); }
             else { WriteXmlLog(); }
         }
