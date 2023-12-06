@@ -1,227 +1,171 @@
-﻿using System;
-using System.IO;
+﻿using System.Data;
 using System.Diagnostics;
-using Easysave.ViewModels;
 
-namespace Easysave.Models
+namespace EasySave.Models
 {
     public class Save
     {
         public int SaveId;
         public string SaveName { get; set; }
         public string SaveSourcePath { get; set; }
-        public int SaveFilesNumber { get; set; }
         public string Type { get; set; }
 
-        private DataState saveDataState = new();
-
-
-        Config configObj = Config.getConfig();
+        private Config _config = Config.getConfig();
+        private Log _log = Log.getLog();
+        private State _state = new();
+        private Stopwatch Duration = new();
 
         public Save() { }
 
         public void CreateSave()
         {
-            Log logObj = Log.getLog();
-            DataLog dataLog = new();
+            string saveTargetPath = Path.Combine(_config.TargetDir, SaveName);
+            string lang = _config.Language;
 
-            string saveFolderPath = Path.Combine(configObj.TargetDir, SaveName);
-            string lang = configObj.Language;
-            saveDataState.SaveId = SaveId;
-            saveDataState.SaveName = SaveName;
-            saveDataState.Time = DateTime.Now.ToString("dd-MM-yyyy HH:mm:ss");
-            saveDataState.SourcePath = SaveSourcePath;
-            saveDataState.TargetPath = saveFolderPath;
-            saveDataState.Type = Type;
-            saveDataState.FilesSize = DirSize(new DirectoryInfo(SaveSourcePath));
-            saveDataState.FilesNumber = Directory.GetFiles(SaveSourcePath).Length;
+            _state.SaveId = SaveId;
+            _state.SaveName = SaveName;
+            _state.Type = Type;
+            _state.Time = DateTime.Now.ToString("dd-MM-yyyy HH:mm:ss");
+            _state.SourcePath = SaveSourcePath;
+            _state.TargetPath = saveTargetPath;
+            _state.FilesSize = DirSize(new DirectoryInfo(SaveSourcePath));
+            _state.FilesNumber = Directory.GetFiles(SaveSourcePath).Length;
 
             try
             {
-                Stopwatch duration = new();
                 if (Directory.Exists(SaveSourcePath))
                 {
-                    if (!Directory.Exists(saveFolderPath))
-                    {
-                        Directory.CreateDirectory(saveFolderPath);
-                    }
-                    if (Type == "full")
-                    {
-                        string[] filesToCopy = Directory.GetFiles(SaveSourcePath);
-                        saveDataState.FilesNumber = filesToCopy.Length;
-                        foreach (string file in filesToCopy)
-                        {
-                            FileInfo fileInfo = new(file);
-                            duration.Restart();
-                            string destinationFile = Path.Combine(saveFolderPath, Path.GetFileName(file));
-                            File.Copy(file, destinationFile, true);
-                            duration.Stop();
+                    if (!Directory.Exists(saveTargetPath)) { Directory.CreateDirectory(saveTargetPath); }
 
-                            dataLog.SaveDuration = duration.ElapsedMilliseconds;
-                            dataLog.SavedFileName = file;
-                            dataLog.SaveSize = fileInfo.Length;
-                            dataLog.SourceDir = SaveSourcePath;
-                            dataLog.TargetDir = destinationFile;
-                            dataLog.Timestamp = DateTime.Now.ToString("dd-MM-yyyy hh:mm:ss");
+                    if (Type == "full") { FullSave(saveTargetPath); }
+                    else { DiffSave(saveTargetPath); }
 
-                            logObj.LogObj = dataLog;
-                            logObj.WriteLog();
-                        }
-                        // Updating state.json file by adding a new entry
-                        State stateObj = new State
-                        {
-                            DataState = saveDataState
-                        };
-                        stateObj.CreateState();
-                    }
-                    else if (Type == "diff")
-                    {
-                        string[] destinationFiles = Directory.GetFiles(saveFolderPath);
-                        string[] sourceFiles = Directory.GetFiles(SaveSourcePath);
-                        string[] newModifiedFiles = CompareFiles(sourceFiles, destinationFiles, saveFolderPath);
-
-                        foreach (string file in newModifiedFiles)
-                        {
-
-                            FileInfo fileInfo = new(file);
-                            duration.Restart();
-
-                            string fileName = Path.GetFileName(file);
-                            string destinationFile = Path.Combine(saveFolderPath, fileName);
-                            File.Copy(file, destinationFile, true);
-                            duration.Stop();
-
-                            dataLog.SaveDuration = duration.ElapsedMilliseconds;
-                            dataLog.SavedFileName = file;
-                            dataLog.SaveSize = fileInfo.Length;
-                            dataLog.SourceDir = SaveSourcePath;
-                            dataLog.TargetDir = destinationFile;
-                            dataLog.Timestamp = DateTime.Now.ToString("dd-MM-yyyy hh:mm:ss");
-
-                            logObj.LogObj = dataLog;
-                            logObj.WriteLog();
-
-                        }
-                        // Updating state.json file by adding a new entry
-                        State stateObj = new State
-                        {
-                            DataState = saveDataState
-                        };
-                        stateObj.UpdateState();
-                    }
-                    if (lang == "fr")
-                    {
-                        Console.WriteLine($"Sauvegarde '{SaveName}' créée avec succès.");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Backup '{SaveName}' created with success.");
-                    }
+                    if (lang == "fr") { Console.WriteLine($"Sauvegarde '{SaveName}' créée avec succès."); }
+                    else { Console.WriteLine($"Backup '{SaveName}' created with success."); }
                 }
                 else
                 {
-                    if (lang == "fr")
-                    {
-                        Console.WriteLine($"Répertoire source '{SaveSourcePath}' introuvable.");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Source directory '{SaveSourcePath}' not found.");
-                    }
+                    if (lang == "fr") { Console.WriteLine($"Répertoire source '{SaveSourcePath}' introuvable."); }
+                    else { Console.WriteLine($"Source directory '{SaveSourcePath}' not found."); }
                 }
             }
             catch (Exception ex)
             {
-                if (lang == "fr")
-                {
-                    Console.WriteLine($"Erreur lors de la création de la sauvegarde '{SaveName}': {ex.Message}");
-                }
-                else
-                {
-                    Console.WriteLine($"Error creating '{SaveName}' backup : {ex.Message}");
-                }
-
+                if (lang == "fr") { Console.WriteLine($"Erreur lors de la création de la sauvegarde '{SaveName}': {ex.Message}"); }
+                else { Console.WriteLine($"Error creating '{SaveName}' backup : {ex.Message}"); }
             }
         }
 
+
+
+        private void FullSave(string folderPath)
+        {
+            if (Directory.Exists(folderPath) && Directory.GetFiles(folderPath).Length != 0)
+            {
+                string[] files = Directory.GetFiles(folderPath);
+                foreach (string file in files)
+                {
+                    File.Delete(file);
+                }
+            }
+            string[] filesToCopy = Directory.GetFiles(SaveSourcePath);
+
+            foreach (string file in filesToCopy)
+            {
+                FileInfo fileInfo = new(file);
+
+                Duration.Start();
+                string destinationFile = Path.Combine(folderPath, Path.GetFileName(file));
+                File.Copy(file, destinationFile, true);
+                Duration.Stop();
+
+                _log.FileSaveDuration = Duration.ElapsedMilliseconds;
+                _log.FileName = file;
+                _log.FileSize = fileInfo.Length;
+                _log.SourceDir = SaveSourcePath;
+                _log.TargetDir = destinationFile;
+                _log.Timestamp = DateTime.Now.ToString("dd-MM-yyyy hh:mm:ss");
+                _log.WriteLog();
+            }
+            // Updating state.json file by adding a new entry
+            _state.AddState();
+        }
+
+        private void DiffSave(string folderPath)
+        {
+            string[] destinationFiles = Directory.GetFiles(folderPath);
+            string[] sourceFiles = Directory.GetFiles(SaveSourcePath);
+            string[] newModifiedFiles = CompareFiles(sourceFiles, destinationFiles, folderPath);
+
+            foreach (string file in newModifiedFiles)
+            {
+
+                FileInfo fileInfo = new(file);
+                Duration.Restart();
+
+                string fileName = Path.GetFileName(file);
+                string destinationFile = Path.Combine(folderPath, fileName);
+                File.Copy(file, destinationFile, true);
+                Duration.Stop();
+
+                _log.FileSaveDuration = Duration.ElapsedMilliseconds;
+                _log.FileName = file;
+                _log.FileSize = fileInfo.Length;
+                _log.SourceDir = SaveSourcePath;
+                _log.TargetDir = destinationFile;
+                _log.Timestamp = DateTime.Now.ToString("dd-MM-yyyy hh:mm:ss");
+
+                _log.WriteLog();
+
+            }
+            // Updating state.json file by adding a new entry
+            _state.UpdateState();
+        }
 
         public void DeleteSave()
         {
-            string lang = configObj.Language;
+            string lang = _config.Language;
             try
             {
-                // Combine the TargetPath and saveName to get the full path of the save file
-                string saveFilePath = Path.Combine(configObj.TargetDir, SaveName);
+                string saveFilePath = Path.Combine(_config.TargetDir, SaveName);
 
-                // Check if the directory exists before attempting to delete it
                 if (Directory.Exists(saveFilePath))
                 {
-                    // Empty the directory before deleting it
                     string[] files = Directory.GetFiles(saveFilePath);
-
                     foreach (string file in files)
                     {
                         File.Delete(file);
-                        Console.WriteLine($"Deleted file: {file}");
                     }
-
-                    // Delete the save directory
                     Directory.Delete(saveFilePath);
 
                     // Updating state.json file
+                    _state.SaveId = SaveId;
+                    _state.DeleteState();
 
-                    saveDataState.SaveId = SaveId;
-                    State stateObj = new()
-                    {
-                        DataState = saveDataState
-                    };
-                    stateObj.DeleteState();
-
-                    if (lang == "fr")
-                    {
-                        Console.WriteLine($"Sauvegarde '{SaveName}' supprimée avec succés");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Backup '{SaveName}' deleted successfully.");
-                    }
+                    if (lang == "fr") { Console.WriteLine($"Sauvegarde '{SaveName}' supprimée avec succés"); }
+                    else { Console.WriteLine($"Backup '{SaveName}' deleted successfully."); }
                 }
                 else
                 {
-                    if (lang == "fr")
-                    {
-                        Console.WriteLine($"Sauvegarde '{SaveName}' introuvable.");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Backup '{SaveName}' not found");
-                    }
+                    if (lang == "fr") { Console.WriteLine($"Sauvegarde '{SaveName}' introuvable."); }
+                    else { Console.WriteLine($"Backup '{SaveName}' not found"); }
                 }
             }
             catch (Exception ex)
             {
-                if (lang == "fr")
-                {
-                    Console.WriteLine($"Erreur lors de la suppression de '{SaveName}': {ex.Message}");
-                }
-                else
-                {
-                    Console.WriteLine($"Error deleting save file '{SaveName}': {ex.Message}");
-                }
+                if (lang == "fr") { Console.WriteLine($"Erreur lors de la suppression de '{SaveName}': {ex.Message}"); }
+                else { Console.WriteLine($"Error deleting save file '{SaveName}': {ex.Message}"); }
             }
         }
 
-        public DataState GetSaveProgress()
+        public void GetSaveProgress()
         {
+            string lang = _config.Language;
             try
             {
-                // Retrieve the list of full paths for all files in the source directory
                 string[] filesToCopy = Directory.GetFiles(SaveSourcePath);
+                string saveFolderPath = Path.Combine(_config.TargetDir, SaveName);
 
-                // Create the full path of the destination directory
-                string saveFolderPath = Path.Combine(configObj.TargetDir, SaveName);
-
-                // Calculate the total number of files and the number of remaining files to be copied
                 int totalFiles = filesToCopy.Length;
                 int remainingFiles = totalFiles - Directory.GetFiles(saveFolderPath).Length;
 
@@ -233,31 +177,20 @@ namespace Easysave.Models
                     .Where(file => !File.Exists(Path.Combine(saveFolderPath, Path.GetFileName(file))))
                     .Sum(file => new FileInfo(file).Length);
 
-                // Calculate the progress percentage
                 double progress = 100.0 * (totalFiles - remainingFiles) / totalFiles;
 
-                // Create a DataState object with progress details
-                DataState progressDetails = new DataState()
-                {
-                    Progress = progress,
-                    RemainingFiles = remainingFiles,
-                    RemainingFilesSize = remainingSize
-                };
-
-                // Return the DataState object with progress details
-                return progressDetails;
+                _state.Progress = progress;
+                _state.RemainingFiles = remainingFiles;
+                _state.RemainingFilesSize = remainingSize;
             }
             catch (Exception ex)
             {
-                // Handle errors and print an error message in case of failure
-                Console.WriteLine($"Error calculating save progress: {ex.Message}");
-
-                // Return a new DataState object in case of an exception
-                return new DataState();
+                if (lang == "fr") { Console.WriteLine($"Erreur lors du calcul du progres: {ex.Message}"); }
+                else { Console.WriteLine($"Error calculating save progress: {ex.Message}"); }
             }
         }
 
-        private string[] CompareFiles(string[] sourceFiles, string[] destinationFiles, string saveFolderPath)
+        private static string[] CompareFiles(string[] sourceFiles, string[] destinationFiles, string saveFolderPath)
         {
             List<string> newModifiedFiles = new List<string>();
 

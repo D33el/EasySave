@@ -1,105 +1,104 @@
-﻿using System;
-using System.Data;
-using System.Text.Json;
-using Easysave.ViewModels;
+﻿using System.Text.Json;
 
-namespace Easysave.Models
+namespace EasySave.Models
 {
     public class State
     {
-        public DataState DataState { get; set; }
-        private Config configObj = Config.getConfig();
+        public int SaveId { get; set; }
+        public string SaveName { get; set; }
+        public string Time { get; set; }
+        public string Type { get; set; }
+        public bool SaveState { get; set; }
+        public string SourcePath { get; set; }
+        public string TargetPath { get; set; }
+        public int FilesNumber { get; set; }
+        public long FilesSize { get; set; }
+        public double Progress { get; set; }
+        public long RemainingFiles { get; set; }
+        public long RemainingFilesSize { get; set; }
 
-        public State() {
-            if (!File.Exists(configObj.SaveStateDir))
+        private Config ConfigObj = Config.getConfig();
+
+        public State()
+        {
+            // checks if the state.json files exists and create one if not
+            if (!File.Exists(ConfigObj.StateFilePath))
             {
-                File.Create(configObj.SaveStateDir).Close();
-                using StreamWriter sw = File.CreateText(configObj.SaveStateDir);
+                File.Create(ConfigObj.StateFilePath).Close();
+
+                // Writes in the file so its in JSON format
+                using StreamWriter sw = File.CreateText(ConfigObj.StateFilePath);
                 sw.Write("[]");
             }
         }
 
-        public void CreateState()
+        public void AddState()
         {
-            string stateFilePath = configObj.SaveStateDir;
+            string stateFilePath = ConfigObj.StateFilePath;
             string jsonString = File.ReadAllText(stateFilePath);
 
-            DataState[] dataStateArr = JsonSerializer.Deserialize<DataState[]>(jsonString);
-            List<DataState> stateList = new List<DataState>();
+            State[] statesArr = JsonSerializer.Deserialize<State[]>(jsonString);
+            List<State> stateList = new List<State>();
 
-            //Adding the old state entries to the list
-            stateList.AddRange(dataStateArr);
-            //Adding the new state entry to the list
-            stateList.Add(DataState);
+            // Adding the old state entries to the list
+            stateList.AddRange(statesArr);
+            // Adding the new state entry to the list
+            stateList.Add(this);
 
             string serializedJSON = JsonSerializer.Serialize(stateList) + Environment.NewLine;
-            
-
-            File.WriteAllText(configObj.SaveStateDir, serializedJSON);
+            File.WriteAllText(ConfigObj.StateFilePath, serializedJSON);
         }
 
+        // TODO
         public void UpdateState()
         {
-            List<DataState> stateList = new List<DataState>();
-            if (!File.Exists(configObj.SaveStateDir))
-            {
-                File.Create(configObj.SaveStateDir).Close();
-            }
+            List<State> stateList = new List<State>();
 
-            string jsonString = File.ReadAllText(configObj.SaveStateDir);
-            DataState[] dataStateList = JsonSerializer.Deserialize<DataState[]>(jsonString);
-            foreach (var saveSlot in dataStateList)
+            string jsonString = File.ReadAllText(ConfigObj.StateFilePath);
+            State[] dataStateList = JsonSerializer.Deserialize<State[]>(jsonString);
+
+            foreach (var save in dataStateList)
             {
-                if (saveSlot.SaveId == DataState.SaveId)
+                if (save.SaveId == SaveId)
                 {
-                    saveSlot.SaveName = DataState.SaveName;
-                    saveSlot.Time = DataState.Time;
-                    saveSlot.Type = DataState.Type;
-                    saveSlot.SaveState = DataState.SaveState;
-                    saveSlot.SourcePath = DataState.SourcePath;
-                    saveSlot.TargetPath = DataState.TargetPath;
-                    saveSlot.FilesNumber = DataState.FilesNumber;
-                    saveSlot.FilesSize = DataState.FilesSize;
-                    if (saveSlot.SaveState)
-                    {
-                        saveSlot.Progress = DataState.Progress;
-                        saveSlot.RemainingFiles = DataState.RemainingFiles;
-                        saveSlot.RemainingFilesSize = DataState.RemainingFilesSize;
-                    }
+                    save.SaveName = SaveName;
+                    save.Time = Time;
+                    save.Type = Type;
+                    save.SaveState = SaveState;
+                    save.SourcePath = SourcePath;
+                    save.TargetPath = TargetPath;
+                    save.FilesNumber = FilesNumber;
+                    save.FilesSize = FilesSize;
+                    save.Progress = Progress;
+                    save.RemainingFiles = RemainingFiles;
+                    save.RemainingFilesSize = RemainingFilesSize;
                 }
-
-                stateList.Add(saveSlot);
-
+                stateList.Add(save);
             }
 
             string serializedJSON = JsonSerializer.Serialize(stateList.ToArray()) + Environment.NewLine;
-            File.WriteAllText(configObj.SaveStateDir, serializedJSON);
-
+            File.WriteAllText(ConfigObj.StateFilePath, serializedJSON);
         }
 
+        // TODO
         public void DeleteState()
         {
-            if (!File.Exists(configObj.SaveStateDir))
-            {
-                File.Create(configObj.SaveStateDir).Close();
-            }
+            string jsonString = File.ReadAllText(ConfigObj.StateFilePath);
+            List<State> stateList = JsonSerializer.Deserialize<List<State>>(jsonString);
 
-            string jsonString = File.ReadAllText(configObj.SaveStateDir);
-            List<DataState> stateList = JsonSerializer.Deserialize<List<DataState>>(jsonString);
-
-            stateList.RemoveAll(save => save.SaveId == DataState.SaveId);
+            stateList.RemoveAll(save => save.SaveId == SaveId);
 
             string serializedJSON = JsonSerializer.Serialize(stateList.ToArray()) + Environment.NewLine;
-            File.WriteAllText(configObj.SaveStateDir, serializedJSON);
+            File.WriteAllText(ConfigObj.StateFilePath, serializedJSON);
         }
 
-
-        public DataState[] GetStateArr()
+        public static State[] GetStateArr()
         {
-            string jsonString = File.ReadAllText(configObj.SaveStateDir);
-            DataState[] dataStateArr = JsonSerializer.Deserialize<DataState[]>(jsonString);
+            Config configObj = Config.getConfig();
+            string jsonString = File.ReadAllText(configObj.StateFilePath);
+            State[] stateArr = JsonSerializer.Deserialize<State[]>(jsonString);
 
-            return dataStateArr;
+            return stateArr ??= Array.Empty<State>();
         }
 
     }

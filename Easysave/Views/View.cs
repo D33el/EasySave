@@ -1,14 +1,50 @@
-﻿using System;
-using System.Text.RegularExpressions;
-using Easysave.Models;
-using Easysave.ViewModels;
+﻿using System.Text.RegularExpressions;
+using EasySave.ViewModels;
 
-namespace Easysave.Views
+namespace EasySave.Views
 {
     public class View
     {
-        ViewModel viewModel = new ViewModel();
-        Config configObj = Config.getConfig();
+        private SaveViewModel _saveViewModel = new();
+        private Config _config = Config.getConfig();
+
+        public void Navigate(int page)
+        {
+            switch (page)
+            {
+                case 1: // Show the saves
+                    SaveViewModel.ShowSaveList();
+                    ShowSaveExecutionMenu();
+                    ShowMainMenu();
+                    break;
+                case 2: // Create a new save
+                    ShowSaveMenu();
+                    ShowMainMenu();
+                    break;
+
+                case 3: // Delete a save
+                    ShowDeleteMenu();
+                    ShowMainMenu();
+                    break;
+
+                case 4: // Configuration
+                    int step = ShowParameters();
+                    if (step == 0) { ShowMainMenu(); }
+                    else
+                    {
+                        SetParameters(step);
+                        Navigate(4);
+                    }
+                    break;
+
+                case 5: // Exit
+                    Environment.Exit(0);
+                    break;
+
+                default:
+                    break;
+            }
+        }
 
         public static void ShowFirstLaunchMenu()
         {
@@ -21,13 +57,19 @@ namespace Easysave.Views
             Console.WriteLine("|===   Configurez l'application avant de commencer les sauvegardes   ===|");
             Console.WriteLine("|===              Setup the app before starting backups              ===|");
             Console.WriteLine("|=======================================================================|");
+            Console.WriteLine("");
+            Console.WriteLine("|=======================================================================|");
+            Console.WriteLine("|===               Paramétrage initial / Initial Setup               ===|");
+            Console.WriteLine("|=======================================================================|");
+            Console.WriteLine("");
         }
 
         public int ShowParameters()
         {
-            string lang = configObj.Language;
-            int step = 0;
-
+            string lang = _config.Language;
+            int page;
+            string[] possibleChoices = { "0", "1", "2", "3", "4", "5","6" };
+            string choice;
             Console.Clear();
 
             if (lang == "fr")
@@ -35,62 +77,59 @@ namespace Easysave.Views
                 Console.WriteLine("|==(EasySave V1.0)====================================================|");
                 Console.WriteLine("|=========================== Paramétres ==============================|");
                 Console.WriteLine("|=====================================================================|");
-                Console.WriteLine("| [0] Tout reconfigurer                                               |");
-                Console.WriteLine("| [1] Changer la langue                                               |");
-                Console.WriteLine("| [2] Configurer l'emplacement dossier de destination des sauvegardes |");
-                Console.WriteLine("| [3] Configurer l'emplacement du fichier de log                      |");
-                Console.WriteLine("| [4] Configurer l'emplacement du fichier state                       |");
+                Console.WriteLine("| [1] Tout reconfigurer                                               |");
+                Console.WriteLine("| [2] Changer la langue                                               |");
+                Console.WriteLine("| [3] Configurer l'emplacement dossier de destination des sauvegardes |");
+                Console.WriteLine("| [4] Configurer l'emplacement du fichier de log                      |");
+                Console.WriteLine("| [5] Changer le type de logs                                         |");
+                Console.WriteLine("| [6] Configurer l'emplacement du fichier state                       |");
                 Console.WriteLine("|=====================================================================|");
-                Console.WriteLine("| [5] Revenir au menu principal                                       |");
+                Console.WriteLine("| [0] Revenir au menu principal                                       |");
                 Console.WriteLine("|=====================================================================|");
-
             }
             else
             {
                 Console.WriteLine("|==(EasySave V1.0)====================================================|");
                 Console.WriteLine("|============================ Settings ===============================|");
                 Console.WriteLine("|=====================================================================|");
-                Console.WriteLine("| [0] Reset All                                                       |");
-                Console.WriteLine("| [1] Change language                                                 |");
-                Console.WriteLine("| [2] Set backup destination path                                     |");
-                Console.WriteLine("| [3] Set log file path                                               |");
-                Console.WriteLine("| [4] Set state file path                                             |");
+                Console.WriteLine("| [1] Reset All                                                       |");
+                Console.WriteLine("| [2] Change language                                                 |");
+                Console.WriteLine("| [3] Set backup destination path                                     |");
+                Console.WriteLine("| [4] Set log file path                                               |");
+                Console.WriteLine("| [5] Change logs type                                                |");
+                Console.WriteLine("| [6] Set state file path                                             |");
                 Console.WriteLine("|=====================================================================|");
-                Console.WriteLine("| [5] Go back to main menu                                            |");
+                Console.WriteLine("| [0] Go back to main menu                                            |");
                 Console.WriteLine("|=====================================================================|");
             }
 
-            string choice = Console.ReadLine();
-            if(string.IsNullOrWhiteSpace(choice)) {
-                showErrorInput(); 
-                ShowParameters();
-            }
-            else 
+            do
             {
-                if(int.TryParse(choice,out int result)) 
-                { 
-                    step = result; 
-
-                    if(step <= 5)
-                    {
-                         return step;
-                    }
-                    else 
-                    {
-                        showErrorInput(); 
-                        ShowParameters(); 
-                    }
+                if (lang == "fr")
+                {
+                    Console.Write("Veuillez choisir un chiffre : ");
                 }
-            }
+                else
+                {
+                    Console.Write("Please choose a number : ");
+                }
+                choice = Console.ReadLine();
+            } while (!possibleChoices.Contains(choice));
 
-            return step;
+            page = int.Parse(choice);
+
+            return page;
         }
 
         public void ShowMainMenu()
         {
-            ViewModel viewmodel = new ViewModel();
+            string lang = _config.Language;
+
+            string[] possibleChoices = { "1", "2", "3", "4", "5" };
+            string choice;
+            int page;
+
             Console.ForegroundColor = ConsoleColor.White;
-            string lang = configObj.Language;
             Console.WriteLine();
             Console.WriteLine();
             Console.WriteLine("|=====================================================================|");
@@ -109,7 +148,6 @@ namespace Easysave.Views
                 Console.WriteLine("| [5] Quitter                                                         |");
                 Console.WriteLine("|=====================================================================|");
                 Console.WriteLine("|=====>               Veuillez inserer un chiffre               <=====|");
-
             }
             else
             {
@@ -124,286 +162,400 @@ namespace Easysave.Views
                 Console.WriteLine("|=====================================================================|");
                 Console.WriteLine("|=====>                 Please insert a number                  <=====|");
             }
-
-            string pageString = Console.ReadLine();
-            if(string.IsNullOrWhiteSpace(pageString))
+            do
             {
-                showErrorInput();
-                ShowMainMenu();
-            }
-            else 
-            { 
-                int page = int.Parse(pageString);
-                if(page > 5) { showErrorInput(); ShowMainMenu(); }
-                viewmodel.NavigateTo(page); 
-            }
+                if (lang == "fr")
+                {
+                    Console.Write("Veuillez choisir un chiffre : ");
+                }
+                else
+                {
+                    Console.Write("Please choose a number : ");
+                }
+                choice = Console.ReadLine();
+            } while (!possibleChoices.Contains(choice));
 
+            page = int.Parse(choice);
 
-        }
-
-        public void showErrorInput()
-        {
-            string lang = configObj.Language;
-            Console.Clear();
-            Console.ForegroundColor = ConsoleColor.Red;
-            if (lang == "fr")
-            {
-                Console.WriteLine("Veuillez choisir une option !");
-            }
-            else
-            {
-                Console.WriteLine("Please re-enter an option !");
-            }
-
-            Thread.Sleep(1500);
-            Console.Clear();
-            Console.ForegroundColor = ConsoleColor.White;
+            Navigate(page);
         }
 
         public void ShowSaveMenu()
         {
-            ViewModel viewmodel = new ViewModel();
-            string lang = configObj.Language;
+            string lang = _config.Language;
 
-            int res = viewmodel.checkSavesNumber();
+            int savesNumber = SaveViewModel.GetSavesNumber();
+
+            if (savesNumber == 5)
+            {
+                if (lang == "fr")
+                {
+                    Console.WriteLine("/!\\ Impossible de créer une nouvelle sauvegarde, vous en avez déja 5.");
+                }
+                else
+                {
+                    Console.WriteLine("/!\\ Impossible to create a new save, you already have 5.");
+                }
+                ShowMainMenu();
+                return;
+            }
 
             Console.Clear();
 
-            string type = "";
-            string saveName = "";
-            string sourcePath = "";
-            int Id = 0;
+            string type;
+            string saveName;
+            string sourcePath;
+            int id = 0;
 
 
             if (lang == "fr")
             {
-                Console.WriteLine("==== Veuillez saisir le type de sauvegarde");
-                Console.WriteLine("==== [1] Complete");
-                if (res != 0)
-                {
-                    Console.WriteLine("==== [2] Différentielle");
-                }
+                Console.WriteLine("|==== Veuillez saisir le type de sauvegarde");
+                Console.WriteLine("|==== [1] Complete");
+                Console.WriteLine("|==== [2] Différentielle");
             }
             else
             {
-                Console.WriteLine("==== Please enter the type of backup");
-                Console.WriteLine("==== [1] Full");
-                if (res != 0)
-                {
-                    Console.WriteLine("==== [2] Differential");
-                }
+                Console.WriteLine("|==== Please enter the type of backup");
+                Console.WriteLine("|==== [1] Full");
+                Console.WriteLine("|==== [2] Differential");
             }
-
-            type = Console.ReadLine();
-            if (type == "1") { type = "full"; } else if (type == "2" && res != 0) { type = "diff"; } else { type = ""; }
-
-            if(string.IsNullOrWhiteSpace(type)) { showErrorInput(); ShowSaveMenu(); }
+            do
+            {
+                if (lang == "fr")
+                {
+                    Console.Write("Veuillez choisir un chiffre : ");
+                }
+                else
+                {
+                    Console.Write("Please choose a number : ");
+                }
+                type = Console.ReadLine();
+            } while (type != "1" && type != "2");
+            if (type == "1") { type = "full"; } else if (type == "2") { type = "diff"; }
 
             if (type == "full")
             {
                 if (lang == "fr")
                 {
-
-                    Console.WriteLine("==== Etape 2 sur 3");
-                    Console.WriteLine("==== Veuillez saisir le nom de la sauvegarde :");
-                    saveName = Console.ReadLine();
-
-
-                    Console.WriteLine("==== Etape 3 sur 3");
-                    Console.WriteLine("==== Veuillez saisir le chemin source du fichier :");
-                    sourcePath = Console.ReadLine();
+                    Console.WriteLine("|==== Etape 2 sur 3");
+                    Console.WriteLine("|==== Veuillez saisir le nom de la sauvegarde :");
 
                 }
                 else
                 {
-
-                    Console.WriteLine("==== Step 2 of 3");
-                    Console.WriteLine("==== Please enter the name of the backup :");
-                    saveName = Console.ReadLine();
-
-                    Console.WriteLine("==== Step 3 of 3");
-                    Console.WriteLine("==== Please enter the source path of the files :");
-                    sourcePath = Console.ReadLine();
+                    Console.WriteLine("|==== Step 2 of 3");
+                    Console.Write("|==== Please enter the name of the backup : ");
                 }
 
-
-
-                DataState inputObj = new DataState()
+                do
                 {
-                    SaveId = Id,
-                    SaveName = saveName,
-                    SourcePath = sourcePath,
-                    Type = type,
-                };
+                    saveName = Console.ReadLine();
+                } while (!Regex.IsMatch(saveName, @"^[\w\s -]+$"));
 
-                viewmodel.InitializeSave(inputObj);
 
+                if (lang == "fr")
+                {
+                    Console.WriteLine("==== Etape 3 sur 3");
+                    Console.WriteLine("==== Veuillez saisir le chemin source du fichier : ");
+                }
+                else
+                {
+                    Console.WriteLine("|==== Step 3 of 3");
+                    Console.WriteLine("|==== Please enter the source path of the files : ");
+                }
+                do
+                {
+                    sourcePath = Console.ReadLine();
+                } while (!Regex.IsMatch(sourcePath, @"^(.+)\/([^\/]+)$"));
+
+
+                _saveViewModel.InitializeSave(saveName, type, sourcePath, id);
             }
-            else if (type == "diff")// differential backup
+            else if (type == "diff")
+            {
+                if (savesNumber == 0)
+                {
+                    if (lang == "fr")
+                    {
+                        Console.WriteLine("/!\\ Vous n'avez aucune sauvegarde.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("/!\\ You dont have any backup");
+                    }
+
+                    ShowMainMenu();
+                    return;
+                }
+
+                if (lang == "fr")
+                {
+                    Console.WriteLine("|==== Etape 2 sur 3");
+                    Console.WriteLine("|==== Veuillez selectionner une sauvegarde.");
+                }
+                else
+                {
+                    Console.WriteLine("|==== Step 2 of 3");
+                    Console.WriteLine("|==== Please select a save.");
+                }
+                int[] savesIds = SaveViewModel.ShowSaveList();
+                do
+                {
+                    if (lang == "fr")
+                    {
+                        Console.Write("Veuillez choisir un chiffre : ");
+                    }
+                    else
+                    {
+                        Console.Write("Please choose a number : ");
+                    }
+                    id = int.Parse(Console.ReadLine());
+                } while (!savesIds.Contains(id));
+
+                if (lang == "fr")
+                {
+                    Console.WriteLine("|==== Etape 3 sur 3");
+                    Console.Write("|==== Veuillez saisir le chemin source des fichiers :");
+                }
+                else
+                {
+                    Console.WriteLine("==== Step 3 of 3");
+                    Console.Write("==== Please enter the source path of the files :");
+                }
+                do
+                {
+                    sourcePath = Console.ReadLine();
+                } while (!Regex.IsMatch(sourcePath, @"^(.+)\/([^\/]+)$"));
+
+                _saveViewModel.InitializeSave("", type, sourcePath, id);
+            }
+        }
+
+        public void ShowSaveExecutionMenu()
+        {
+            string lang = _config.Language;
+
+            if (lang == "fr")
+            {
+                Console.WriteLine("|=== Voulez vous réexecuter une ou plusieurs sauvegardes ? [O / N]");
+            }
+            else
+            {
+                Console.WriteLine("|=== Do you want to re execute backups ? [O / N]");
+            }
+            ConsoleKeyInfo choice = Console.ReadKey();
+
+            if (choice.Key == ConsoleKey.Y || choice.Key == ConsoleKey.O)
             {
                 if (lang == "fr")
                 {
-                    Console.WriteLine("==== Etape 2 sur 3");
-                    Console.WriteLine("==== Veuillez selectionner une sauvegarde :");
+                    Console.WriteLine("|=== Choisissez les sauvegardes a executer.");
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                    Console.WriteLine("\\Info/ [ 1-3 ] pour executer de 1 a 3 \\Info/");
+                    Console.WriteLine("\\Info/ [ 1,3 ] pour executer 1 et 3 \\Info/");
+                    Console.ForegroundColor = ConsoleColor.White;
                 }
                 else
                 {
-                    Console.WriteLine("==== Step 2 of 3");
-                    Console.WriteLine("==== Please select a save  :");
+                    Console.WriteLine("|=== Choose the backups to execute.");
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                    Console.WriteLine("\\Info/ [ 1-3 ] to execute from 1 to 3 \\Info/");
+                    Console.WriteLine("\\Info/ [ 1,3 ] to execute 1 and 3 \\Info/");
+                    Console.ForegroundColor = ConsoleColor.White;
                 }
-                ShowSaveList();
-                Console.ForegroundColor = ConsoleColor.White;
-                Id = int.Parse(Console.ReadLine());
-                DataState saveInfo = viewmodel.GetSaveInfo(Id);
-
-                if (lang == "fr")
+                string input;
+                do
                 {
-                    Console.WriteLine("==== Etape 3 sur 3");
-                    Console.WriteLine("==== Veuillez saisir le chemin source des fichiers :");
-                    sourcePath = Console.ReadLine();
+                    input = Console.ReadLine() ?? "";
+                } while (!Regex.IsMatch(input, @"^\d+[-,]\d+$"));
+
+                string[] parts = input.Split(',', StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (string part in parts)
+                {
+                    // Handle range
+                    if (part.Contains('-'))
+                    {
+                        string[] range = part.Split('-');
+                        if (range.Length == 2 && int.TryParse(range[0], out int start) && int.TryParse(range[1], out int end))
+                        {
+                            for (int i = start; i <= end; i++)
+                            {
+                                _saveViewModel.InitializeSaveReexecution(i);
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("Invalid range format.");
+                        }
+                    }
+                    // Handle single number
+                    else if (int.TryParse(part, out int backupNumber))
+                    {
+                        _saveViewModel.InitializeSaveReexecution(backupNumber);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid input format.");
+                    }
                 }
-                else
-                {
-                    Console.WriteLine("==== Step 3 of 3");
-                    Console.WriteLine("==== Please enter the source path of the files :");
-                    sourcePath = Console.ReadLine();
-                }
-
-                DataState inputObj = new DataState()
-                {
-                    SaveId = saveInfo.SaveId,
-                    SaveName = saveInfo.SaveName,
-                    SourcePath = sourcePath,
-                    Type = type
-                };
-
-                viewmodel.InitializeSave(inputObj);
             }
+            else if (choice.Key == ConsoleKey.N)
+            {
+                return;
+            }
+
         }
 
         public void ShowDeleteMenu()
         {
+            string lang = _config.Language;
 
-            ViewModel viewmodel = new ViewModel();
-            string lang = configObj.Language;
+            int savesNumber = SaveViewModel.GetSavesNumber();
 
-            int userChoice = 0;
+            if (savesNumber == 0)
+            {
+                if (lang == "fr")
+                {
+                    Console.WriteLine("/!\\ Il n'y a rien a supprimer, vous n'avez aucune sauvegarde.");
+                }
+                else
+                {
+                    Console.WriteLine("/!\\ Nothing to delete, you have no backups.");
+                }
+                Console.ForegroundColor = ConsoleColor.White;
+                return;
+            }
+
+            int choice;
             ConsoleKeyInfo userConfirm;
 
             Console.Clear();
 
             if (lang == "fr")
             {
-                Console.WriteLine("==== Etape 1 sur 2");
-                Console.WriteLine("==== Veuillez selectionner la sauvegarde a supprimer");
+                Console.WriteLine("|==== Etape 1 sur 2");
+                Console.WriteLine("|==== Veuillez selectionner la sauvegarde a supprimer");
             }
             else
             {
-                Console.WriteLine("==== Step 1 of 2");
-                Console.WriteLine("==== Please select the save to delete");
+                Console.WriteLine("|==== Step 1 of 2");
+                Console.WriteLine("|==== Please select the save to delete");
             }
+            int[] savesIds = SaveViewModel.ShowSaveList();
 
-            ShowSaveList();
-            string choice = Console.ReadLine();
-            if (string.IsNullOrWhiteSpace(choice)) { showErrorInput(); ShowDeleteMenu(); }
-            userChoice = int.Parse(choice);
-            DataState data = viewmodel.GetSaveInfo(userChoice);
-            if(data.SaveId != userChoice) { showErrorInput(); ShowDeleteMenu(); }
+            do
+            {
+                if (lang == "fr")
+                {
+                    Console.Write("Veuillez choisir un chiffre : ");
+                }
+                else
+                {
+                    Console.Write("Please choose a number : ");
+                }
+                choice = int.Parse(Console.ReadLine());
+            } while (!savesIds.Contains(choice));
 
             if (lang == "fr")
             {
-                Console.WriteLine("==== Etape 2 sur 2");
-                Console.WriteLine("==== Êtes-vous sûr de vouloir supprimer cette sauvegarde ? [O / N]");
+                Console.WriteLine("|==== Etape 2 sur 2");
+                Console.Write("|==== Êtes-vous sûr de vouloir supprimer cette sauvegarde ? [O / N]");
             }
             else
             {
-                Console.WriteLine("==== Step 2 of 2");
-                Console.WriteLine("==== Are you sure you want to delete this backup ? [Y / N]");
+                Console.WriteLine("|==== Step 2 of 2");
+                Console.Write("|==== Are you sure you want to delete this backup ? [Y / N]");
             }
 
             userConfirm = Console.ReadKey();
 
             if (userConfirm.Key == ConsoleKey.Y || userConfirm.Key == ConsoleKey.O)
             {
-                viewmodel.InitializeDeleteSave(userChoice);
+                _saveViewModel.InitializeDeleteSave(choice);
             }
-            else if (userConfirm.Key == ConsoleKey.N)
+            else
             {
-                if (lang == "fr")
-                {
-                    Console.WriteLine("Suppression annulée");
-                }
-                else
-                {
-                    Console.WriteLine("deletion canceled");
-                }
-            }
-
-        }
-
-        public void ShowSaveList()
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            DataState[] resultArr = viewModel.GetSavelist();
-
-            foreach (var result in resultArr)
-            {
-                Console.WriteLine($"|==== [{result.SaveId}] {result.SaveName}  {result.Time}");
+                ShowMainMenu();
             }
         }
 
-        public DataConfig GetParametersInput(bool isFirstTime, int step)
+        public void SetParameters(int step)
         {
             string lang;
             string targetDir;
-            string saveLogDir;
-            string saveStateDir;
+            string logsDir;
+            string logsType;
+            string stateFilePath;
 
-            if (isFirstTime || step == 0)
+            if (step == 1)
             {
-                Console.WriteLine("");
-                Console.WriteLine("|=======================================================================|");
-                Console.WriteLine("|===               Paramétrage initial / Initial Setup               ===|");
-                Console.WriteLine("|=======================================================================|");
-                Console.WriteLine("");
-
                 Console.WriteLine("|=======================================================================|");
                 Console.WriteLine("|===            Veuillez choisir une langue [eng / fr]               ===|");
                 Console.WriteLine("|===                 Choose a language [eng / fr]                    ===|");
                 Console.WriteLine("|=======================================================================|");
-                lang = Console.ReadLine() ?? "";
+
+                do
+                {
+                    lang = Console.ReadLine();
+
+                } while (lang != "fr" && lang != "eng");
+
 
                 Console.WriteLine("|=======================================================================|");
                 Console.WriteLine("|===          Veuillez choisir le chemin des sauvegardes             ===|");
                 Console.WriteLine("|===                Choose the path of the backups                   ===|");
                 Console.WriteLine("|=======================================================================|");
-                targetDir = Console.ReadLine() ?? "";
+                do
+                {
+                    targetDir = Console.ReadLine();
 
-                Console.WriteLine("|=======================================================================|");
-                Console.WriteLine("|===   Veuillez choisir le chemin du dossier ou iront les logs       ===|");
-                Console.WriteLine("|===            Choose the path of the logs directory                ===|");
-                Console.WriteLine("|=======================================================================|");
-                saveLogDir = Console.ReadLine() ?? "";
+                } while (!Regex.IsMatch(targetDir, @"^(.+)\/([^\/]+)$"));
 
                 Console.WriteLine("|=======================================================================|");
                 Console.WriteLine("|===        Veuillez choisir le chemin du fichier state.json         ===|");
                 Console.WriteLine("|===            Choose the path of the state.json file               ===|");
                 Console.WriteLine("|=======================================================================|");
-                saveStateDir = Console.ReadLine() ?? "";
+                do
+                {
+                    stateFilePath = Console.ReadLine();
+
+                } while (!Regex.IsMatch(targetDir, @"^(.+)\/([^\/]+)$"));
+
+                Console.WriteLine("|=======================================================================|");
+                Console.WriteLine("|===   Veuillez choisir le chemin du dossier ou iront les logs       ===|");
+                Console.WriteLine("|===            Choose the path of the logs directory                ===|");
+                Console.WriteLine("|=======================================================================|");
+                do
+                {
+                    logsDir = Console.ReadLine();
+
+                } while (!Regex.IsMatch(targetDir, @"^(.+)\/([^\/]+)$"));
+
+                Console.WriteLine("|=======================================================================|");
+                Console.WriteLine("|===          Veuillez choisir le type de logs [json / xml]          ===|");
+                Console.WriteLine("|===              Choose the type of logs [json / xml]               ===|");
+                Console.WriteLine("|=======================================================================|");
+                do
+                {
+                    logsType = Console.ReadLine();
+
+                } while (logsType != "json" && logsType != "xml");
+
             }
             else
             {
-                string selectedLang = configObj.Language;
-                lang = selectedLang;
-                targetDir = configObj.TargetDir;
-                saveStateDir = configObj.SaveStateDir;
-                saveLogDir = configObj.SaveLogDir;
-
+                lang = _config.Language;
+                targetDir = _config.TargetDir;
+                stateFilePath = _config.StateFilePath;
+                logsDir = _config.LogsDir;
+                logsType = _config.LogsType;
 
                 switch (step)
                 {
-                    case 1:
-                        if (selectedLang == "fr")
+                    case 2:
+                        if (lang == "fr")
                         {
                             Console.WriteLine("|=====================================================================|");
                             Console.WriteLine("|===             Veuillez choisir une langue [eng / fr]            ===|");
@@ -416,8 +568,8 @@ namespace Easysave.Views
                         lang = Console.ReadLine();
                         break;
 
-                    case 2:
-                        if (selectedLang == "fr")
+                    case 3:
+                        if (lang == "fr")
                         {
                             Console.WriteLine("|=====================================================================|");
                             Console.WriteLine("|===           Veuillez choisir le chemin des sauvegardes          ===|");
@@ -431,22 +583,36 @@ namespace Easysave.Views
                         targetDir = Console.ReadLine();
                         break;
 
-                    case 3:
-                        if (selectedLang == "fr")
+                    case 4:
+                        if (lang == "fr")
                         {
                             Console.WriteLine("|=====================================================================|");
-                            Console.WriteLine("|===        Veuillez choisir le chemin du fichier log.json         ===|");
+                            Console.WriteLine("|===        Veuillez choisir le chemin du dossier des logs         ===|");
                         }
                         else
                         {
                             Console.WriteLine("|=====================================================================|");
-                            Console.WriteLine("|===             Choose the path of the log.json file              ===|");
+                            Console.WriteLine("|===             Choose the path of the logs directory             ===|");
                         }
-                        saveLogDir = Console.ReadLine();
+                        logsDir = Console.ReadLine();
                         break;
 
-                    case 4:
-                        if (selectedLang == "fr")
+                    case 5:
+                        if (lang == "fr")
+                        {
+                            Console.WriteLine("|=====================================================================|");
+                            Console.WriteLine("|===        Veuillez choisir le type de logs [ json / xml ]         ===|");
+                        }
+                        else
+                        {
+                            Console.WriteLine("|=====================================================================|");
+                            Console.WriteLine("|===             Choose the type of logs [ json / xml ]             ===|");
+                        }
+                        logsType = Console.ReadLine();
+                        break;
+
+                    case 6:
+                        if (lang == "fr")
                         {
                             Console.WriteLine("|=====================================================================|");
                             Console.WriteLine("|===        Veuillez choisir le chemin du fichier state.json       ===|");
@@ -456,37 +622,19 @@ namespace Easysave.Views
                             Console.WriteLine("|=====================================================================|");
                             Console.WriteLine("|===            Choose the path of the state.json file             ===|");
                         }
-                        saveStateDir = Console.ReadLine();
+                        stateFilePath = Console.ReadLine();
                         break;
                 }
-
-
             }
 
-            DataConfig inputObj = new DataConfig();
-            inputObj.Language = lang;
-            inputObj.TargetDir = targetDir;
-            inputObj.SaveStateDir = saveStateDir;
-            inputObj.SaveLogDir = saveLogDir;
+            _config.Language = lang;
+            _config.StateFilePath = stateFilePath;
+            _config.LogsDir = logsDir;
+            _config.LogsType = logsType;
+            _config.TargetDir = targetDir;
 
-            return inputObj;
-
+            _config.SaveConfig();
+            _config.LoadConfig();
         }
-
-        public int GetInput(int step)
-        {
-            string input = Console.ReadLine();
-
-            if (int.TryParse(input, out int choice))
-            {
-                return choice;
-            }
-            else
-            {
-                Console.WriteLine("Entrée invalide. Veuillez saisir un nombre entier.");
-                return GetInput(step);
-            }
-        }
-
     }
 }
