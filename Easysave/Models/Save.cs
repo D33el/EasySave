@@ -11,14 +11,15 @@ namespace EasySave.Models
         public string Type { get; set; }
 
         private Config _config = Config.GetConfig();
-        private Log _log = Log.GetLog();
-        private State _state = new();
+
         private Stopwatch Duration = new();
 
         public Save() { }
 
         public void CreateSave()
         {
+            Log _log = Log.GetLog();
+            State _state = new();
             string saveTargetPath = Path.Combine(_config.TargetDir, SaveName);
             string lang = _config.Language;
 
@@ -37,8 +38,8 @@ namespace EasySave.Models
                 {
                     if (!Directory.Exists(saveTargetPath)) { Directory.CreateDirectory(saveTargetPath); }
 
-                    if (Type == "full") { FullSave(saveTargetPath); }
-                    else { DiffSave(saveTargetPath); }
+                    if (Type == "full") { FullSave(saveTargetPath, _log, _state); }
+                    else { DiffSave(saveTargetPath, _log, _state); }
 
                     if (lang == "fr") { Console.WriteLine($"Sauvegarde '{SaveName}' créée avec succès."); }
                     else { Console.WriteLine($"Backup '{SaveName}' created with success."); }
@@ -56,7 +57,7 @@ namespace EasySave.Models
             }
         }
 
-        private void FullSave(string folderPath)
+        private void FullSave(string folderPath, Log _log, State _state)
         {
             if (Directory.Exists(folderPath) && Directory.GetFiles(folderPath).Length != 0)
             {
@@ -89,7 +90,7 @@ namespace EasySave.Models
             _state.AddState();
         }
 
-        private void DiffSave(string folderPath)
+        private void DiffSave(string folderPath, Log _log, State _state)
         {
             string[] destinationFiles = Directory.GetFiles(folderPath);
             string[] sourceFiles = Directory.GetFiles(SaveSourcePath);
@@ -123,6 +124,7 @@ namespace EasySave.Models
         public void DeleteSave()
         {
             string lang = _config.Language;
+            State _state = new();
             try
             {
                 string saveFilePath = Path.Combine(_config.TargetDir, SaveName);
@@ -159,6 +161,7 @@ namespace EasySave.Models
         public void GetSaveProgress()
         {
             string lang = _config.Language;
+            State _state = new();
             try
             {
                 string[] filesToCopy = Directory.GetFiles(SaveSourcePath);

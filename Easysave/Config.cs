@@ -15,7 +15,12 @@ namespace EasySave
 
         private Config()
         {
-            
+            if (!File.Exists(FilePath))
+            {
+                File.Create(FilePath).Close();
+                using StreamWriter sw = File.CreateText(FilePath);
+                sw.Write("[]");
+            }
         }
 
         public static Config GetConfig()
@@ -33,13 +38,6 @@ namespace EasySave
 
         public bool CheckConfig()
         {
-            if (!File.Exists(FilePath))
-            {
-                File.Create(FilePath).Close();
-                using StreamWriter sw = File.CreateText(FilePath);
-                sw.Write("[]");
-                return false;
-            }
             string JSONtext = File.ReadAllText(FilePath);
             int fileLength = JSONtext.Length;
             if (fileLength > 32) { return true; } else { return false; }
