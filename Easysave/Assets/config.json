@@ -1,0 +1,7 @@
+{
+  "Language": "fr",
+  "TargetDir": "/users/adel/desktop/testbackup",
+  "LogsDir": "/users/adel/desktop/logs",
+  "StateFilePath": "/users/adel/desktop/state.json",
+  "LogsType": "xml"
+}
