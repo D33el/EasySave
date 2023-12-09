@@ -1,0 +1,140 @@
+﻿<Window x:Class="easyesaveVF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:easyesaveVF"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450"
+        Width="650"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize">
+
+    <Grid Background="#a7c6ed">
+
+        <TextBlock Text="Merci d’avoir téléchargé EasySave by ProSoft" FontWeight="Bold" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,22,0,0" />
+
+        <TextBlock Text="Veuillez procéder au paramétrage initial de l’application avant de continuer" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,50,0,0" />
+
+        <StackPanel Margin="20,100,20,10">
+
+            <StackPanel Margin="20,0">
+                <TextBlock Text="Langue de l'application :" HorizontalAlignment="Center" FontSize="16" FontWeight="Bold" Foreground="#318CE7" Margin="0,0,0,5"/>
+                <ComboBox x:Name="LangueComboBox" Width="250" SelectionChanged="LangueComboBox_SelectionChanged">
+                    
+                </ComboBox>
+            </StackPanel>
+
+            <StackPanel HorizontalAlignment="Left" Margin="0,25,0,0">
+                <TextBlock Text="Emplacement des sauvegardes :" HorizontalAlignment="Center" FontSize="16" FontWeight="Bold" Foreground="#318CE7" Margin="0,0,0,5"/>
+                <StackPanel Orientation="Horizontal">
+                    <TextBox Width="200" TextChanged="TextBox_TextChanged" Height="30" />
+                    <Button Content="Ajouter" Width="80" Height="30" Margin="5" Click="Ajouter_Click">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Background" Value="#007ACC" />
+                                <Setter Property="Foreground" Value="White" />
+                                <Setter Property="BorderBrush" Value="#007ACC" />
+                                <Setter Property="BorderThickness" Value="1" />
+                                <Setter Property="FontSize" Value="14" />
+                                <Setter Property="FontWeight" Value="Bold" />
+                                <Setter Property="Cursor" Value="Hand" />
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="#005A99" />
+                                        <Setter Property="BorderBrush" Value="#005A99" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </StackPanel>
+            </StackPanel>
+
+            <StackPanel HorizontalAlignment="Right" Margin="0,-66,0,0">
+                <TextBlock Text="Emplacement du fichier état :" HorizontalAlignment="Center" FontSize="16" FontWeight="Bold" Foreground="#318CE7" Margin="0,0,0,5"/>
+                <StackPanel Orientation="Horizontal">
+                    <TextBox Width="200" TextChanged="TextBox_TextChanged" Height="30" />
+                    <Button Content="Ajouter" Width="80" Height="30" Margin="5" Click="Ajouter_Click">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Background" Value="#007ACC" />
+                                <Setter Property="Foreground" Value="White" />
+                                <Setter Property="BorderBrush" Value="#007ACC" />
+                                <Setter Property="BorderThickness" Value="1" />
+                                <Setter Property="FontSize" Value="14" />
+                                <Setter Property="FontWeight" Value="Bold" />
+                                <Setter Property="Cursor" Value="Hand" />
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="#005A99" />
+                                        <Setter Property="BorderBrush" Value="#005A99" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </StackPanel>
+            </StackPanel>
+
+            <StackPanel HorizontalAlignment="Left" Margin="0,20,0,0" >
+                <TextBlock Text="Types de logs :" HorizontalAlignment="Center" FontSize="16" FontWeight="Bold" Foreground="#318CE7" Margin="0,0,0,5"/>
+                <ComboBox Width="200" Height="30" />
+            </StackPanel>
+
+            <StackPanel HorizontalAlignment="Right" Margin="0,-60,0,0">
+                <TextBlock Text="Emplacement des logs :" HorizontalAlignment="Center" FontSize="16" FontWeight="Bold" Foreground="#318CE7" Margin="0,0,0,
+5"/>
+                <StackPanel Orientation="Horizontal">
+                    <TextBox Width="200" TextChanged="TextBox_TextChanged" Height="30"/>
+                    <Button Content="Ajouter" Width="80" Height="30" Margin="5" Click="Ajouter_Click">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Background" Value="#007ACC" />
+                                <Setter Property="Foreground" Value="White" />
+                                <Setter Property="BorderBrush" Value="#007ACC" />
+                                <Setter Property="BorderThickness" Value="1" />
+                                <Setter Property="FontSize" Value="14" />
+                                <Setter Property="FontWeight" Value="Bold" />
+                                <Setter Property="Cursor" Value="Hand" />
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="#005A99" />
+                                        <Setter Property="BorderBrush" Value="#005A99" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </StackPanel>
+            </StackPanel>
+
+            <Button Content="Continuer"
+                    Width="200"
+                    HorizontalAlignment="Center"
+                    Margin="0,20,0,0"
+                    Click="Continuer_Click">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Background" Value="#318CE7" />
+                        <Setter Property="Foreground" Value="White" />
+                        <Setter Property="BorderBrush" Value="#318CE7" />
+                        <Setter Property="BorderThickness" Value="1" />
+                        <Setter Property="Padding" Value="10,5" />
+                        <Setter Property="FontSize" Value="16" />
+                        <Setter Property="FontWeight" Value="Bold" />
+                        <Setter Property="Cursor" Value="Hand" />
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#007ACC" />
+                                <Setter Property="BorderBrush" Value="#007ACC" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+        </StackPanel>
+    </Grid>
+</Window>
