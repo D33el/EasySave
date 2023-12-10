@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace easyesaveVF
+namespace wpftest
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -23,69 +23,43 @@ namespace easyesaveVF
         public MainWindow()
         {
             InitializeComponent();
-            List<string> choices = new List<string>();
-            choices.Add("Francais");
-            choices.Add("Anglais");
+            //WelcomePage.Visibility = Visibility.Collapsed;
+            HomePage.Visibility = Visibility.Visible;
 
-
-            // Set the ComboBox's ItemsSource to the list of choices
-            LangueComboBox.ItemsSource = choices;
+            SettingsPage.Visibility = Visibility.Collapsed;
+            SavePage.Visibility = Visibility.Collapsed;
         }
-        private void LangueComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+
+        private void Home_Click(object sender, RoutedEventArgs e)
         {
-            if (LangueComboBox.SelectedItem != null)
-            {
-                TextBlock langText = (TextBlock)FindName("LanguageText");
+            HomePage.Visibility = Visibility.Visible;
 
-                if (langText != null)
-                {
-                    string selectedLanguage = LangueComboBox.SelectedItem.ToString();
-                    switch (selectedLanguage)
-                    {
-                        case "English":
-                            langText.Text = "Language:";
-                            break;
-                        case "French":
-                            langText.Text = "Langage :";
-                            break;
-                        default:
-                            break;
-                    }
-                }  
-            }
+            SettingsPage.Visibility = Visibility.Collapsed;
+            SavePage.Visibility = Visibility.Collapsed;
+        }
+        private void Settings_Click(object sender, RoutedEventArgs e)
+        {
+            SettingsPage.Visibility = Visibility.Visible;
 
+            HomePage.Visibility = Visibility.Collapsed;
+            SavePage.Visibility = Visibility.Collapsed;
+        }
+        private void Save_Click(object sender, RoutedEventArgs e)
+        {
+            SavePage.Visibility = Visibility.Visible;
+
+            HomePage.Visibility = Visibility.Collapsed;
+            SettingsPage.Visibility = Visibility.Collapsed;
         }
 
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            TextBox textBox = (TextBox)sender;
-            string enteredText = textBox.Text;
 
-            // Update your data using the entered text
         }
 
-        private void Ajouter_Click(object sender, RoutedEventArgs e)
+        private void OpenExplorer_Click(object sender, RoutedEventArgs e)
         {
-            Button clickedButton = (Button)sender;
-            StackPanel parentPanel = (StackPanel)clickedButton.Parent;
-            TextBox textBox = (TextBox)parentPanel.Children[0];
 
-            string enteredText = textBox.Text;
-
-            // Perform actions based on the clicked button and entered text
-        }
-
-
-
-        private void Continuer_Click(object sender, RoutedEventArgs e)
-        {
-            // Your code to handle the "Continuer" button click event
         }
     }
-
 }
-
-
-
-
-
