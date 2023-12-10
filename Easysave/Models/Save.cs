@@ -1,11 +1,14 @@
-﻿using System.Data;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 
 namespace EasySave.Models
 {
     public class Save
     {
-        public int SaveId;
+        public Guid SaveId { get; set; }
         public string SaveName { get; set; }
         public string SaveSourcePath { get; set; }
         public string Type { get; set; }
@@ -22,7 +25,9 @@ namespace EasySave.Models
             string saveTargetPath = Path.Combine(_config.TargetDir, SaveName);
             string lang = _config.Language;
 
-            _state.SaveId = SaveId;
+            _state.SaveId = Guid.NewGuid();
+
+
             _state.SaveName = SaveName;
             _state.Type = Type;
             _state.Time = DateTime.Now.ToString("dd-MM-yyyy HH:mm:ss");
@@ -55,9 +60,28 @@ namespace EasySave.Models
                 else { Console.WriteLine($"Error creating '{SaveName}' backup : {ex.Message}"); }
             }
         }
+        public void CreateSaveContinuously()
+        {
+            string lang = _config.Language;
 
+            try
+            {
+                while (true)
+                {
+                    CreateSave(); // Appeler votre méthode CreateSave existante
 
-
+                    // Ajouter un délai entre les sauvegardes (par exemple, 1 heure)
+                    int delayMinutes = 1;
+                    TimeSpan delay = TimeSpan.FromMinutes(delayMinutes);
+                    System.Threading.Thread.Sleep(delay);
+                }
+            }
+            catch (Exception ex)
+            {
+                if (lang == "fr") { Console.WriteLine($"Erreur lors de la création de la sauvegarde: {ex.Message}"); }
+                else { Console.WriteLine($"Error creating backup: {ex.Message}"); }
+            }
+        }
         private void FullSave(string folderPath)
         {
             if (Directory.Exists(folderPath) && Directory.GetFiles(folderPath).Length != 0)
@@ -99,7 +123,6 @@ namespace EasySave.Models
 
             foreach (string file in newModifiedFiles)
             {
-
                 FileInfo fileInfo = new(file);
                 Duration.Restart();
 
@@ -116,7 +139,6 @@ namespace EasySave.Models
                 _log.Timestamp = DateTime.Now.ToString("dd-MM-yyyy hh:mm:ss");
 
                 _log.WriteLog();
-
             }
             // Updating state.json file by adding a new entry
             _state.UpdateState();
