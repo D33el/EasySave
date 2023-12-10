@@ -13,15 +13,16 @@ namespace EasySave.Models
         public string SaveSourcePath { get; set; }
         public string Type { get; set; }
 
-        private Config _config = Config.getConfig();
-        private Log _log = Log.getLog();
-        private State _state = new();
+        private Config _config = Config.GetConfig();
+
         private Stopwatch Duration = new();
 
         public Save() { }
 
         public void CreateSave()
         {
+            Log _log = Log.GetLog();
+            State _state = new();
             string saveTargetPath = Path.Combine(_config.TargetDir, SaveName);
             string lang = _config.Language;
 
@@ -42,8 +43,8 @@ namespace EasySave.Models
                 {
                     if (!Directory.Exists(saveTargetPath)) { Directory.CreateDirectory(saveTargetPath); }
 
-                    if (Type == "full") { FullSave(saveTargetPath); }
-                    else { DiffSave(saveTargetPath); }
+                    if (Type == "full") { FullSave(saveTargetPath, _log, _state); }
+                    else { DiffSave(saveTargetPath, _log, _state); }
 
                     if (lang == "fr") { Console.WriteLine($"Sauvegarde '{SaveName}' créée avec succès."); }
                     else { Console.WriteLine($"Backup '{SaveName}' created with success."); }
@@ -115,11 +116,11 @@ namespace EasySave.Models
             _state.AddState();
         }
 
-        private void DiffSave(string folderPath)
+        private void DiffSave(string folderPath, Log _log, State _state)
         {
             string[] destinationFiles = Directory.GetFiles(folderPath);
             string[] sourceFiles = Directory.GetFiles(SaveSourcePath);
-            string[] newModifiedFiles = CompareFiles(sourceFiles, destinationFiles, folderPath);
+            string[] newModifiedFiles = CompareFiles(sourceFiles, destinationFiles);
 
             foreach (string file in newModifiedFiles)
             {
@@ -147,6 +148,7 @@ namespace EasySave.Models
         public void DeleteSave()
         {
             string lang = _config.Language;
+            State _state = new();
             try
             {
                 string saveFilePath = Path.Combine(_config.TargetDir, SaveName);
@@ -183,6 +185,7 @@ namespace EasySave.Models
         public void GetSaveProgress()
         {
             string lang = _config.Language;
+            State _state = new();
             try
             {
                 string[] filesToCopy = Directory.GetFiles(SaveSourcePath);
@@ -212,7 +215,7 @@ namespace EasySave.Models
             }
         }
 
-        private static string[] CompareFiles(string[] sourceFiles, string[] destinationFiles, string saveFolderPath)
+        private static string[] CompareFiles(string[] sourceFiles, string[] destinationFiles)
         {
             List<string> newModifiedFiles = new List<string>();
 
@@ -249,5 +252,16 @@ namespace EasySave.Models
             }
             return size;
         }
+
+        public void Encrypt(string sourceDir, string targetDir)
+        {
+            using Process process = new Process();
+            process.StartInfo.FileName = @"/CryptoSoft/CryptoSoft.exe";
+            process.StartInfo.Arguments = String.Format("\"{0}\"", sourceDir) + " " + String.Format("\"{0}\"", targetDir);
+            process.Start();
+            process.Close();
+
+        }
+
     }
 }
