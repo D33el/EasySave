@@ -7,19 +7,19 @@ namespace EasySave
     {
         public static void Main(string[] args)
         {
-            Config configObj = Config.GetConfig();
-            View view = new();
+            Config _config = Config.GetConfig();
+            View _view = new();
 
-            bool configExists = configObj.CheckConfig();
+            bool configExists = _config.CheckConfig();
 
             if (!configExists)
             {
                 View.ShowFirstLaunchMenu();
-                view.SetParameters(1);
-                configObj.SaveConfig();
-                configObj.LoadConfig();
+                _view.SetParameters(1);
+                _config.SaveConfig();
+                _config.LoadConfig();
             }
-            view.ShowMainMenu();
+            _view.ShowMainMenu();
         }
     }
 }

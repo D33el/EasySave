@@ -68,7 +68,7 @@ namespace EasySave.Views
         {
             string lang = _config.Language;
             int page;
-            string[] possibleChoices = { "0", "1", "2", "3", "4", "5","6" };
+            string[] possibleChoices = { "0", "1", "2", "3", "4", "5" };
             string choice;
             Console.Clear();
 
@@ -82,7 +82,6 @@ namespace EasySave.Views
                 Console.WriteLine("| [3] Configurer l'emplacement dossier de destination des sauvegardes |");
                 Console.WriteLine("| [4] Configurer l'emplacement du fichier de log                      |");
                 Console.WriteLine("| [5] Changer le type de logs                                         |");
-                Console.WriteLine("| [6] Configurer l'emplacement du fichier state                       |");
                 Console.WriteLine("|=====================================================================|");
                 Console.WriteLine("| [0] Revenir au menu principal                                       |");
                 Console.WriteLine("|=====================================================================|");
@@ -97,7 +96,6 @@ namespace EasySave.Views
                 Console.WriteLine("| [3] Set backup destination path                                     |");
                 Console.WriteLine("| [4] Set log file path                                               |");
                 Console.WriteLine("| [5] Change logs type                                                |");
-                Console.WriteLine("| [6] Set state file path                                             |");
                 Console.WriteLine("|=====================================================================|");
                 Console.WriteLine("| [0] Go back to main menu                                            |");
                 Console.WriteLine("|=====================================================================|");
@@ -183,7 +181,6 @@ namespace EasySave.Views
         public void ShowSaveMenu()
         {
             string lang = _config.Language;
-
             int savesNumber = SaveViewModel.GetSavesNumber();
 
             if (savesNumber == 5)
@@ -368,7 +365,7 @@ namespace EasySave.Views
                 do
                 {
                     input = Console.ReadLine() ?? "";
-                } while (!Regex.IsMatch(input, @"^\d+[-,]\d+$"));
+                } while (!Regex.IsMatch(input, @"^\d+(-\d+|,\d+)?$"));
 
                 string[] parts = input.Split(',', StringSplitOptions.RemoveEmptyEntries);
 
@@ -514,16 +511,6 @@ namespace EasySave.Views
                 } while (!Regex.IsMatch(targetDir, @"^(.+)\/([^\/]+)$"));
 
                 Console.WriteLine("|=======================================================================|");
-                Console.WriteLine("|===        Veuillez choisir le chemin du fichier state.json         ===|");
-                Console.WriteLine("|===            Choose the path of the state.json file               ===|");
-                Console.WriteLine("|=======================================================================|");
-                do
-                {
-                    stateFilePath = Console.ReadLine();
-
-                } while (!Regex.IsMatch(targetDir, @"^(.+)\/([^\/]+)$"));
-
-                Console.WriteLine("|=======================================================================|");
                 Console.WriteLine("|===   Veuillez choisir le chemin du dossier ou iront les logs       ===|");
                 Console.WriteLine("|===            Choose the path of the logs directory                ===|");
                 Console.WriteLine("|=======================================================================|");
@@ -548,7 +535,6 @@ namespace EasySave.Views
             {
                 lang = _config.Language;
                 targetDir = _config.TargetDir;
-                stateFilePath = _config.StateFilePath;
                 logsDir = _config.LogsDir;
                 logsType = _config.LogsType;
 
@@ -611,24 +597,10 @@ namespace EasySave.Views
                         logsType = Console.ReadLine();
                         break;
 
-                    case 6:
-                        if (lang == "fr")
-                        {
-                            Console.WriteLine("|=====================================================================|");
-                            Console.WriteLine("|===        Veuillez choisir le chemin du fichier state.json       ===|");
-                        }
-                        else
-                        {
-                            Console.WriteLine("|=====================================================================|");
-                            Console.WriteLine("|===            Choose the path of the state.json file             ===|");
-                        }
-                        stateFilePath = Console.ReadLine();
-                        break;
                 }
             }
 
             _config.Language = lang;
-            _config.StateFilePath = stateFilePath;
             _config.LogsDir = logsDir;
             _config.LogsType = logsType;
             _config.TargetDir = targetDir;

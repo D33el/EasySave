@@ -25,7 +25,7 @@ namespace EasySave.ViewModels
             }
             else if (saveType == "diff")
             {
-                _save.SaveId = saveId;
+                SetSaveInfo(saveId);
             }
             _save.CreateSave();
         }

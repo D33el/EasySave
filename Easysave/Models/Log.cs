@@ -42,8 +42,17 @@ namespace EasySave.Models
 
         public static Log GetLog()
         {
+            try
+            {
             LogInstance ??= new Log();
             return LogInstance;
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return new Log();
+            }
         }
 
         public void WriteLog()
