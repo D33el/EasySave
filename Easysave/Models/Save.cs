@@ -83,7 +83,7 @@ namespace EasySave.Models
                 else { Console.WriteLine($"Error creating backup: {ex.Message}"); }
             }
         }
-        private void FullSave(string folderPath)
+        private void FullSave(string folderPath, Log _log, State _state)
         {
             if (Directory.Exists(folderPath) && Directory.GetFiles(folderPath).Length != 0)
             {
