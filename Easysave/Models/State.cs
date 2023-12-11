@@ -4,7 +4,7 @@ namespace EasySave.Models
 {
     public class State
     {
-        public Guid SaveId { get; set; }
+        public int SaveId { get; set; }
         public string SaveName { get; set; }
         public string Time { get; set; }
         public string Type { get; set; }
