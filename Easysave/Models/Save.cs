@@ -233,62 +233,52 @@ namespace EasySave.Models
             return size;
         }
 
-        public static void CalculateStorageStatistics()
+        public static double GetAllSavesSize()
         {
             long totalSizeBytes = 0;
-            int totalFiles = 0;
+            State[] statesArr = State.GetStateArr();
 
-            State[] existingStates = State.GetStateArr();
-
-            foreach (var existingState in existingStates)
+            foreach (var save in statesArr)
             {
-                totalSizeBytes += existingState.FilesSize;
-                totalFiles += existingState.FilesNumber;
+                totalSizeBytes += save.FilesSize;
             }
 
-            double totalSizeGB = ConvertBytesToGigabytes(totalSizeBytes);
 
-            Console.WriteLine($"Nombre total de gigaoctets stockés : {totalSizeGB} Go");
-            Console.WriteLine($"Nombre total de fichiers stockés : {totalFiles} fichiers");
+            return totalSizeBytes;
         }
 
-        private static double ConvertBytesToGigabytes(long bytes)
+        public static int[] GetSavesTypesNumber()
         {
-            const double BytesInGigabyte = 1.0 / (1024 * 1024 * 1024);
-            return bytes * BytesInGigabyte;
-        }
-
-        public static void CalculateSaveTypesCount()
-        {
-            
-
             int fullSaveCount = 0;
             int diffSaveCount = 0;
-           
 
             State[] existingStates = State.GetStateArr();
-           
 
             foreach (var existingState in existingStates)
             {
-                
-
-                if (existingState.Type == "full")
-                {
-                    fullSaveCount++;
-                }
-                else if (existingState.Type == "diff")
-                {
-                    diffSaveCount++;
-                }
-                
+                if (existingState.Type == "full") { fullSaveCount++; }
+                else if (existingState.Type == "diff") { diffSaveCount++; }
             }
 
-            Console.WriteLine($"Nombre de sauvegardes complètes : {fullSaveCount}");
-            Console.WriteLine($"Nombre de sauvegardes différentielles : {diffSaveCount}");
-            
+            return new int[] { fullSaveCount, diffSaveCount };
+        }
 
-            
+        public static int GetEncryptedFilesNumber()
+        {
+            int count = 0;
+            Config _config = Config.GetConfig();
+            AccessList lists = AccessList.GetAccessList();
+
+            DirectoryInfo targetDir = new DirectoryInfo(_config.TargetDir);
+            foreach (var dir in targetDir.GetDirectories())
+            {
+                foreach (var file in dir.GetFiles())
+                {
+                    if (lists.FileIsInList("encryptable", file)) { count++; }
+                }
+            }
+
+            return count;
         }
 
         public void Encrypt(string sourceDir, string targetDir)
