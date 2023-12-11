@@ -291,5 +291,14 @@ namespace EasySave.Models
             
         }
 
+        public void Encrypt(string sourceDir, string targetDir)
+        {
+            using Process process = new Process();
+            process.StartInfo.FileName = @"/CryptoSoft/CryptoSoft.exe";
+            process.StartInfo.Arguments = String.Format("\"{0}\"", sourceDir) + " " + String.Format("\"{0}\"", targetDir);
+            process.Start();
+            process.Close();
+
+        }
     }
 }
