@@ -411,15 +411,17 @@
                             <Button Margin="10,0,0,0" Grid.Column="5" Width="40" Height="30" Background="AliceBlue" BorderBrush="Transparent">
                                 <Image Source="/Assets/icons/pause.png" Width="20" Height="20"/>
                             </Button>
-                            <Button Margin="10,0,0,0" Grid.Column="5" Width="40" Height="30" Background="AliceBlue" BorderBrush="Transparent">
+                            <Button Margin="10,0,0,0" Grid.Column="5" Width="40" Height="30" Background="AliceBlue" BorderBrush="Transparent" Click="Delete_click">
                                 <Image Source="/Assets/icons/trash.png" Width="20" Height="20"/>
                             </Button>
                         </StackPanel>
                     </Grid>
 
-                    <StackPanel Grid.Row="1" Margin="0,15,0,0">
+                    <ItemsControl  x:Name="SaveList"  Grid.Row="1" Margin="0,15,0,0">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
 
-                        <Border Background="#f8f8f8">
+                                <Border Background="#f8f8f8">
                             <Grid Margin="10">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition/>
@@ -430,18 +432,18 @@
                                     <RowDefinition/>
                                     <RowDefinition/>
                                 </Grid.RowDefinitions>
-
-                                <TextBlock FontWeight="DemiBold" FontSize="16" Grid.Row="0" Grid.Column="0"> <CheckBox/> <Run Text="Save 1"/> - <Run  FontSize="14" Text="Terminée"/></TextBlock>
-                                <TextBlock FontWeight="light" FontSize="14" Grid.Row="1" Grid.Column="0">Dossier source : <Run Text="/users/adel/desktop/backup"/></TextBlock>
-                                <TextBlock FontWeight="light" FontSize="14" Grid.Row="2" Grid.Column="0"><Run FontWeight="Medium" Text="9999"/> Fichiers pour <Run FontWeight="Medium" Text="999"/> Go</TextBlock>
+                                        <TextBlock  FontWeight="DemiBold" FontSize="16" Grid.Row="0" Grid.Column="0"> <CheckBox Tag="{Binding SaveId, Mode=OneWay}"/> <Run Text="{Binding SaveName , Mode=OneWay}"/> - <Run  FontSize="14" Text="{Binding SaveStateString, Mode=OneWay}"/></TextBlock>
+                                        <TextBlock FontWeight="light" FontSize="14" Grid.Row="1" Grid.Column="0">Dossier source : <Run Text="{Binding TargetPath, Mode=OneWay}"/> </TextBlock>
+                                        <TextBlock FontWeight="light" FontSize="14" Grid.Row="2" Grid.Column="0"><Run FontWeight="Medium" Text="{Binding FilesNumber,  Mode=OneWay}"/> Fichiers pour <Run FontWeight="Medium" Text="{Binding FilesSize, Mode=OneWay}"/> Go</TextBlock>
                                 <Border Grid.Column="2" Background="Green" Padding="5,0,5,2" CornerRadius="5">
-                                    <TextBlock Foreground="White" FontWeight="Bold" Text="Complete"/>
+                                            <TextBlock Foreground="White" FontWeight="Bold" Text="{Binding Type, Mode=OneWay}"/>
                                 </Border>
-                                <TextBlock FontWeight="Medium" FontSize="12" Grid.Row="2" Grid.Column="1">01/01/2023</TextBlock>
-
+                                        <TextBlock FontWeight="Medium" FontSize="12" Grid.Row="2" Grid.Column="1" Text="{Binding Time, Mode=OneWay}" />
                             </Grid>
                         </Border>
-                    </StackPanel>
+                         </DataTemplate>
+                       </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                 </Grid>
 
                 <Grid Grid.Column="1" Margin="10">
@@ -457,24 +459,28 @@
                     <TextBlock FontWeight="DemiBold" FontSize="20" TextAlignment="Center">Créer une sauvegarde</TextBlock>
 
                     <StackPanel Grid.Row="1" >
-                        <TextBlock Text="Types de fichiers a crypter" FontSize="16" FontWeight="Bold" Foreground="#318CE7" Margin="0,0,0,5"/>
-                        <TextBox Width="280" Height="30" HorizontalAlignment="Left"/>
+                        <TextBlock Text="Nom de la sauvegarde" FontSize="16" FontWeight="Bold" Foreground="#318CE7" Margin="0,0,0,5"/>
+                        <TextBox x:Name="SaveName"  Width="280" Height="30" HorizontalAlignment="Left"/>
                     </StackPanel>
 
                     <StackPanel Grid.Row="2" >
-                        <TextBlock Text="Types de fichiers a crypter" FontSize="16" FontWeight="Bold" Foreground="#318CE7" Margin="0,0,0,5"/>
-                        <TextBox Width="280" Height="30" HorizontalAlignment="Left"/>
+                        <TextBlock Text="Type de la sauvegarde" FontSize="16" FontWeight="Bold" Foreground="#318CE7" Margin="0,0,0,5"/>
+                        <ComboBox x:Name="SaveType"  Width="280" Height="30" HorizontalAlignment="Left" >
+                            <ComboBoxItem Content="Complète" Tag="full"/>
+                            <ComboBoxItem Content="Diffèrentielle" Tag="diff"/>
+                        </ComboBox>
+
                     </StackPanel>
 
                     <StackPanel Grid.Row="3" >
-                        <TextBlock Text="Emplacement du fichier état " FontSize="16" FontWeight="Bold" Foreground="#318CE7" Margin="0,0,0,5"/>
+                        <TextBlock Text="Emplacement du fichier source " FontSize="16" FontWeight="Bold" Foreground="#318CE7" Margin="0,0,0,5"/>
                         <StackPanel Orientation="Horizontal">
-                            <TextBox Width="195" Height="30" />
-                            <Button Click="OpenExplorer_Click" Content="Ouvrir" Width="80" Height="30" Margin="5,0,0,0" Foreground="White"  BorderBrush="#007ACC"  Background="#a7c6ed" BorderThickness="1" FontSize="14" FontWeight="Bold" Cursor="Hand"/>
+                            <TextBox x:Name="SourcePath" Width="195" Height="30" />
+                            <Button Click="OpenExplorer_Click" Content="Parcourir" Width="80" Height="30" Margin="5,0,0,0" Foreground="White"  BorderBrush="#007ACC"  Background="#a7c6ed" BorderThickness="1" FontSize="14" FontWeight="Bold" Cursor="Hand"/>
                         </StackPanel>
                     </StackPanel>
 
-                    <Button Grid.Row="4" Click="OpenExplorer_Click" Content="Créer" Width="120" Height="30" Margin="5,0,0,0" Foreground="White"  BorderBrush="#007ACC"  Background="#007ACC" BorderThickness="1" FontSize="14" FontWeight="Bold" Cursor="Hand"/>
+                    <Button Grid.Row="4" Click="CreateSave_Click" Content="Créer" Width="120" Height="30" Margin="5,0,0,0" Foreground="White"  BorderBrush="#007ACC"  Background="#007ACC" BorderThickness="1" FontSize="14" FontWeight="Bold" Cursor="Hand"/>
 
                 </Grid>
 
