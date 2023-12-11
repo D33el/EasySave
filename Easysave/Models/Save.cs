@@ -1,34 +1,35 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
-using System.IO;
+using System.Text.Json;
+using System.Xml.Serialization;
+using System.Collections.Generic;
 using System.Linq;
+using System.IO;
+
 
 namespace EasySave.Models
 {
     public class Save
     {
-        public Guid SaveId { get; set; }
+        public int SaveId { get; set; }
         public string SaveName { get; set; }
         public string SaveSourcePath { get; set; }
         public string Type { get; set; }
 
         private Config _config = Config.GetConfig();
-
-        private Stopwatch Duration = new();
+        private Log _log = Log.GetLog();
+        private State _state = new State();
+        private Stopwatch Duration = new Stopwatch();
 
         public Save() { }
 
         public void CreateSave()
         {
-            Log _log = Log.GetLog();
-            State _state = new();
             string saveTargetPath = Path.Combine(_config.TargetDir, SaveName);
             string lang = _config.Language;
 
-            _state.SaveId = Guid.NewGuid();
-
-
+            _state.SaveId = SaveId;
             _state.SaveName = SaveName;
             _state.Type = Type;
             _state.Time = DateTime.Now.ToString("dd-MM-yyyy HH:mm:ss");
@@ -43,8 +44,8 @@ namespace EasySave.Models
                 {
                     if (!Directory.Exists(saveTargetPath)) { Directory.CreateDirectory(saveTargetPath); }
 
-                    if (Type == "full") { FullSave(saveTargetPath, _log, _state); }
-                    else { DiffSave(saveTargetPath, _log, _state); }
+                    if (Type == "full") { FullSave(saveTargetPath); }
+                    else { DiffSave(saveTargetPath); }
 
                     if (lang == "fr") { Console.WriteLine($"Sauvegarde '{SaveName}' créée avec succès."); }
                     else { Console.WriteLine($"Backup '{SaveName}' created with success."); }
@@ -61,29 +62,8 @@ namespace EasySave.Models
                 else { Console.WriteLine($"Error creating '{SaveName}' backup : {ex.Message}"); }
             }
         }
-        public void CreateSaveContinuously()
-        {
-            string lang = _config.Language;
 
-            try
-            {
-                while (true)
-                {
-                    CreateSave(); // Appeler votre méthode CreateSave existante
-
-                    // Ajouter un délai entre les sauvegardes (par exemple, 1 heure)
-                    int delayMinutes = 1;
-                    TimeSpan delay = TimeSpan.FromMinutes(delayMinutes);
-                    System.Threading.Thread.Sleep(delay);
-                }
-            }
-            catch (Exception ex)
-            {
-                if (lang == "fr") { Console.WriteLine($"Erreur lors de la création de la sauvegarde: {ex.Message}"); }
-                else { Console.WriteLine($"Error creating backup: {ex.Message}"); }
-            }
-        }
-        private void FullSave(string folderPath, Log _log, State _state)
+        private void FullSave(string folderPath)
         {
             if (Directory.Exists(folderPath) && Directory.GetFiles(folderPath).Length != 0)
             {
@@ -97,7 +77,7 @@ namespace EasySave.Models
 
             foreach (string file in filesToCopy)
             {
-                FileInfo fileInfo = new(file);
+                FileInfo fileInfo = new FileInfo(file);
 
                 Duration.Start();
                 string destinationFile = Path.Combine(folderPath, Path.GetFileName(file));
@@ -116,7 +96,7 @@ namespace EasySave.Models
             _state.AddState();
         }
 
-        private void DiffSave(string folderPath, Log _log, State _state)
+        private void DiffSave(string folderPath)
         {
             string[] destinationFiles = Directory.GetFiles(folderPath);
             string[] sourceFiles = Directory.GetFiles(SaveSourcePath);
@@ -124,7 +104,8 @@ namespace EasySave.Models
 
             foreach (string file in newModifiedFiles)
             {
-                FileInfo fileInfo = new(file);
+
+                FileInfo fileInfo = new FileInfo(file);
                 Duration.Restart();
 
                 string fileName = Path.GetFileName(file);
@@ -140,6 +121,7 @@ namespace EasySave.Models
                 _log.Timestamp = DateTime.Now.ToString("dd-MM-yyyy hh:mm:ss");
 
                 _log.WriteLog();
+
             }
             // Updating state.json file by adding a new entry
             _state.UpdateState();
@@ -148,7 +130,6 @@ namespace EasySave.Models
         public void DeleteSave()
         {
             string lang = _config.Language;
-            State _state = new();
             try
             {
                 string saveFilePath = Path.Combine(_config.TargetDir, SaveName);
@@ -185,7 +166,6 @@ namespace EasySave.Models
         public void GetSaveProgress()
         {
             string lang = _config.Language;
-            State _state = new();
             try
             {
                 string[] filesToCopy = Directory.GetFiles(SaveSourcePath);
@@ -253,14 +233,62 @@ namespace EasySave.Models
             return size;
         }
 
-        public void Encrypt(string sourceDir, string targetDir)
+        public static void CalculateStorageStatistics()
         {
-            using Process process = new Process();
-            process.StartInfo.FileName = @"/CryptoSoft/CryptoSoft.exe";
-            process.StartInfo.Arguments = String.Format("\"{0}\"", sourceDir) + " " + String.Format("\"{0}\"", targetDir);
-            process.Start();
-            process.Close();
+            long totalSizeBytes = 0;
+            int totalFiles = 0;
 
+            State[] existingStates = State.GetStateArr();
+
+            foreach (var existingState in existingStates)
+            {
+                totalSizeBytes += existingState.FilesSize;
+                totalFiles += existingState.FilesNumber;
+            }
+
+            double totalSizeGB = ConvertBytesToGigabytes(totalSizeBytes);
+
+            Console.WriteLine($"Nombre total de gigaoctets stockés : {totalSizeGB} Go");
+            Console.WriteLine($"Nombre total de fichiers stockés : {totalFiles} fichiers");
+        }
+
+        private static double ConvertBytesToGigabytes(long bytes)
+        {
+            const double BytesInGigabyte = 1.0 / (1024 * 1024 * 1024);
+            return bytes * BytesInGigabyte;
+        }
+
+        public static void CalculateSaveTypesCount()
+        {
+            
+
+            int fullSaveCount = 0;
+            int diffSaveCount = 0;
+           
+
+            State[] existingStates = State.GetStateArr();
+           
+
+            foreach (var existingState in existingStates)
+            {
+                
+
+                if (existingState.Type == "full")
+                {
+                    fullSaveCount++;
+                }
+                else if (existingState.Type == "diff")
+                {
+                    diffSaveCount++;
+                }
+                
+            }
+
+            Console.WriteLine($"Nombre de sauvegardes complètes : {fullSaveCount}");
+            Console.WriteLine($"Nombre de sauvegardes différentielles : {diffSaveCount}");
+            
+
+            
         }
 
     }
