@@ -1,10 +1,15 @@
 ﻿using EasySave.Models;
-
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
 namespace EasySave.ViewModels
 {
     public class SaveViewModel
     {
-        private Save _save = new();
+        private Save _save = new Save();
 
         public SaveViewModel() { }
 
@@ -53,7 +58,7 @@ namespace EasySave.ViewModels
 
             Config ConfigObj = Config.GetConfig();
             State[] statesArr = State.GetStateArr();
-            List<int> savesIds = new();
+            List<int> savesIds = new List<int>();
 
             if (statesArr.Length == 0)
             {

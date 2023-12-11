@@ -1,5 +1,9 @@
-﻿using System.Data;
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 
 namespace EasySave.Models
 {
@@ -12,14 +16,14 @@ namespace EasySave.Models
 
         private Config _config = Config.GetConfig();
 
-        private Stopwatch Duration = new();
+        private Stopwatch Duration = new Stopwatch();
 
         public Save() { }
 
         public void CreateSave()
         {
             Log _log = Log.GetLog();
-            State _state = new();
+            State _state = new State();
             string saveTargetPath = Path.Combine(_config.TargetDir, SaveName);
             string lang = _config.Language;
 
@@ -71,7 +75,7 @@ namespace EasySave.Models
 
             foreach (string file in filesToCopy)
             {
-                FileInfo fileInfo = new(file);
+                FileInfo fileInfo = new FileInfo(file);
 
                 Duration.Start();
                 string destinationFile = Path.Combine(folderPath, Path.GetFileName(file));
@@ -99,7 +103,7 @@ namespace EasySave.Models
             foreach (string file in newModifiedFiles)
             {
 
-                FileInfo fileInfo = new(file);
+                FileInfo fileInfo = new FileInfo(file);
                 Duration.Restart();
 
                 string fileName = Path.GetFileName(file);
@@ -124,7 +128,7 @@ namespace EasySave.Models
         public void DeleteSave()
         {
             string lang = _config.Language;
-            State _state = new();
+            State _state = new State();
             try
             {
                 string saveFilePath = Path.Combine(_config.TargetDir, SaveName);
@@ -161,7 +165,7 @@ namespace EasySave.Models
         public void GetSaveProgress()
         {
             string lang = _config.Language;
-            State _state = new();
+            State _state = new State();
             try
             {
                 string[] filesToCopy = Directory.GetFiles(SaveSourcePath);
