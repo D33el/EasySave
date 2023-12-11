@@ -85,6 +85,32 @@ namespace EasySave.ViewModels
             return savesIds.ToArray();
         }
 
+
+        public object[] GetSaveList()
+        {
+            State[] statesArr = State.GetStateArr();
+
+            List<object> saveList = new List<object>();
+
+            foreach (var state in statesArr)
+            {
+                if(state.Type == "full") { state.Type = "Complète"; } else { state.Type = "Diffèrentielle"; }
+                if(state.SaveState == true) { state.SaveStateString = "En cours";  } else { state.SaveStateString = "Terminée"; }
+                saveList.Add(new
+                {
+                    state.SaveId,
+                    state.TargetPath,
+                    state.SaveName,
+                    state.Time,
+                    state.FilesSize,
+                    state.Type,
+                    state.SaveStateString,
+                    state.FilesNumber
+                });
+            }
+
+            return saveList.ToArray();
+        }
         private void SetSaveInfo(int saveId)
         {
             State save = State.GetStateArr().FirstOrDefault(s => s.SaveId == saveId) ?? new State();
