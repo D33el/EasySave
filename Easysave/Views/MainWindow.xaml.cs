@@ -23,7 +23,7 @@ namespace wpftest
         public MainWindow()
         {
             InitializeComponent();
-            //WelcomePage.Visibility = Visibility.Collapsed;
+            WelcomePage.Visibility = Visibility.Collapsed;
             HomePage.Visibility = Visibility.Visible;
 
             SettingsPage.Visibility = Visibility.Collapsed;

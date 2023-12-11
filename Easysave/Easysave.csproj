@@ -6,4 +6,19 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove="Assets\icons\play.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\icons\folder-download.png" />
+    <Resource Include="Assets\icons\home.png" />
+    <Resource Include="Assets\icons\lock.png" />
+    <Resource Include="Assets\icons\pause.png" />
+    <Resource Include="Assets\icons\play.png" />
+    <Resource Include="Assets\icons\settings.png" />
+    <Resource Include="Assets\icons\trash.png" />
+    <Resource Include="Assets\icons\user-gear.png" />
+  </ItemGroup>
+
 </Project>
