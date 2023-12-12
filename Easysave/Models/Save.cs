@@ -218,33 +218,39 @@ namespace EasySave.Models
         private static long DirSize(DirectoryInfo d)
         {
             long size = 0;
+
             // Add file sizes.
             FileInfo[] fis = d.GetFiles();
             foreach (FileInfo fi in fis)
             {
                 size += fi.Length;
             }
+
             // Add subdirectory sizes.
             DirectoryInfo[] dis = d.GetDirectories();
             foreach (DirectoryInfo di in dis)
             {
                 size += DirSize(di);
             }
+
             return size;
         }
 
-        public static double GetAllSavesSize()
-        {
-            long totalSizeBytes = 0;
-            State[] statesArr = State.GetStateArr();
 
-            foreach (var save in statesArr)
+        private static string FormatFileSize(long sizeInBytes)
+        {
+            string[] sizeSuffixes = { "B", "KB", "MB", "GB" };
+
+            int i = 0;
+            double size = sizeInBytes;
+
+            while (size >= 1024 && i < sizeSuffixes.Length - 1)
             {
-                totalSizeBytes += save.FilesSize;
+                size /= 1024;
+                i++;
             }
 
-
-            return totalSizeBytes;
+            return $"{size:N2} {sizeSuffixes[i]}";
         }
 
         public static int[] GetSavesTypesNumber()
