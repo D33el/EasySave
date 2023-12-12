@@ -19,6 +19,8 @@ namespace EasySave.Models
 
         private Config _config = Config.GetConfig();
         private Log _log = Log.GetLog();
+        private AccessList _accessList = AccessList.GetAccessList();
+
         private State _state = new State();
         private Stopwatch Duration = new Stopwatch();
 
@@ -75,13 +77,22 @@ namespace EasySave.Models
             }
             string[] filesToCopy = Directory.GetFiles(SaveSourcePath);
 
+            Duration.Start();
             foreach (string file in filesToCopy)
             {
                 FileInfo fileInfo = new FileInfo(file);
 
-                Duration.Start();
+                Duration.Restart();
                 string destinationFile = Path.Combine(folderPath, Path.GetFileName(file));
-                File.Copy(file, destinationFile, true);
+
+                if (_accessList.FileIsInList("encryptable", fileInfo))
+                {
+                    _log.EncryptionTime = EncryptedCopy(file, destinationFile);
+                }
+                else
+                {
+                    File.Copy(file, destinationFile, true);
+                }
                 Duration.Stop();
 
                 _log.FileSaveDuration = Duration.ElapsedMilliseconds;
@@ -102,6 +113,7 @@ namespace EasySave.Models
             string[] sourceFiles = Directory.GetFiles(SaveSourcePath);
             string[] newModifiedFiles = CompareFiles(sourceFiles, destinationFiles);
 
+            Duration.Start();
             foreach (string file in newModifiedFiles)
             {
 
@@ -110,7 +122,14 @@ namespace EasySave.Models
 
                 string fileName = Path.GetFileName(file);
                 string destinationFile = Path.Combine(folderPath, fileName);
-                File.Copy(file, destinationFile, true);
+                if (_accessList.FileIsInList("encryptable", fileInfo))
+                {
+                    _log.EncryptionTime = EncryptedCopy(file, destinationFile);
+                }
+                else
+                {
+                    File.Copy(file, destinationFile, true);
+                }
                 Duration.Stop();
 
                 _log.FileSaveDuration = Duration.ElapsedMilliseconds;
@@ -236,23 +255,6 @@ namespace EasySave.Models
             return size;
         }
 
-
-        private static string FormatFileSize(long sizeInBytes)
-        {
-            string[] sizeSuffixes = { "B", "KB", "MB", "GB" };
-
-            int i = 0;
-            double size = sizeInBytes;
-
-            while (size >= 1024 && i < sizeSuffixes.Length - 1)
-            {
-                size /= 1024;
-                i++;
-            }
-
-            return $"{size:N2} {sizeSuffixes[i]}";
-        }
-
         public static int[] GetSavesTypesNumber()
         {
             int fullSaveCount = 0;
@@ -287,13 +289,39 @@ namespace EasySave.Models
             return count;
         }
 
-        public void Encrypt(string sourceDir, string targetDir)
+        private static long EncryptedCopy(string sourceFile, string targetFile)
         {
-            using Process process = new Process();
-            process.StartInfo.FileName = @"/CryptoSoft/CryptoSoft.exe";
-            process.StartInfo.Arguments = String.Format("\"{0}\"", sourceDir) + " " + String.Format("\"{0}\"", targetDir);
-            process.Start();
-            process.Close();
+            Stopwatch EncryptionDuration = new Stopwatch();
+            string appDir = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName + @"/Assets/CryptoSoft/";
+            string arguments = $"\"{sourceFile}\" \"{targetFile}\"";
+            try
+            {
+                EncryptionDuration.Start();
+
+                using Process process = new Process();
+                
+                process.StartInfo.FileName = Path.Combine(appDir, "Cryptosoft.exe");
+                process.StartInfo.Arguments = arguments;
+                Console.WriteLine("Process start info");
+                Console.WriteLine($"fileName = ${process.StartInfo.FileName}");
+                Console.WriteLine($"arguments = ${process.StartInfo.Arguments}");
+                process.Start();
+
+                process.WaitForExit();
+                //TODO : finir l'eventhandler (WS 5)
+                process.EnableRaisingEvents = true;
+                
+                EncryptionDuration.Stop();
+
+                return EncryptionDuration.ElapsedMilliseconds;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Encryption failed : {ex}");
+                return -1;
+            }
+
+
 
         }
     }

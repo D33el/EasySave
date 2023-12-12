@@ -1,4 +1,4 @@
 {
-  "EncryptableFiles": [],
-  "IgnoredFiles": []
+  "EncryptableFiles": [".txt", ".png"],
+  "IgnoredFiles": [".exe"]
 }
