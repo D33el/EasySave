@@ -40,31 +40,37 @@
 
                 <StackPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center">
                     <TextBlock FontSize="16" FontWeight="Bold" Foreground="#318CE7" Margin="0,0,0,5"><Run Language="fr-fr" Text="Langue de l'application"/></TextBlock>
-                    <ComboBox Width="285" Height="30" HorizontalAlignment="Left" />
+                    <ComboBox x:Name="LangueSetting" Width="285" Height="30" HorizontalAlignment="Left" >
+                        <ComboBoxItem Content="Français" Tag="fr"/>
+                        <ComboBoxItem Content="English" Tag="eng"/>
+                    </ComboBox>
                 </StackPanel>
 
                 <StackPanel Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <TextBlock Text="Emplacement des sauvegardes " FontSize="16" FontWeight="Bold" Foreground="#318CE7" Margin="0,0,0,5"/>
+                    <TextBlock  Text="Emplacement des sauvegardes " FontSize="16" FontWeight="Bold" Foreground="#318CE7" Margin="0,0,0,5"/>
                     <StackPanel Orientation="Horizontal">
-                        <TextBox Width="200" Height="30" />
-                        <Button Click="OpenExplorer_Click" Content="Ouvrir" Width="80" Height="30" Margin="5,0,0,0" Foreground="White"  BorderBrush="#007ACC"  Background="#a7c6ed" BorderThickness="1" FontSize="14" FontWeight="Bold" Cursor="Hand"/>
+                        <TextBox x:Name="TargetSave" Width="200" Height="30"  />
+                        <Button Click="OpenExplorer_Click" Tag="TargetSave" Content="Parcourir" Width="80" Height="30" Margin="5,0,0,0" Foreground="White"  BorderBrush="#007ACC"  Background="#a7c6ed" BorderThickness="1" FontSize="14" FontWeight="Bold" Cursor="Hand"/>
                     </StackPanel>
                 </StackPanel>
 
                 <StackPanel  Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center">
                     <TextBlock Text="Emplacement des logs " FontSize="16" FontWeight="Bold" Foreground="#318CE7" Margin="0,0,0,5"/>
                     <StackPanel Orientation="Horizontal">
-                        <TextBox Width="200" TextChanged="TextBox_TextChanged" Height="30"/>
-                        <Button Click="OpenExplorer_Click" Content="Ouvrir" Width="80" Height="30" Margin="5,0,0,0" Foreground="White"  BorderBrush="#007ACC"  Background="#a7c6ed" BorderThickness="1" FontSize="14" FontWeight="Bold" Cursor="Hand"/>
+                        <TextBox x:Name="TargetLogs" Width="200" TextChanged="TextBox_TextChanged" Height="30"/>
+                        <Button Click="OpenExplorer_Click" Tag="TargetLogs" Content="Parcourir" Width="80" Height="30" Margin="5,0,0,0" Foreground="White"  BorderBrush="#007ACC"  Background="#a7c6ed" BorderThickness="1" FontSize="14" FontWeight="Bold" Cursor="Hand"/>
                     </StackPanel>
                 </StackPanel>
 
                 <StackPanel  Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center">
                     <TextBlock FontSize="16" FontWeight="Bold" Foreground="#318CE7" Margin="0,0,0,5"><Run Text="Types de"/><Run Language="fr-fr" Text="s"/><Run Text=" logs "/></TextBlock>
-                    <ComboBox Width="285" Height="30" HorizontalAlignment="Left" />
+                    <ComboBox  x:Name="LogsType"  Width="285" Height="30" HorizontalAlignment="Left" >
+                        <ComboBoxItem Content="JSon" Tag="json"/>
+                        <ComboBoxItem Content="XML" Tag="xml"/>
+                    </ComboBox>
                 </StackPanel>
 
-                <Button Grid.Row="2" Grid.ColumnSpan="11" Click="OpenExplorer_Click" Content="Commencer" Width="180" Height="40" Margin="5,0,0,0" Foreground="White"  BorderBrush="#007ACC"  Background="#007ACC" BorderThickness="1" FontSize="17" FontWeight="Bold" Cursor="Hand"/>
+                <Button Grid.Row="2" Grid.ColumnSpan="11" Click="Commencer_Click" Content="Commencer" Width="180" Height="40" Margin="5,0,0,0" Foreground="White"  BorderBrush="#007ACC"  Background="#007ACC" BorderThickness="1" FontSize="17" FontWeight="Bold" Cursor="Hand"/>
 
             </Grid>
         </Grid>
@@ -476,7 +482,7 @@
                         <TextBlock Text="Emplacement du fichier source " FontSize="16" FontWeight="Bold" Foreground="#318CE7" Margin="0,0,0,5"/>
                         <StackPanel Orientation="Horizontal">
                             <TextBox x:Name="SourcePath" Width="195" Height="30" />
-                            <Button Click="OpenExplorer_Click" Content="Parcourir" Width="80" Height="30" Margin="5,0,0,0" Foreground="White"  BorderBrush="#007ACC"  Background="#a7c6ed" BorderThickness="1" FontSize="14" FontWeight="Bold" Cursor="Hand"/>
+                            <Button Click="OpenExplorer_Click" Content="Parcourir" Tag="SourcePath" Width="80" Height="30" Margin="5,0,0,0" Foreground="White"  BorderBrush="#007ACC"  Background="#a7c6ed" BorderThickness="1" FontSize="14" FontWeight="Bold" Cursor="Hand"/>
                         </StackPanel>
                     </StackPanel>
 
