@@ -11,10 +11,10 @@ namespace EasySave
     public sealed class Config
     {
         private readonly string FilePath = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName + @"/Assets/config.json";
-        public string Language { get; set; } = "fr";
+        public string Language { get; set; } = "";
         public string TargetDir { get; set; } = "";
         public string LogsDir { get; set; } = "";
-        public string LogsType { get; set; } = "json";
+        public string LogsType { get; set; } = "";
 
         private static Config ConfigInstance;
 
