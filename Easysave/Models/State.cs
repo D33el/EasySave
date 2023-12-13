@@ -52,47 +52,12 @@ namespace EasySave.Models
             File.WriteAllText(StateFilePath, serializedJSON);
         }
 
-        // FIXME : ajoute au lieu de modifier (je sais pas pourquoi ptn)
         public void UpdateState()
         {
-            string jsonString = File.ReadAllText(StateFilePath);
-            List<State> dataStateList = JsonSerializer.Deserialize<List<State>>(jsonString);
-
-            State existingState = dataStateList.FirstOrDefault(save => save.SaveId == SaveId);
-
-            if (existingState != null)
-            {
-                existingState.SaveName = SaveName;
-                existingState.Time = Time;
-                existingState.Type = Type;
-                existingState.SaveState = SaveState;
-                existingState.SourcePath = SourcePath;
-                existingState.TargetPath = TargetPath;
-                existingState.FilesNumber = FilesNumber;
-                existingState.FilesSize = FilesSize;
-                existingState.Progress = Progress;
-                existingState.RemainingFiles = RemainingFiles;
-                existingState.RemainingFilesSize = RemainingFilesSize;
-
-
-
-                string serializedJSON = JsonSerializer.Serialize(dataStateList);
-                try
-                {
-                    File.WriteAllText(StateFilePath, serializedJSON);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("Error writing to file: " + e.Message);
-                }
-            }
-            else
-            {
-                Console.WriteLine("SaveId not found in dataStateList.");
-            }
+            DeleteState();
+            AddState();
         }
 
-        // TODO
         public void DeleteState()
         {
             string jsonString = File.ReadAllText(StateFilePath);
