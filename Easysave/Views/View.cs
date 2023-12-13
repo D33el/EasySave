@@ -14,7 +14,6 @@ namespace EasySave.Views
             {
                 case 1: // Show the saves
                     SaveViewModel.ShowSaveList();
-                    ShowSaveExecutionMenu();
                     ShowMainMenu();
                     break;
                 case 2: // Create a new save
