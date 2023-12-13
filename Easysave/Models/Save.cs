@@ -20,25 +20,27 @@ namespace EasySave.Models
         private Config _config = Config.GetConfig();
         private Log _log = Log.GetLog();
         private AccessList _accessList = AccessList.GetAccessList();
-
         private State _state = new State();
         private Stopwatch Duration = new Stopwatch();
 
         public Save() { }
 
-        public void CreateSave()
+        private void SetSaveState()
         {
-            string saveTargetPath = Path.Combine(_config.TargetDir, SaveName);
-            string lang = _config.Language;
-
             _state.SaveId = SaveId;
             _state.SaveName = SaveName;
             _state.Type = Type;
             _state.Time = DateTime.Now.ToString("dd-MM-yyyy HH:mm:ss");
             _state.SourcePath = SaveSourcePath;
-            _state.TargetPath = saveTargetPath;
+            _state.TargetPath = Path.Combine(_config.TargetDir, SaveName);
             _state.FilesSize = DirSize(new DirectoryInfo(SaveSourcePath));
             _state.FilesNumber = Directory.GetFiles(SaveSourcePath).Length;
+        }
+
+        public void CreateSave()
+        {
+            string saveTargetPath = Path.Combine(_config.TargetDir, SaveName);
+            SetSaveState();
 
             try
             {
@@ -46,22 +48,23 @@ namespace EasySave.Models
                 {
                     if (!Directory.Exists(saveTargetPath)) { Directory.CreateDirectory(saveTargetPath); }
 
-                    if (Type == "full") { FullSave(saveTargetPath); }
-                    else { DiffSave(saveTargetPath); }
+                    if (Type == "full") {
+                        FullSave(saveTargetPath);
+                    }
+                    else {
+                        DiffSave(saveTargetPath);
+                    }
 
-                    if (lang == "fr") { Console.WriteLine($"Sauvegarde '{SaveName}' créée avec succès."); }
-                    else { Console.WriteLine($"Backup '{SaveName}' created with success."); }
+                    Console.WriteLine($"Sauvegarde '{SaveName}' créée avec succès.");
                 }
                 else
                 {
-                    if (lang == "fr") { Console.WriteLine($"Répertoire source '{SaveSourcePath}' introuvable."); }
-                    else { Console.WriteLine($"Source directory '{SaveSourcePath}' not found."); }
+                    Console.WriteLine($"Source directory '{SaveSourcePath}' not found.");
                 }
             }
             catch (Exception ex)
             {
-                if (lang == "fr") { Console.WriteLine($"Erreur lors de la création de la sauvegarde '{SaveName}': {ex.Message}"); }
-                else { Console.WriteLine($"Error creating '{SaveName}' backup : {ex.Message}"); }
+                Console.WriteLine($"Error creating '{SaveName}' backup : {ex.Message}");
             }
         }
 
@@ -111,7 +114,7 @@ namespace EasySave.Models
         {
             string[] destinationFiles = Directory.GetFiles(folderPath);
             string[] sourceFiles = Directory.GetFiles(SaveSourcePath);
-            string[] newModifiedFiles = CompareFiles(sourceFiles, destinationFiles);
+            List<string> newModifiedFiles = CompareFiles(sourceFiles, destinationFiles);
 
             Duration.Start();
             foreach (string file in newModifiedFiles)
@@ -145,6 +148,40 @@ namespace EasySave.Models
             // Updating state.json file by adding a new entry
             _state.UpdateState();
         }
+
+        private static List<string> CompareFiles(string[] sourceFiles, string[] destinationFiles)
+        {
+            List<string> newModifiedFiles = new List<string>();
+
+            foreach (string sourceFile in sourceFiles)
+            {
+                string sourceFileName = Path.GetFileName(sourceFile);
+
+                // Find corresponding file in destinationFiles array
+                string destinationFile = destinationFiles.FirstOrDefault(df =>
+                    string.Equals(Path.GetFileName(df), sourceFileName, StringComparison.OrdinalIgnoreCase));
+
+                if (destinationFile != null)
+                {
+                    // Compare last write times of source and destination files
+                    DateTime sourceLastWriteTime = File.GetLastWriteTimeUtc(sourceFile);
+                    DateTime destinationLastWriteTime = File.GetLastWriteTimeUtc(destinationFile);
+
+                    if (sourceLastWriteTime > destinationLastWriteTime)
+                    {
+                        newModifiedFiles.Add(sourceFile);
+                    }
+                }
+                else
+                {
+                    // File exists in source but not in destination
+                    newModifiedFiles.Add(sourceFile);
+                }
+            }
+
+            return newModifiedFiles;
+        }
+
 
         public void DeleteSave()
         {
@@ -214,26 +251,6 @@ namespace EasySave.Models
             }
         }
 
-        private static string[] CompareFiles(string[] sourceFiles, string[] destinationFiles)
-        {
-            List<string> newModifiedFiles = new List<string>();
-
-            foreach (string sourceFile in sourceFiles)
-            {
-                string sourceFileName = Path.GetFileName(sourceFile);
-
-                foreach (var destinationFile in destinationFiles)
-                {
-                    string destinationFileName = Path.GetFileName(sourceFile);
-                    if (sourceFileName != destinationFileName || File.GetLastWriteTimeUtc(sourceFile) > File.GetLastWriteTimeUtc(destinationFile))
-                    {
-                        newModifiedFiles.Add(sourceFile);
-                    }
-                }
-            }
-            return newModifiedFiles.ToArray();
-        }
-
         private static long DirSize(DirectoryInfo d)
         {
             long size = 0;
@@ -299,7 +316,7 @@ namespace EasySave.Models
                 EncryptionDuration.Start();
 
                 using Process process = new Process();
-                
+
                 process.StartInfo.FileName = Path.Combine(appDir, "Cryptosoft.exe");
                 process.StartInfo.Arguments = arguments;
                 Console.WriteLine("Process start info");
@@ -310,7 +327,7 @@ namespace EasySave.Models
                 process.WaitForExit();
                 //TODO : finir l'eventhandler (WS 5)
                 process.EnableRaisingEvents = true;
-                
+
                 EncryptionDuration.Stop();
 
                 return EncryptionDuration.ElapsedMilliseconds;
