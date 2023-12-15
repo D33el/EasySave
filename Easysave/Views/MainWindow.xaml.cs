@@ -67,7 +67,21 @@ namespace wpftest
 
         public void displayParameters()
         {
-
+            SettingLanguage.SelectedItem = FindComboBoxItemByTag(SettingLanguage, _config.Language);
+            SettingTargetSave.Text = _config.TargetDir;
+            SettingLogsPath.Text = _config.LogsDir;
+            SettingTypeLogs.SelectedItem = FindComboBoxItemByTag(SettingTypeLogs,_config.LogsType);
+        }
+        private ComboBoxItem FindComboBoxItemByTag(ComboBox comboBox, string tag)
+        {
+            foreach (ComboBoxItem item in comboBox.Items)
+            {
+                if (item.Tag.ToString() == tag)
+                {
+                    return item;
+                }
+            }
+            return null; 
         }
 
         private void Commencer_Click(object sender, RoutedEventArgs e)
@@ -151,6 +165,28 @@ namespace wpftest
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+
+        }
+
+        private void Sauvegarder_Click(object sender, RoutedEventArgs e)
+        {
+            ComboBoxItem selectedLangue = SettingLanguage.SelectedItem as ComboBoxItem;
+            ComboBoxItem selectedTypeLogs = SettingTypeLogs.SelectedItem as ComboBoxItem;
+
+            string Langue = selectedLangue.Tag.ToString();
+            string savesPath = SettingTargetSave.Text;
+            string logsPath = SettingLogsPath.Text;
+            string filesCrypt = SettingFilesCrypte.Text;
+            string filesIgnore = SettingFilesIgnore.Text;
+            string LogsType = selectedTypeLogs.Tag.ToString();
+
+            _config.Language = Langue;
+            _config.TargetDir = savesPath;
+            _config.LogsDir = logsPath;
+            _config.LogsType = LogsType;
+
+            _config.SaveConfig();
+            displayParameters();
 
         }
 

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EasySave"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="650" Width="1000">
 
 
     <Grid>
@@ -287,7 +287,7 @@
                     </Grid.ColumnDefinitions>
 
                     <TextBlock Grid.Column="0" Text="Paramètres" FontWeight="Medium" FontSize="20" Margin="0,0,0,20" />
-                    <Button Grid.Column="1" Content="Sauvegarder" Width="120" Height="30" Margin="5,0,0,0" Foreground="White"  BorderBrush="#007ACC"  Background="#007ACC" BorderThickness="1" FontSize="14" FontWeight="Bold" Cursor="Hand" />
+                    <Button Grid.Column="1" Click="Sauvegarder_Click"  Content="Sauvegarder" Width="120" Height="30" Margin="5,0,0,0" Foreground="White"  BorderBrush="#007ACC"  Background="#007ACC" BorderThickness="1" FontSize="14" FontWeight="Bold" Cursor="Hand" />
                 </Grid>
 
 
@@ -308,46 +308,44 @@
 
                     <StackPanel Grid.Row="0" Grid.Column="0" >
                         <TextBlock FontSize="16" FontWeight="Bold" Foreground="#318CE7" Margin="0,0,0,5"><Run Language="fr-fr" Text="Langue de l'application"/></TextBlock>
-                        <ComboBox Width="285" Height="30" HorizontalAlignment="Left" />
+                        <ComboBox x:Name="SettingLanguage"  Width="285" Height="30" HorizontalAlignment="Left" >
+                            <ComboBoxItem Content="Français" Tag="fr"/>
+                            <ComboBoxItem Content="English" Tag="eng"/>
+                        </ComboBox>
                     </StackPanel>
 
                     <StackPanel Grid.Row="1" Grid.Column="0" >
                         <TextBlock Text="Emplacement des sauvegardes " FontSize="16" FontWeight="Bold" Foreground="#318CE7" Margin="0,0,0,5"/>
                         <StackPanel Orientation="Horizontal">
-                            <TextBox Width="200" Height="30" />
-                            <Button Click="OpenExplorer_Click" Content="Ouvrir" Width="80" Height="30" Margin="5,0,0,0" Foreground="White"  BorderBrush="#007ACC"  Background="#a7c6ed" BorderThickness="1" FontSize="14" FontWeight="Bold" Cursor="Hand"/>
+                            <TextBox x:Name="SettingTargetSave"  Width="200" Height="30" />
+                            <Button Click="OpenExplorer_Click" Tag="SettingTargetSave" Content="Parcourir" Width="80" Height="30" Margin="5,0,0,0" Foreground="White"  BorderBrush="#007ACC"  Background="#a7c6ed" BorderThickness="1" FontSize="14" FontWeight="Bold" Cursor="Hand"/>
                         </StackPanel>
                     </StackPanel>
 
                     <StackPanel  Grid.Row="2" Grid.Column="0">
                         <TextBlock Text="Emplacement des logs " FontSize="16" FontWeight="Bold" Foreground="#318CE7" Margin="0,0,0,5"/>
                         <StackPanel Orientation="Horizontal">
-                            <TextBox Width="200" TextChanged="TextBox_TextChanged" Height="30"/>
-                            <Button Click="OpenExplorer_Click" Content="Ouvrir" Width="80" Height="30" Margin="5,0,0,0" Foreground="White"  BorderBrush="#007ACC"  Background="#a7c6ed" BorderThickness="1" FontSize="14" FontWeight="Bold" Cursor="Hand"/>
+                            <TextBox x:Name="SettingLogsPath" Width="200" TextChanged="TextBox_TextChanged" Height="30"/>
+                            <Button Click="OpenExplorer_Click"  Tag="SettingLogsPath"  Content="Parcourir" Width="80" Height="30" Margin="5,0,0,0" Foreground="White"  BorderBrush="#007ACC"  Background="#a7c6ed" BorderThickness="1" FontSize="14" FontWeight="Bold" Cursor="Hand"/>
                         </StackPanel>
                     </StackPanel>
 
-                    <StackPanel  Grid.Row="3" Grid.Column="0" >
-                        <TextBlock Text="Emplacement du fichier état " FontSize="16" FontWeight="Bold" Foreground="#318CE7" Margin="0,0,0,5"/>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBox Width="200" Height="30" />
-                            <Button Click="OpenExplorer_Click" Content="Ouvrir" Width="80" Height="30" Margin="5,0,0,0" Foreground="White"  BorderBrush="#007ACC"  Background="#a7c6ed" BorderThickness="1" FontSize="14" FontWeight="Bold" Cursor="Hand"/>
-                        </StackPanel>
-                    </StackPanel>
-
-                    <StackPanel  Grid.Row="0" Grid.Column="1" >
-                        <TextBlock Text="Types de fichiers a crypter" FontSize="16" FontWeight="Bold" Foreground="#318CE7" Margin="0,0,0,5"/>
-                        <TextBox Width="285" Height="30" HorizontalAlignment="Left"/>
+                    <StackPanel Grid.Row="0" Grid.Column="1">
+                        <TextBlock Text="Types de fichiers à crypter" FontSize="16" FontWeight="Bold" Foreground="#318CE7" Margin="0,0,0,5" />
+                        <TextBox x:Name="SettingFilesCrypte"  Width="285" Height="30" HorizontalAlignment="Left" TextChanged="TextBox_TextChanged" />
                     </StackPanel>
 
                     <StackPanel  Grid.Row="1" Grid.Column="1" >
                         <TextBlock FontSize="16" FontWeight="Bold" Foreground="#318CE7" Margin="0,0,0,5"><Run Text="Types de fichiers a ignorer lors d"/><Run Language="fr-fr" Text="'"/><Run Text="une sauvegarde"/></TextBlock>
-                        <TextBox Width="285" Height="30" HorizontalAlignment="Left" TextChanged="TextBox_TextChanged" />
+                        <TextBox x:Name="SettingFilesIgnore" Width="285" Height="30" HorizontalAlignment="Left" TextChanged="TextBox_TextChanged" />
                     </StackPanel>
 
                     <StackPanel  Grid.Row="2" Grid.Column="1" >
                         <TextBlock FontSize="16" FontWeight="Bold" Foreground="#318CE7" Margin="0,0,0,5"><Run Text="Types de"/><Run Language="fr-fr" Text="s"/><Run Text=" logs "/></TextBlock>
-                        <ComboBox Width="285" Height="30" HorizontalAlignment="Left" />
+                        <ComboBox x:Name="SettingTypeLogs" Width="285" Height="30" HorizontalAlignment="Left" >
+                            <ComboBoxItem Content="JSON" Tag="json"/>
+                            <ComboBoxItem Content="XML" Tag="xml"/>
+                        </ComboBox>
                     </StackPanel>
 
                 </Grid>
@@ -442,7 +440,7 @@
                                         <TextBlock FontWeight="light" FontSize="14" Grid.Row="1" Grid.Column="0">Dossier source : <Run Text="{Binding TargetPath, Mode=OneWay}"/> </TextBlock>
                                         <TextBlock FontWeight="light" FontSize="14" Grid.Row="2" Grid.Column="0"><Run FontWeight="Medium" Text="{Binding FilesNumber,  Mode=OneWay}"/> Fichiers pour <Run FontWeight="Medium" Text="{Binding FilesSize, Mode=OneWay}"/> Go</TextBlock>
                                 <Border Grid.Column="2" Background="Green" Padding="5,0,5,2" CornerRadius="5">
-                                            <TextBlock Foreground="White" FontWeight="Bold" Text="{Binding Type, Mode=OneWay}"/>
+                                            <TextBlock Foreground="White" FontWeight="Bold" TextAlignment="Center"  Text="{Binding Type, Mode=OneWay}"/>
                                 </Border>
                                         <TextBlock FontWeight="Medium" FontSize="12" Grid.Row="2" Grid.Column="1" Text="{Binding Time, Mode=OneWay}" />
                             </Grid>
