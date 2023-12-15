@@ -16,9 +16,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Collections;
 using EasySave.ViewModels;
-using EasySave;
 
-namespace wpftest
+namespace EasySave.Views
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
