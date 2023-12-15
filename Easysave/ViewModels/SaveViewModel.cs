@@ -1,45 +1,83 @@
-﻿using EasySave.Models;
+﻿using System;
+using System.Text;
+using EasySave.Models;
 
 namespace EasySave.ViewModels
 {
     public class SaveViewModel
     {
-        private Save _save = new();
+        private BackupExecutor _backupExecutor = new BackupExecutor();
+        
+        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        public bool AreBackupsActive { get; set; }
 
-        public SaveViewModel() { }
+        public SaveViewModel()
+        {
+        }
+
+        public Dictionary<int, double> GetBackupProgress()
+        {
+            return new Dictionary<int, double>(_backupExecutor.BackupsProgress);
+        }
+
 
         public void InitializeSave(string saveName, string saveType, string sourcePath, int saveId)
         {
-            State[] statesArr = State.GetStateArr();
-            _save.SaveName = saveName;
-            _save.SaveSourcePath = sourcePath;
-            _save.Type = saveType;
+            var save = new Save(_backupExecutor.BackupsProgress)
+            {
+                SaveId = saveId,
+                SaveName = saveName,
+                SaveSourcePath = sourcePath,
+                Type = saveType
+            };
 
-            if (saveType == "full")
-            {
-                if(statesArr.Length == 0 )
-                {
-                    _save.SaveId = 1;
-                } else { _save.SaveId = statesArr.Max(item => item.SaveId) + 1; }
-                
-            }
-            else if (saveType == "diff")
-            {
-                SetSaveInfo(saveId);
-            }
-            _save.CreateSave();
+            _backupExecutor.EnqueueBackup(save);
         }
 
-        public void InitializeSaveReexecution(int saveId)
+        public async Task ExecuteEnqueuedBackupsAsync()
         {
-            SetSaveInfo(saveId);
-            _save.CreateSave();
+            await _backupExecutor.ExecuteBackupsAsync(_cancellationTokenSource.Token);
+            CheckAllBackupsCompleted(); // Additional method to confirm all backups are complete
+        }
+
+        public void CheckAllBackupsCompleted()
+        {
+            // Check if any backup task is not completed
+            AreBackupsActive = _backupExecutor.BackupsProgress.Any(p => p.Value < 100);
+        }
+
+        public async Task ReexecuteAllBackupsAsync()
+        {
+            State[] allBackups = State.GetStateArr();
+            await _backupExecutor.ExecuteBackupsAsync(_cancellationTokenSource.Token);
+            AreBackupsActive = false;
+            foreach (var backupState in allBackups)
+            {
+                var saveTask = new Save(_backupExecutor.BackupsProgress)
+                {
+                    SaveName = backupState.SaveName,
+                    SaveSourcePath = backupState.SourcePath,
+                    Type = backupState.Type,
+                    SaveId = backupState.SaveId
+                };
+
+                _backupExecutor.EnqueueBackup(saveTask);
+            }
+
+            AreBackupsActive = true;
         }
 
         public void InitializeDeleteSave(int saveId)
         {
-            SetSaveInfo(saveId);
+            Save _save = new Save(_backupExecutor.BackupsProgress);
+            _save = SetSaveInfo(saveId);
             _save.DeleteSave();
+        }
+
+        public void CancelAllBackups()
+        {
+            _cancellationTokenSource.Cancel();
+            _backupExecutor.StopAllBackups();
         }
 
         public static int GetSavesNumber()
@@ -80,8 +118,9 @@ namespace EasySave.ViewModels
             return savesIds.ToArray();
         }
 
-        private void SetSaveInfo(int saveId)
+        private Save SetSaveInfo(int saveId)
         {
+            Save _save = new Save(_backupExecutor.BackupsProgress);
             State save = State.GetStateArr().FirstOrDefault(s => s.SaveId == saveId) ?? new State();
             if (save != null)
             {
@@ -90,6 +129,7 @@ namespace EasySave.ViewModels
                 _save.Type = save.Type;
                 _save.SaveId = save.SaveId;
             }
+            return _save;
         }
     }
 }

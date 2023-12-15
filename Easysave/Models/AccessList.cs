@@ -11,6 +11,8 @@ namespace EasySave.Models
         private static string FilePath = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName + @"/Assets/accessLists.json";
         private static AccessList Instance;
 
+        private static readonly object _listLock = new object();
+
         private AccessList()
         {
             if (!File.Exists(FilePath))
@@ -30,18 +32,21 @@ namespace EasySave.Models
 
         public void WriteList()
         {
-            try
+            lock (_listLock)
             {
-                AccessListData accessLists = new AccessListData();
-                accessLists.EncryptableFiles = EncryptableFiles;
-                accessLists.IgnoredFiles = IgnoredFiles;
+                try
+                {
+                    AccessListData accessLists = new AccessListData();
+                    accessLists.EncryptableFiles = EncryptableFiles;
+                    accessLists.IgnoredFiles = IgnoredFiles;
 
-                string serializedJSON = JsonSerializer.Serialize(accessLists) + Environment.NewLine;
-                File.WriteAllText(FilePath, serializedJSON);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
+                    string serializedJSON = JsonSerializer.Serialize(accessLists) + Environment.NewLine;
+                    File.WriteAllText(FilePath, serializedJSON);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
             }
         }
 

@@ -17,6 +17,8 @@ namespace EasySave.Models
         private Config _config = Config.GetConfig();
         private static Log LogInstance;
 
+        private static readonly object _logLock = new object();
+
         static Log()
         {
             string logFileType = Config.GetConfig().LogsType;
@@ -45,8 +47,8 @@ namespace EasySave.Models
         {
             try
             {
-            LogInstance ??= new Log();
-            return LogInstance;
+                LogInstance ??= new Log();
+                return LogInstance;
 
             }
             catch (Exception ex)
@@ -58,9 +60,12 @@ namespace EasySave.Models
 
         public void WriteLog()
         {
-            string logFileType = _config.LogsType;
-            if (logFileType == "json") { WriteJsonLog(); }
-            else { WriteXmlLog(); }
+            lock (_logLock)
+            {
+                string logFileType = _config.LogsType;
+                if (logFileType == "json") { WriteJsonLog(); }
+                else { WriteXmlLog(); }
+            }
         }
 
         private void WriteJsonLog()
