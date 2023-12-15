@@ -1,41 +1,105 @@
-﻿using EasySave.Views;
+﻿using EasySave.ViewModels;
+//using EasySave.Views;
 
 
 namespace EasySave
 {
     class Program
     {
-        public static void Main(string[] args)
+
+        static int SavesCounter = 0;
+        static async Task Main(string[] args)
         {
-            Config _config = Config.GetConfig();
-            View _view = new();
-
-            bool configExists = _config.CheckConfig();
-
-            if (!configExists)
+            var viewModel = new SaveViewModel();
+            while (true)
             {
-                View.ShowFirstLaunchMenu();
-                _view.SetParameters(1);
-                _config.SaveConfig();
-                _config.LoadConfig();
+                Console.WriteLine("=========================== V3.0");
+                Console.WriteLine("1. Create a new backup");
+                Console.WriteLine("2. Re-execute all backup");
+                Console.WriteLine("3. Delete a backup");
+                Console.WriteLine("4. Cancel all backups");
+                Console.WriteLine("5. Exit");
+
+                switch (Console.ReadLine())
+                {
+                    case "1":
+                        SavesCounter++;
+                        CreateNewBackup(viewModel);
+                        _ = MonitorBackupProgressAsync(viewModel); // Start monitoring in a separate task
+                        await viewModel.ExecuteEnqueuedBackupsAsync(); // Execute backups
+                        break;
+                    case "2":
+                        await viewModel.ReexecuteAllBackupsAsync();
+                        _ = MonitorBackupProgressAsync(viewModel); // Start monitoring in a separate task
+                        await viewModel.ExecuteEnqueuedBackupsAsync(); // Execute backups
+                        break;
+                    case "3":
+                        viewModel.CancelAllBackups();
+                        Console.WriteLine("All backups have been canceled.");
+                        break;
+                    case "5":
+                        return;
+                    default:
+                        Console.WriteLine("Invalid option, please try again.");
+                        break;
+                }
             }
-            _view.ShowMainMenu();
         }
 
-        public static string FormatFileSize(long sizeInBytes)
+        private static void CreateNewBackup(SaveViewModel viewModel)
         {
-            string[] sizeSuffixes = { "B", "KB", "MB", "GB" };
+            // Example inputs - modify as needed for your testing
+            string saveName = "TestBackup" + SavesCounter;
+            string saveType = "full"; // or "diff"
+            string sourcePath = "/users/adel/desktop/files/file" + SavesCounter;
+            int saveId = SavesCounter;
+            Console.Clear();
+            Console.WriteLine($"=== Creating a new backup: {saveName}");
+            viewModel.InitializeSave(saveName, saveType, sourcePath, saveId);
+        }
 
-            int i = 0;
-            double size = sizeInBytes;
+        private static void DrawProgressBar(int percentage, int width, char progressCharacter = '#', char backgroundCharacter = '-')
+        {
+            int progressWidth = (int)((width * percentage) / 100.0);
+            string progressBar = new string(progressCharacter, progressWidth) + new string(backgroundCharacter, width - progressWidth);
 
-            while (size >= 1024 && i < sizeSuffixes.Length - 1)
+            Console.Write("\r[{0}] {1}%", progressBar, percentage);
+        }
+
+        private static async Task MonitorBackupProgressAsync(SaveViewModel viewModel)
+        {
+            // Remember the initial cursor position
+            int initialCursorTop = Console.CursorTop;
+
+            while (viewModel.AreBackupsActive)
             {
-                size /= 1024;
-                i++;
+                // Reset cursor position to overwrite existing progress lines
+                Console.SetCursorPosition(0, initialCursorTop);
+                Console.WriteLine("\nCurrent Backup Progress:");
+
+                var backupProgress = viewModel.GetBackupProgress();
+                foreach (var progress in backupProgress)
+                {
+                    Console.Write($"Backup ID {progress.Key}: ");
+                    DrawProgressBar((int)progress.Value, 50); // 50 is the width of the progress bar
+                    Console.WriteLine();
+                }
+
+                // Check if all backups are complete (100%)
+                if (backupProgress.All(p => p.Value >= 100))
+                {
+                    viewModel.AreBackupsActive = false;
+                }
+
+                await Task.Delay(1000); // Update every 1 second
             }
 
-            return $"{size:N2} {sizeSuffixes[i]}";
+            Console.WriteLine("\nAll backups are completed.");
         }
+
+
+
+
     }
 }
+
