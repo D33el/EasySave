@@ -1,11 +1,4 @@
 ﻿using System;
-<<<<<<< HEAD
-using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-=======
 using System.Data;
 using System.Diagnostics;
 using System.Text.Json;
@@ -13,8 +6,6 @@ using System.Xml.Serialization;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
-
->>>>>>> dev
 
 namespace EasySave.Models
 {
@@ -25,31 +16,17 @@ namespace EasySave.Models
         public string SaveSourcePath { get; set; }
         public string Type { get; set; }
 
-<<<<<<< HEAD
-        private Config _config = Config.GetConfig();
 
-=======
         private Config _config = Config.GetConfig();
         private Log _log = Log.GetLog();
         private AccessList _accessList = AccessList.GetAccessList();
         private State _state = new State();
->>>>>>> dev
         private Stopwatch Duration = new Stopwatch();
 
         public Save() { }
 
-<<<<<<< HEAD
-        public void CreateSave()
-        {
-            Log _log = Log.GetLog();
-            State _state = new State();
-            string saveTargetPath = Path.Combine(_config.TargetDir, SaveName);
-            string lang = _config.Language;
-
-=======
         private void SetSaveState()
         {
->>>>>>> dev
             _state.SaveId = SaveId;
             _state.SaveName = SaveName;
             _state.Type = Type;
@@ -209,10 +186,6 @@ namespace EasySave.Models
         public void DeleteSave()
         {
             string lang = _config.Language;
-<<<<<<< HEAD
-            State _state = new State();
-=======
->>>>>>> dev
             try
             {
                 string saveFilePath = Path.Combine(_config.TargetDir, SaveName);
@@ -249,10 +222,6 @@ namespace EasySave.Models
         public void GetSaveProgress()
         {
             string lang = _config.Language;
-<<<<<<< HEAD
-            State _state = new State();
-=======
->>>>>>> dev
             try
             {
                 string[] filesToCopy = Directory.GetFiles(SaveSourcePath);
