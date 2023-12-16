@@ -1,4 +1,1 @@
-{
-  "EncryptableFiles": [".txt", ".png"],
-  "IgnoredFiles": [".exe"]
-}
+{"EncryptableFiles":[".txt",".png"],"IgnoredFiles":[".exe"],"ExtensionsPriority":[".txt",".xml",".json",".png"]}
