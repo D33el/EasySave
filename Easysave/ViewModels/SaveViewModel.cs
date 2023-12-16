@@ -1,10 +1,15 @@
 ﻿using EasySave.Models;
-
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
 namespace EasySave.ViewModels
 {
     public class SaveViewModel
     {
-        private Save _save = new();
+        private Save _save = new Save();
 
         public SaveViewModel() { }
 
@@ -25,7 +30,7 @@ namespace EasySave.ViewModels
             }
             else if (saveType == "diff")
             {
-                _save.SaveId = saveId;
+                SetSaveInfo(saveId);
             }
             _save.CreateSave();
         }
@@ -53,7 +58,7 @@ namespace EasySave.ViewModels
 
             Config ConfigObj = Config.GetConfig();
             State[] statesArr = State.GetStateArr();
-            List<int> savesIds = new();
+            List<int> savesIds = new List<int>();
 
             if (statesArr.Length == 0)
             {
@@ -80,6 +85,49 @@ namespace EasySave.ViewModels
             return savesIds.ToArray();
         }
 
+
+        public object[] GetSaveList()
+        {
+            State[] statesArr = State.GetStateArr();
+
+            List<object> saveList = new List<object>();
+
+            foreach (var state in statesArr)
+            {
+                if(state.Type == "full") { state.Type = "Complète"; } else { state.Type = "Diffèrentielle"; }
+                if(state.SaveState == true) { state.SaveStateString = "En cours";  } else { state.SaveStateString = "Terminée"; }
+                state.FilesSizeString = FormatFileSize(state.FilesSize);
+                saveList.Add(new
+                {
+                    state.SaveId,
+                    state.TargetPath,
+                    state.SaveName,
+                    state.Time,
+                    state.FilesSizeString,
+                    state.Type,
+                    state.SaveStateString,
+                    state.FilesNumber
+                });
+            }
+
+            return saveList.ToArray();
+        }
+
+        public static string FormatFileSize(long sizeInBytes)
+        {
+            string[] sizeSuffixes = { "B", "KB", "MB", "GB" };
+
+            int i = 0;
+            double size = sizeInBytes;
+
+            while (size >= 1024 && i < sizeSuffixes.Length - 1)
+            {
+                size /= 1024;
+                i++;
+            }
+
+            return $"{size:N2} {sizeSuffixes[i]}";
+        }
         private void SetSaveInfo(int saveId)
         {
             State save = State.GetStateArr().FirstOrDefault(s => s.SaveId == saveId) ?? new State();
@@ -91,6 +139,53 @@ namespace EasySave.ViewModels
                 _save.SaveId = save.SaveId;
             }
         }
+
+        public void WriteAcl(string[] listCrypt, string[] listIgnore)
+        {
+            AccessList acl = AccessList.GetAccessList();
+            acl.EncryptableFiles = listCrypt;
+            acl.IgnoredFiles = listIgnore;
+            acl.WriteList();
+        }
+
+        public string[] getAclEncryptableFiles()
+        {
+            AccessList acl = AccessList.GetAccessList();
+            return acl.EncryptableFiles;
+        }
+
+        public  string[] getAclIgnoreFiles()
+        {
+            AccessList acl = AccessList.GetAccessList();
+            return acl.IgnoredFiles;
+        }
+
+        public int statsNumberFull()
+        {
+          return  _save.GetFullSaveCount();
+        }
+
+        public int statsNumberDiff()
+        {
+            return _save.GetDiffSaveCount();
+        }
+
+        public int statsEncryptedFilesNumber()
+        {
+            return _save.GetEncryptedFilesNumber();
+        }
+
+        public long GetAllSavesSize()
+        {
+            State[] stateArr = State.GetStateArr();
+            long total = 0;
+            foreach (State state in stateArr)
+            {
+                total += state.FilesSize;
+            }
+            return total;
+        }
+
     }
 }
 

@@ -1,0 +1,4 @@
+{
+  "EncryptableFiles": [".txt", ".png"],
+  "IgnoredFiles": [".exe"]
+}

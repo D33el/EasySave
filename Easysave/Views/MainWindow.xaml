@@ -1,0 +1,452 @@
+﻿<Window x:Class="EasySave.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:EasySave"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="650" Width="1000">
+
+
+    <Grid>
+
+        <!--Welcome grid-->
+        <Grid x:Name="WelcomePage" Background="#a7c6ed">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0" Margin="0,10,0,10">
+                <TextBlock Text="Merci d’avoir téléchargé EasySave by ProSoft" FontWeight="Bold" FontSize="20" TextAlignment="Center"/>
+                <TextBlock Text="Veuillez procéder au paramétrage initial de l’application avant de continuer" FontSize="14" TextAlignment="Center"/>
+            </StackPanel>
+
+
+
+            <Grid Grid.Row="1">
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <TextBlock FontSize="16" FontWeight="Bold" Foreground="#318CE7" Margin="0,0,0,5"><Run Language="fr-fr" Text="Langue de l'application"/></TextBlock>
+                    <ComboBox x:Name="LangueSetting" Width="285" Height="30" HorizontalAlignment="Left" >
+                        <ComboBoxItem Content="Français" Tag="fr"/>
+                        <ComboBoxItem Content="English" Tag="eng"/>
+                    </ComboBox>
+                </StackPanel>
+
+                <StackPanel Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <TextBlock  Text="Emplacement des sauvegardes " FontSize="16" FontWeight="Bold" Foreground="#318CE7" Margin="0,0,0,5"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBox x:Name="TargetSave" Width="200" Height="30"  />
+                        <Button Click="OpenExplorer_Click" Tag="TargetSave" Content="Parcourir" Width="80" Height="30" Margin="5,0,0,0" Foreground="White"  BorderBrush="#007ACC"  Background="#a7c6ed" BorderThickness="1" FontSize="14" FontWeight="Bold" Cursor="Hand"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel  Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <TextBlock Text="Emplacement des logs " FontSize="16" FontWeight="Bold" Foreground="#318CE7" Margin="0,0,0,5"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBox x:Name="TargetLogs" Width="200" TextChanged="TextBox_TextChanged" Height="30"/>
+                        <Button Click="OpenExplorer_Click" Tag="TargetLogs" Content="Parcourir" Width="80" Height="30" Margin="5,0,0,0" Foreground="White"  BorderBrush="#007ACC"  Background="#a7c6ed" BorderThickness="1" FontSize="14" FontWeight="Bold" Cursor="Hand"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel  Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <TextBlock FontSize="16" FontWeight="Bold" Foreground="#318CE7" Margin="0,0,0,5"><Run Text="Types de"/><Run Language="fr-fr" Text="s"/><Run Text=" logs "/></TextBlock>
+                    <ComboBox  x:Name="LogsType"  Width="285" Height="30" HorizontalAlignment="Left" >
+                        <ComboBoxItem Content="JSon" Tag="json"/>
+                        <ComboBoxItem Content="XML" Tag="xml"/>
+                    </ComboBox>
+                </StackPanel>
+
+                <Button Grid.Row="2" Grid.ColumnSpan="11" Click="Commencer_Click" Content="Commencer" Width="180" Height="40" Margin="5,0,0,0" Foreground="White"  BorderBrush="#007ACC"  Background="#007ACC" BorderThickness="1" FontSize="17" FontWeight="Bold" Cursor="Hand"/>
+
+            </Grid>
+        </Grid>
+
+        <!--Home grid-->
+        <Grid x:Name="HomePage">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" Height="50" Background="#92b6eb" VerticalAlignment="Center">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="20"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="20"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="1" Height="auto" FontWeight="Bold" FontSize="25">EasySave <LineBreak/> <Run FontWeight="Light" FontSize="10">By Prosoft</Run></TextBlock>
+                <Button Click="Home_Click" Margin="0,0,0,0" Grid.Column="3" Width="40" Height="30" Background="White" BorderBrush="Transparent">
+                    <Image Source="/Assets/icons/home.png" Width="20" Height="20"/>
+                </Button>
+                <Button Click="Save_Click" Margin="20,0,0,0" Grid.Column="4" Width="40" Height="30" Background="White" BorderBrush="Transparent">
+                    <Image Source="/Assets/icons/disk.png" Width="20" Height="20"/>
+                </Button>
+                <Button Click="Settings_Click" Margin="20,0,0,0" Grid.Column="5" Width="40" Height="30" Background="White" BorderBrush="Transparent">
+                    <Image Source="/Assets/icons/settings.png" Width="20" Height="20"/>
+                </Button>
+            </Grid>
+
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+
+
+                <Grid Grid.Column="1" Margin="20">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" FontSize="20" FontWeight="Bold">Accueil</TextBlock>
+
+                    <Grid Grid.Row="1" Height="120">
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0" Margin="0,0,10,0" Padding="10"  CornerRadius="5" Background="AliceBlue">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="auto"/>
+                                    <RowDefinition Height="auto"/>
+                                    <RowDefinition Height="20"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Row="0" FontSize="15" FontWeight="DemiBold">
+                                <Image Source="/Assets/icons/floppy-disks.png" Width="20" VerticalAlignment="Center"/>
+                                <Run> Sauvegardes</Run>
+                                </TextBlock>
+                                <TextBlock Grid.Row="1" FontSize="15" FontWeight="Bold" x:Name="NumberOfFull">
+                                
+                                <Run FontSize="12" FontWeight="Normal">Completes</Run>
+                                </TextBlock>
+                                <TextBlock Grid.Row="2" FontSize="15" FontWeight="Bold" x:Name="NumberOfDiff" >
+                                
+                                <Run FontSize="12" FontWeight="Normal">Différentielles</Run>
+                                </TextBlock>
+                            </Grid>
+                        </Border>
+
+                        <Border Grid.Column="1" Margin="0,0,10,0" Padding="10"  CornerRadius="5" Background="AliceBlue">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="auto"/>
+                                    <RowDefinition Height="20"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Row="0" FontSize="15" FontWeight="DemiBold">
+                                <Image Source="/Assets/icons/database.png" Width="20" VerticalAlignment="Center"/>
+                                <Run> Go stockés</Run>
+                                </TextBlock>
+                                <TextBlock Grid.Row="1" FontSize="15" FontWeight="Bold" x:Name="SavesSize">
+                                999
+                                <Run FontSize="12" FontWeight="Normal">Go</Run>
+                                </TextBlock>
+                            </Grid>
+                        </Border>
+
+                        <Border Grid.Column="2" Margin="0,0,10,0" Padding="10"  CornerRadius="5" Background="AliceBlue">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="auto"/>
+                                    <RowDefinition Height="20"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Row="0" FontSize="15" FontWeight="DemiBold">
+                                <Image Source="/Assets/icons/lock.png" Width="20" VerticalAlignment="Center"/>
+                                <Run> fichiers cryptés</Run>
+                                </TextBlock>
+                                <TextBlock Grid.Row="1" FontSize="15" FontWeight="Bold" x:Name="NumberOfEncrypted">
+                                999
+                                <Run FontSize="12" FontWeight="Normal">Fichiers</Run>
+                                </TextBlock>
+                            </Grid>
+                        </Border>
+
+                    </Grid>
+
+                </Grid>
+            </Grid>
+
+        </Grid>
+
+        <!--Settings grid-->
+        <Grid x:Name="SettingsPage" Background="White" Margin="0,0,0,0">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+
+            <Grid Grid.Row="0" Height="50" Background="#92b6eb" VerticalAlignment="Center">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="20"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="20"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="1" Height="auto" FontWeight="Bold" FontSize="25">EasySave <LineBreak/> <Run FontWeight="Light" FontSize="10">By Prosoft</Run></TextBlock>
+                <Button Click="Home_Click" Margin="0,0,0,0" Grid.Column="3" Width="40" Height="30" Background="White" BorderBrush="Transparent">
+                    <Image Source="/Assets/icons/home.png" Width="20" Height="20"/>
+                </Button>
+                <Button Click="Save_Click" Margin="20,0,0,0" Grid.Column="4" Width="40" Height="30" Background="White" BorderBrush="Transparent">
+                    <Image Source="/Assets/icons/disk.png" Width="20" Height="20"/>
+                </Button>
+                <Button Click="Settings_Click" Margin="20,0,0,0" Grid.Column="5" Width="40" Height="30" Background="White" BorderBrush="Transparent">
+                    <Image Source="/Assets/icons/settings.png" Width="20" Height="20"/>
+                </Button>
+            </Grid>
+
+            <Grid Grid.Row="1" Margin="10">
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+
+                <Grid Grid.Row="0">
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0" Text="Paramètres" FontWeight="Medium" FontSize="20" Margin="0,0,0,20" />
+                    <Button Grid.Column="1" Click="Sauvegarder_Click"  Content="Sauvegarder" Width="120" Height="30" Margin="5,0,0,0" Foreground="White"  BorderBrush="#007ACC"  Background="#007ACC" BorderThickness="1" FontSize="14" FontWeight="Bold" Cursor="Hand" />
+                </Grid>
+
+
+                <Grid Grid.Row="1">
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+
+                    <StackPanel Grid.Row="0" Grid.Column="0" >
+                        <TextBlock FontSize="16" FontWeight="Bold" Foreground="#318CE7" Margin="0,0,0,5"><Run Language="fr-fr" Text="Langue de l'application"/></TextBlock>
+                        <ComboBox x:Name="SettingLanguage"  Width="285" Height="30" HorizontalAlignment="Left" >
+                            <ComboBoxItem Content="Français" Tag="fr"/>
+                            <ComboBoxItem Content="English" Tag="eng"/>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="1" Grid.Column="0" >
+                        <TextBlock Text="Emplacement des sauvegardes " FontSize="16" FontWeight="Bold" Foreground="#318CE7" Margin="0,0,0,5"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBox x:Name="SettingTargetSave"  Width="200" Height="30" />
+                            <Button Click="OpenExplorer_Click" Tag="SettingTargetSave" Content="Parcourir" Width="80" Height="30" Margin="5,0,0,0" Foreground="White"  BorderBrush="#007ACC"  Background="#a7c6ed" BorderThickness="1" FontSize="14" FontWeight="Bold" Cursor="Hand"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <StackPanel  Grid.Row="2" Grid.Column="0">
+                        <TextBlock Text="Emplacement des logs " FontSize="16" FontWeight="Bold" Foreground="#318CE7" Margin="0,0,0,5"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBox x:Name="SettingLogsPath" Width="200" TextChanged="TextBox_TextChanged" Height="30"/>
+                            <Button Click="OpenExplorer_Click"  Tag="SettingLogsPath"  Content="Parcourir" Width="80" Height="30" Margin="5,0,0,0" Foreground="White"  BorderBrush="#007ACC"  Background="#a7c6ed" BorderThickness="1" FontSize="14" FontWeight="Bold" Cursor="Hand"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="0" Grid.Column="1">
+                        <TextBlock Text="Types de fichiers à crypter" FontSize="16" FontWeight="Bold" Foreground="#318CE7" Margin="0,0,0,5" />
+                        <TextBox x:Name="SettingFilesCrypte"  Width="285" Height="30" HorizontalAlignment="Left" TextChanged="TextBox_TextChanged" />
+                    </StackPanel>
+
+                    <StackPanel  Grid.Row="1" Grid.Column="1" >
+                        <TextBlock FontSize="16" FontWeight="Bold" Foreground="#318CE7" Margin="0,0,0,5"><Run Text="Types de fichiers a ignorer lors d"/><Run Language="fr-fr" Text="'"/><Run Text="une sauvegarde"/></TextBlock>
+                        <TextBox x:Name="SettingFilesIgnore" Width="285" Height="30" HorizontalAlignment="Left" TextChanged="TextBox_TextChanged" />
+                    </StackPanel>
+
+                    <StackPanel  Grid.Row="2" Grid.Column="1" >
+                        <TextBlock FontSize="16" FontWeight="Bold" Foreground="#318CE7" Margin="0,0,0,5"><Run Text="Types de"/><Run Language="fr-fr" Text="s"/><Run Text=" logs "/></TextBlock>
+                        <ComboBox x:Name="SettingTypeLogs" Width="285" Height="30" HorizontalAlignment="Left" >
+                            <ComboBoxItem Content="JSON" Tag="json"/>
+                            <ComboBoxItem Content="XML" Tag="xml"/>
+                        </ComboBox>
+                    </StackPanel>
+
+                </Grid>
+            </Grid>
+        </Grid>
+
+        <!--Save grid-->
+        <Grid x:Name="SavePage">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+
+            <Grid Grid.Row="0" Height="50" Background="#92b6eb" VerticalAlignment="Center">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="20"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="20"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="1" Height="auto" FontWeight="Bold" FontSize="25">EasySave <LineBreak/> <Run FontWeight="Light" FontSize="10">By Prosoft</Run></TextBlock>
+                <Button Click="Home_Click" Margin="0,0,0,0" Grid.Column="3" Width="40" Height="30" Background="White" BorderBrush="Transparent">
+                    <Image Source="/Assets/icons/home.png" Width="20" Height="20"/>
+                </Button>
+                <Button Click="Save_Click" Margin="20,0,0,0" Grid.Column="4" Width="40" Height="30" Background="White" BorderBrush="Transparent">
+                    <Image Source="/Assets/icons/disk.png" Width="20" Height="20"/>
+                </Button>
+                <Button Click="Settings_Click" Margin="20,0,0,0" Grid.Column="5" Width="40" Height="30" Background="White" BorderBrush="Transparent">
+                    <Image Source="/Assets/icons/settings.png" Width="20" Height="20"/>
+                </Button>
+            </Grid>
+            <Grid Grid.Row="1" Margin="10">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="300"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid Grid.Column="0">
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid>
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock VerticalAlignment="Center" FontWeight="DemiBold" FontSize="20">Toutes les sauvegardes</TextBlock>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+
+                            <Button Margin="10,0,0,0" Grid.Column="5" Width="40" Height="30" Background="AliceBlue" BorderBrush="Transparent" Click="Delete_click">
+                                <Image Source="/Assets/icons/trash.png" Width="20" Height="20"/>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+
+                    <ItemsControl  x:Name="SaveList"  Grid.Row="1" Margin="0,15,0,0">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+
+                                <Border Background="#f8f8f8">
+                            <Grid Margin="10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                        <TextBlock  FontWeight="DemiBold" FontSize="16" Grid.Row="0" Grid.Column="0"> <CheckBox Tag="{Binding SaveId, Mode=OneWay}"/> <Run Text="{Binding SaveName , Mode=OneWay}"/> - <Run  FontSize="14" Text="{Binding SaveStateString, Mode=OneWay}"/></TextBlock>
+                                        <TextBlock FontWeight="light" FontSize="14" Grid.Row="1" Grid.Column="0">Dossier source : <Run Text="{Binding TargetPath, Mode=OneWay}"/> </TextBlock>
+                                        <TextBlock FontWeight="light" FontSize="14" Grid.Row="2" Grid.Column="0"><Run FontWeight="Medium" Text="{Binding FilesNumber,  Mode=OneWay}"/> Fichiers pour <Run FontWeight="Medium" Text="{Binding FilesSizeString, Mode=OneWay}"/> </TextBlock>
+                                <Border Grid.Column="2" Background="Green" Padding="5,0,5,2" CornerRadius="5">
+                                            <TextBlock Foreground="White" FontWeight="Bold" TextAlignment="Center"  Text="{Binding Type, Mode=OneWay}"/>
+                                </Border>
+                                        <TextBlock FontWeight="Medium" FontSize="12" Grid.Row="2" Grid.Column="1" Text="{Binding Time, Mode=OneWay}" />
+                            </Grid>
+                        </Border>
+                         </DataTemplate>
+                       </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Grid>
+
+                <Grid Grid.Column="1" Margin="10">
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock FontWeight="DemiBold" FontSize="20" TextAlignment="Center">Créer une sauvegarde</TextBlock>
+
+                    <StackPanel Grid.Row="1" >
+                        <TextBlock Text="Nom de la sauvegarde" FontSize="16" FontWeight="Bold" Foreground="#318CE7" Margin="0,0,0,5"/>
+                        <TextBox x:Name="SaveName"  Width="280" Height="30" HorizontalAlignment="Left"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="2" >
+                        <TextBlock Text="Type de la sauvegarde" FontSize="16" FontWeight="Bold" Foreground="#318CE7" Margin="0,0,0,5"/>
+                        <ComboBox x:Name="SaveType"  Width="280" Height="30" HorizontalAlignment="Left" >
+                            <ComboBoxItem Content="Complète" Tag="full"/>
+                            <ComboBoxItem Content="Diffèrentielle" Tag="diff"/>
+                        </ComboBox>
+
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="3" >
+                        <TextBlock Text="Emplacement du fichier source " FontSize="16" FontWeight="Bold" Foreground="#318CE7" Margin="0,0,0,5"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBox x:Name="SourcePath" Width="195" Height="30" />
+                            <Button Click="OpenExplorer_Click" Content="Parcourir" Tag="SourcePath" Width="80" Height="30" Margin="5,0,0,0" Foreground="White"  BorderBrush="#007ACC"  Background="#a7c6ed" BorderThickness="1" FontSize="14" FontWeight="Bold" Cursor="Hand"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <Button Grid.Row="4" Click="CreateSave_Click" Content="Créer" Width="120" Height="30" Margin="5,0,0,0" Foreground="White"  BorderBrush="#007ACC"  Background="#007ACC" BorderThickness="1" FontSize="14" FontWeight="Bold" Cursor="Hand"/>
+
+                </Grid>
+
+            </Grid>
+        </Grid>
+
+    </Grid>
+
+
+
+
+</Window>

@@ -1,15 +1,20 @@
-﻿using System.Text.Json;
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Text.Json;
 
 namespace EasySave
 {
     public sealed class Config
     {
-        private readonly string FilePath = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName + @"/config.json";
-        public string Language { get; set; }
-        public string TargetDir { get; set; }
-        public string LogsDir { get; set; }
-        public string StateFilePath { get; set; }
-        public string LogsType { get; set; }
+        private readonly string FilePath = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName + @"/Assets/config.json";
+        public string Language { get; set; } = "";
+        public string TargetDir { get; set; } = "";
+        public string LogsDir { get; set; } = "";
+        public string LogsType { get; set; } = "";
 
         private static Config ConfigInstance;
 
@@ -32,15 +37,30 @@ namespace EasySave
 
         public void SaveConfig()
         {
-            string JSONtext = JsonSerializer.Serialize(this);
-            File.WriteAllText(FilePath, JSONtext);
+            try
+            {
+                string JSONtext = JsonSerializer.Serialize(this);
+                File.WriteAllText(FilePath, JSONtext);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error : " + ex);
+            }
         }
 
         public bool CheckConfig()
         {
-            string JSONtext = File.ReadAllText(FilePath);
-            int fileLength = JSONtext.Length;
-            if (fileLength > 32) { return true; } else { return false; }
+            try
+            {
+                string JSONtext = File.ReadAllText(FilePath);
+                int fileLength = JSONtext.Length;
+                if (fileLength > 32) { return true; } else { return false; }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error : " + ex);
+                return false;
+            }
         }
 
         public void LoadConfig()
@@ -54,7 +74,6 @@ namespace EasySave
                 TargetDir = configObj.TargetDir;
                 LogsDir = configObj.LogsDir;
                 LogsType = configObj.LogsType;
-                StateFilePath = configObj.StateFilePath;
             }
             catch (Exception ex)
             {
@@ -67,7 +86,6 @@ namespace EasySave
             public string Language { get; set; }
             public string TargetDir { get; set; }
             public string LogsDir { get; set; }
-            public string StateFilePath { get; set; }
             public string LogsType { get; set; }
         }
     }

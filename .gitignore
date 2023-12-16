@@ -3,15 +3,13 @@
 
 .sln
 config.json
+state.json
 
 ###################
 # compiled source #
 ###################
 *.com
 *.class
-*.dll
-*.exe
-*.pdb
 *.dll.config
 *.cache
 *.suo
@@ -61,7 +59,6 @@ TestResults/
 .DS_STORE
 .DS_Store
 ehthumbs.db
-Icon?
 Thumbs.db
 
 

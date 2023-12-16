@@ -1,4 +1,7 @@
-﻿using System.Text.Json;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text.Json;
 using System.Xml.Serialization;
 
 namespace EasySave.Models
@@ -11,8 +14,9 @@ namespace EasySave.Models
         public string TargetDir { get; set; }
         public long FileSize { get; set; }
         public long FileSaveDuration { get; set; }
-        private static readonly string LogFilePath;
+        public long EncryptionTime { get; set; } = 0;
 
+        private static readonly string LogFilePath;
         private Config _config = Config.GetConfig();
         private static Log LogInstance;
 
