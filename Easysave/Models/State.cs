@@ -22,6 +22,8 @@ namespace EasySave.Models
         public long RemainingFiles { get; set; }
         public long RemainingFilesSize { get; set; }
 
+        public string FilesSizeString {  get; set; }
+
         public string SaveStateString { get; set; }
 
         //private Config _config = Config.GetConfig();

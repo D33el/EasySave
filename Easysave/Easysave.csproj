@@ -7,16 +7,28 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Assets\icons\database.png" />
+    <None Remove="Assets\icons\disk.png" />
+    <None Remove="Assets\icons\floppy-disks.png" />
     <None Remove="Assets\icons\play.png" />
+    <None Remove="Assets\icons\stop.png" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Ookii.Dialogs.Wpf" Version="5.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\icons\database.png" />
+    <Resource Include="Assets\icons\disk.png" />
+    <Resource Include="Assets\icons\floppy-disks.png" />
     <Resource Include="Assets\icons\folder-download.png" />
     <Resource Include="Assets\icons\home.png" />
     <Resource Include="Assets\icons\lock.png" />
     <Resource Include="Assets\icons\pause.png" />
     <Resource Include="Assets\icons\play.png" />
     <Resource Include="Assets\icons\settings.png" />
+    <Resource Include="Assets\icons\stop.png" />
     <Resource Include="Assets\icons\trash.png" />
     <Resource Include="Assets\icons\user-gear.png" />
   </ItemGroup>

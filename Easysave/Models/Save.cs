@@ -272,23 +272,38 @@ namespace EasySave.Models
             return size;
         }
 
-        public static int[] GetSavesTypesNumber()
+
+
+
+
+        public int GetFullSaveCount()
         {
             int fullSaveCount = 0;
-            int diffSaveCount = 0;
-
             State[] existingStates = State.GetStateArr();
 
             foreach (var existingState in existingStates)
             {
                 if (existingState.Type == "full") { fullSaveCount++; }
-                else if (existingState.Type == "diff") { diffSaveCount++; }
             }
 
-            return new int[] { fullSaveCount, diffSaveCount };
+            return fullSaveCount;
         }
 
-        public static int GetEncryptedFilesNumber()
+        public int GetDiffSaveCount()
+        {
+            int diffSaveCount = 0;
+            State[] existingStates = State.GetStateArr();
+
+            foreach (var existingState in existingStates)
+            {
+                if (existingState.Type == "diff") { diffSaveCount++; }
+            }
+
+            return diffSaveCount;
+        }
+
+
+        public int GetEncryptedFilesNumber()
         {
             int count = 0;
             Config _config = Config.GetConfig();
@@ -319,9 +334,6 @@ namespace EasySave.Models
 
                 process.StartInfo.FileName = Path.Combine(appDir, "Cryptosoft.exe");
                 process.StartInfo.Arguments = arguments;
-                Console.WriteLine("Process start info");
-                Console.WriteLine($"fileName = ${process.StartInfo.FileName}");
-                Console.WriteLine($"arguments = ${process.StartInfo.Arguments}");
                 process.Start();
 
                 process.WaitForExit();

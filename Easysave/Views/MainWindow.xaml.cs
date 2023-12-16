@@ -16,6 +16,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Collections;
 using EasySave.ViewModels;
+using EasySave;
 
 namespace EasySave.Views
 {
@@ -23,7 +24,7 @@ namespace EasySave.Views
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     /// 
-    
+
     public partial class MainWindow : Window
     {
        
@@ -51,19 +52,61 @@ namespace EasySave.Views
 
             displaySaveList();
             displayParameters();
+            displayAccessList();
         }
 
 
 
+        public void displayStats()
+        {
+            NumberOfFull.Text = viewModel.statsNumberFull().ToString() + " Complètes";
+            NumberOfDiff.Text = viewModel.statsNumberDiff().ToString() + " Différentielles";
 
+            SavesSize.Text = FormatFileSize(viewModel.GetAllSavesSize());
+
+            NumberOfEncrypted.Text = viewModel.statsEncryptedFilesNumber().ToString() ;
+
+        }
+
+        public static string FormatFileSize(long sizeInBytes)
+        {
+            string[] sizeSuffixes = { "B", "KB", "MB", "GB" };
+
+            int i = 0;
+            double size = sizeInBytes;
+
+            while (size >= 1024 && i < sizeSuffixes.Length - 1)
+            {
+                size /= 1024;
+                i++;
+            }
+
+            return $"{size:N2} {sizeSuffixes[i]}";
+        }
 
 
 
         public void displaySaveList()
         {
+                  
             SaveList.ItemsSource = viewModel.GetSaveList();
+            
+            displayStats();
         }
 
+
+        public void displayAccessList() 
+        {
+            string[] Encryptable = viewModel.getAclEncryptableFiles();
+            string[] Ignored = viewModel.getAclIgnoreFiles();
+
+            string extensionsEncryptable = string.Join(", ", Encryptable);
+            string extensionsIgnored = string.Join(", ", Ignored);
+
+            SettingFilesCrypte.Text = extensionsEncryptable;
+            SettingFilesIgnore.Text = extensionsIgnored;
+
+        }
         public void displayParameters()
         {
             SettingLanguage.SelectedItem = FindComboBoxItemByTag(SettingLanguage, _config.Language);
@@ -148,6 +191,23 @@ namespace EasySave.Views
             }
         }
 
+        public void AccessList()
+        {
+            string extensionsCrypt = SettingFilesCrypte.Text;
+            string extensionsIgnore = SettingFilesIgnore.Text;
+            string[] extensionsCryptArray = extensionsCrypt.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                            for (int i = 0; i<extensionsCryptArray.Length; i++)
+                            {
+                                extensionsCryptArray[i] = extensionsCryptArray[i].Trim();
+                            }
+            string[] extensionsIgnoreArray = extensionsIgnore.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                            for (int i = 0; i < extensionsIgnoreArray.Length; i++)
+                            {
+                                extensionsIgnoreArray[i] = extensionsIgnoreArray[i].Trim();
+                            }
+            viewModel.WriteAcl(extensionsCryptArray, extensionsIgnoreArray);
+        }
+
 
         private void CreateSave_Click(object sender, RoutedEventArgs e)
         {
@@ -160,11 +220,6 @@ namespace EasySave.Views
             SaveType.SelectedItem = null;
             SourcePath.Clear();
             displaySaveList();
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-
         }
 
         private void Sauvegarder_Click(object sender, RoutedEventArgs e)
@@ -185,8 +240,9 @@ namespace EasySave.Views
             _config.LogsType = LogsType;
 
             _config.SaveConfig();
+            AccessList();
             displayParameters();
-
+            displayAccessList();
         }
 
         private void Delete_click(object sender, RoutedEventArgs e)
