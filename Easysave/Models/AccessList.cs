@@ -7,6 +7,7 @@ namespace EasySave.Models
     {
         public string[]? EncryptableFiles { get; set; }
         public string[]? IgnoredFiles { get; set; }
+        public string[]? ExtensionsPriority { get; set; }
 
         private static string FilePath = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName + @"/Assets/accessLists.json";
         private static AccessList Instance;
@@ -39,6 +40,7 @@ namespace EasySave.Models
                     AccessListData accessLists = new AccessListData();
                     accessLists.EncryptableFiles = EncryptableFiles;
                     accessLists.IgnoredFiles = IgnoredFiles;
+                    accessLists.ExtensionsPriority = ExtensionsPriority;
 
                     string serializedJSON = JsonSerializer.Serialize(accessLists) + Environment.NewLine;
                     File.WriteAllText(FilePath, serializedJSON);
@@ -47,6 +49,23 @@ namespace EasySave.Models
                 {
                     Console.WriteLine(ex);
                 }
+            }
+        }
+
+        private void LoadAccessList()
+        {
+            string JSONtext = File.ReadAllText(FilePath);
+            try
+            {
+                AccessListData accessList = JsonSerializer.Deserialize<AccessListData>(JSONtext);
+
+                EncryptableFiles = accessList.EncryptableFiles;
+                IgnoredFiles = accessList.IgnoredFiles;
+                ExtensionsPriority = accessList.ExtensionsPriority;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
             }
         }
 
@@ -64,27 +83,26 @@ namespace EasySave.Models
             return false;
         }
 
-        private void LoadAccessList()
+        public int GetExtensionPriority(FileInfo file)
         {
-            string JSONtext = File.ReadAllText(FilePath);
-            try
-            {
-                AccessListData accessList = JsonSerializer.Deserialize<AccessListData>(JSONtext);
+            int priority = -1;
+            string fileExt = file.Extension.ToLowerInvariant(); // Ensure it's case-insensitive
 
-                EncryptableFiles = accessList.EncryptableFiles;
-                IgnoredFiles = accessList.IgnoredFiles;
+            int index = Array.IndexOf(ExtensionsPriority, fileExt);
 
-            }
-            catch (Exception ex)
+            if (index >= 0)
             {
-                Console.WriteLine(ex);
+                priority = index + 1;
             }
+
+            return priority;
         }
 
         private class AccessListData
         {
             public string[]? EncryptableFiles { get; set; }
             public string[]? IgnoredFiles { get; set; }
+            public string[]? ExtensionsPriority { get; set; }
         }
     }
 }

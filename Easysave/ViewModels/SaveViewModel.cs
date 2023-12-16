@@ -20,7 +20,7 @@ namespace EasySave.ViewModels
             return new Dictionary<int, double>(_backupExecutor.BackupsProgress);
         }
 
-
+        
         public void InitializeSave(string saveName, string saveType, string sourcePath, int saveId)
         {
             var save = new Save(_backupExecutor.BackupsProgress)
@@ -86,6 +86,17 @@ namespace EasySave.ViewModels
             return statesArr.Length;
         }
 
+        public static void WriteAcl(string[] list, string type)
+        {
+            AccessList acl = AccessList.GetAccessList();
+            if (type == "priority")
+            {
+                acl.ExtensionsPriority = list;
+            }
+
+            acl.WriteList();
+        }
+
         public static int[] ShowSaveList()
         {
 
@@ -131,6 +142,8 @@ namespace EasySave.ViewModels
             }
             return _save;
         }
+
+        
     }
 }
 

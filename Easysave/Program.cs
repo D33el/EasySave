@@ -1,5 +1,4 @@
 ﻿using EasySave.ViewModels;
-//using EasySave.Views;
 
 
 namespace EasySave
@@ -16,8 +15,8 @@ namespace EasySave
                 Console.WriteLine("=========================== V3.0");
                 Console.WriteLine("1. Create a new backup");
                 Console.WriteLine("2. Re-execute all backup");
-                Console.WriteLine("3. Delete a backup");
-                Console.WriteLine("4. Cancel all backups");
+                Console.WriteLine("3. Cancel all backups");
+                Console.WriteLine("4. Priorités");
                 Console.WriteLine("5. Exit");
 
                 switch (Console.ReadLine())
@@ -37,6 +36,19 @@ namespace EasySave
                         viewModel.CancelAllBackups();
                         Console.WriteLine("All backups have been canceled.");
                         break;
+                    case "4":
+                        Console.Write("Veuillez saisir les extensions dans l'ordre de priorité (séparés par une virgule) : ");
+                        string extensions = Console.ReadLine();
+                        // Split the string into an array using the comma as a separator
+                        string[] extensionsArray = extensions.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                        // Trim whitespace from each extension
+                        for (int i = 0; i < extensionsArray.Length; i++)
+                        {
+                            extensionsArray[i] = extensionsArray[i].Trim();
+                        }
+                        // Assuming the viewModel.WriteAccessList method takes an array of extensions and a category
+                        SaveViewModel.WriteAcl(extensionsArray, "priority");
+                        return;
                     case "5":
                         return;
                     default:
