@@ -13,15 +13,9 @@ namespace EasySave.Models
         public string TargetPath { get; set; }
         public int FilesNumber { get; set; }
         public long FilesSize { get; set; }
-        public double Progress { get; set; }
-        public long RemainingFiles { get; set; }
-        public long RemainingFilesSize { get; set; }
 
-        //private Config _config = Config.GetConfig();
-        private static string StateFilePath = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName + @"/Assets/state.json";
+        private static readonly string StateFilePath = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName + @"/Assets/state.json";
 
-        public delegate void StateUpdatedHandler();
-        public static event StateUpdatedHandler StateUpdated;
         private static readonly object _stateLock = new object();
 
         public State()
@@ -63,7 +57,6 @@ namespace EasySave.Models
         {
             DeleteState();
             AddState();
-            StateUpdated?.Invoke();
         }
 
         public void DeleteState()

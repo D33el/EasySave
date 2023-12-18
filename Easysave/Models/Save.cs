@@ -25,7 +25,7 @@ namespace EasySave.Models
         private Stopwatch Duration = new Stopwatch();
 
         private ConcurrentDictionary<int, double> _progressTracker;
-        public bool IsCompleted { get; private set; } = false;
+        
 
         public Save(ConcurrentDictionary<int, double> progressTracker)
         {
@@ -46,7 +46,6 @@ namespace EasySave.Models
 
         public void MarkAsCompleted()
         {
-            IsCompleted = true;
             UpdateSaveProgress(100); // Ensure 100% progress on completion
         }
 
@@ -69,8 +68,6 @@ namespace EasySave.Models
                     {
                         DiffSave(saveTargetPath, cancellationToken);
                     }
-
-                    //Console.WriteLine($"+++ Model Success creating : {SaveName} ");
                 }
                 else
                 {
@@ -88,7 +85,7 @@ namespace EasySave.Models
             if (cancellationToken.IsCancellationRequested)
             {
                 Console.WriteLine("Backup operation was canceled.");
-                return; // Exit the method
+                return; 
             }
             if (Directory.Exists(folderPath) && Directory.GetFiles(folderPath).Length != 0)
             {
@@ -134,17 +131,18 @@ namespace EasySave.Models
 
                 UpdateSaveProgress((count + 1) * 100.0 / totalFiles);
             }
-            // Updating state.json file by adding a new entry
+
             UpdateSaveProgress(100);
             _state.UpdateState();
         }
 
+        //TODO ajouter le progress
         private void DiffSave(string folderPath, CancellationToken cancellationToken)
         {
             if (cancellationToken.IsCancellationRequested)
             {
                 Console.WriteLine("Backup operation was canceled.");
-                return; // Exit the method
+                return;
             }
             string[] destinationFiles = Directory.GetFiles(folderPath);
             string[] sourceFiles = Directory.GetFiles(SaveSourcePath);
@@ -179,7 +177,8 @@ namespace EasySave.Models
                 _log.WriteLog();
 
             }
-            // Updating state.json file by adding a new entry
+
+
             _state.UpdateState();
         }
 
@@ -216,7 +215,6 @@ namespace EasySave.Models
             return newModifiedFiles;
         }
 
-
         public void DeleteSave()
         {
             string lang = _config.Language;
@@ -252,35 +250,6 @@ namespace EasySave.Models
                 else { Console.WriteLine($"Error deleting save file '{SaveName}': {ex.Message}"); }
             }
         }
-
-        //public void UpdateSaveProgress()
-        //{
-        //    double progress = 0;
-        //    try
-        //    {
-        //        string[] filesToCopy = Directory.GetFiles(SaveSourcePath);
-        //        string saveFolderPath = Path.Combine(_config.TargetDir, SaveName);
-
-        //        int totalFiles = filesToCopy.Length;
-        //        int remainingFiles = totalFiles - Directory.GetFiles(saveFolderPath).Length;
-
-        //        // Calculate the total size of files to be copied
-        //        long totalSize = filesToCopy.Sum(file => new FileInfo(file).Length);
-
-        //        // Calculate the remaining size to be copied
-        //        long remainingSize = filesToCopy
-        //            .Where(file => !File.Exists(Path.Combine(saveFolderPath, Path.GetFileName(file))))
-        //            .Sum(file => new FileInfo(file).Length);
-
-        //        progress = Math.Round(100.0 * (totalFiles - remainingFiles) / totalFiles, 2);
-        //        _progressTracker[SaveId] = progress;
-
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Console.WriteLine($"Error calculating save progress: {ex.Message}");
-        //    }
-        //}
 
         public void UpdateSaveProgress(double progress)
         {
@@ -351,7 +320,6 @@ namespace EasySave.Models
             try
             {
                 EncryptionDuration.Start();
-
                 using Process process = new Process();
 
                 process.StartInfo.FileName = Path.Combine(appDir, "Cryptosoft.exe");
@@ -378,5 +346,6 @@ namespace EasySave.Models
 
 
         }
+
     }
 }
