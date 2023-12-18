@@ -7,12 +7,36 @@ namespace EasySave.ViewModels
     public class SaveViewModel
     {
         private BackupExecutor _backupExecutor = new BackupExecutor();
-        
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
-        public bool AreBackupsActive { get; set; }
 
-        public SaveViewModel()
+        public bool AreBackupsActive { get; set; }
+        public bool AreBackupsPaused { get; private set; } = false;
+
+        public SaveViewModel() { }
+
+        public void PauseBackups()
         {
+            _backupExecutor.PauseBackups();
+            AreBackupsPaused = true;
+        }
+
+        public void ResumeBackups()
+        {
+            _backupExecutor.ResumeBackups();
+            AreBackupsPaused = false;
+        }
+
+        public void CancelAllBackups()
+        {
+            // If backups are paused, first resume them to allow proper cancellation
+            if (AreBackupsPaused)
+            {
+                ResumeBackups();
+            }
+
+            _cancellationTokenSource.Cancel();
+            _backupExecutor.StopAllBackups();
+            AreBackupsActive = false;
         }
 
         public Dictionary<int, double> GetBackupProgress()
@@ -20,7 +44,6 @@ namespace EasySave.ViewModels
             return new Dictionary<int, double>(_backupExecutor.BackupsProgress);
         }
 
-        
         public void InitializeSave(string saveName, string saveType, string sourcePath, int saveId)
         {
             var save = new Save(_backupExecutor.BackupsProgress)
@@ -42,7 +65,6 @@ namespace EasySave.ViewModels
 
         public void CheckAllBackupsCompleted()
         {
-            // Check if any backup task is not completed
             AreBackupsActive = _backupExecutor.BackupsProgress.Any(p => p.Value < 100);
         }
 
@@ -72,12 +94,6 @@ namespace EasySave.ViewModels
             Save _save = new Save(_backupExecutor.BackupsProgress);
             _save = SetSaveInfo(saveId);
             _save.DeleteSave();
-        }
-
-        public void CancelAllBackups()
-        {
-            _cancellationTokenSource.Cancel();
-            _backupExecutor.StopAllBackups();
         }
 
         public static int GetSavesNumber()
@@ -143,7 +159,6 @@ namespace EasySave.ViewModels
             return _save;
         }
 
-        
     }
 }
 
