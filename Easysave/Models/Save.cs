@@ -192,7 +192,7 @@ namespace EasySave.Models
                 _log.Timestamp = DateTime.Now.ToString("dd-MM-yyyy hh:mm:ss");
 
                 _log.WriteLog();
-                UpdateSaveProgress((count + 1) * 100.0 / filesToCopy.Length);
+                UpdateSaveProgress((count + 1) * 100.0 / newModifiedFiles.Length);
             }
 
             UpdateSaveProgress(100);
