@@ -7,24 +7,39 @@ namespace EasySave.Models
 {
     public class BackupExecutor
     {
+        public ConcurrentDictionary<int, double> BackupsProgress = new ConcurrentDictionary<int, double>();
+
         private readonly ConcurrentQueue<Save> _backupQueue;
         private readonly SemaphoreSlim _maxParallelBackups;
         private readonly int _maxBackupLimit = 2;
         private CancellationTokenSource _cancellationTokenSource;
-
-        public ConcurrentDictionary<int, double> BackupsProgress = new ConcurrentDictionary<int, double>();
+        private ManualResetEventSlim _pauseEvent;
+        private bool _stopRequested = false;
 
         public BackupExecutor()
         {
             _backupQueue = new ConcurrentQueue<Save>();
             _maxParallelBackups = new SemaphoreSlim(_maxBackupLimit, _maxBackupLimit);
             _cancellationTokenSource = new CancellationTokenSource();
+            _pauseEvent = new ManualResetEventSlim(true);
         }
+
+        // Method to pause backups
+        public void PauseBackups()
+        {
+            _pauseEvent.Reset();
+        }
+
+        // Method to resume backups
+        public void ResumeBackups()
+        {
+            _pauseEvent.Set();
+        }
+
 
         // Method to enqueue a backup task
         public void EnqueueBackup(Save saveTask)
         {
-            Console.WriteLine($"+++ Model.BackupExecutor Enqueued : {saveTask.SaveName}");
             _backupQueue.Enqueue(saveTask);
             BackupsProgress[saveTask.SaveId] = 0;
         }
@@ -49,7 +64,7 @@ namespace EasySave.Models
                     // Run the backup task in a separate task
                     Console.WriteLine($"+++ Model.BackupExecutor Executing : {saveTask.SaveName}");
                     Task.Run(() => RunBackupAsync(saveTask, cancellationToken));
-                    
+
                 }
             }
         }
@@ -59,14 +74,14 @@ namespace EasySave.Models
         {
             try
             {
-                //Check for cancelation token before 
+                _pauseEvent.Wait(cancellationToken);
                 cancellationToken.ThrowIfCancellationRequested();
+
                 saveTask.CreateSave(cancellationToken);
             }
             catch (OperationCanceledException)
             {
                 Console.WriteLine("Backup operation was canceled.");
-                // TODO : envoyer un message pour le front 
             }
             catch (Exception ex)
             {
@@ -74,27 +89,31 @@ namespace EasySave.Models
             }
             finally
             {
-                saveTask.MarkAsCompleted(); // Mark the task as completed
+                saveTask.MarkAsCompleted();
+
+                // Release the semaphore slot
                 _maxParallelBackups.Release();
             }
         }
 
 
-        // A method to stop all ongoing and queued backups
         public void StopAllBackups()
         {
-            // Signal cancellation to all running backups
+            _stopRequested = true;
+
+            _pauseEvent.Set();
+            _maxParallelBackups.Wait();
             _cancellationTokenSource.Cancel();
 
-            // Clear the queue to prevent further backups from starting
-            while (_backupQueue.TryDequeue(out _))
-            {
-                // Optionally, handle the dequeued tasks, e.g., logging or cleanup
-            }
+            while (_backupQueue.TryDequeue(out _)) { }
 
-            // Reset the CancellationTokenSource for future use
+            // Reset the CancellationTokenSource
             _cancellationTokenSource.Dispose();
             _cancellationTokenSource = new CancellationTokenSource();
+
+            // Reset the stop requested flag and semaphore
+            _stopRequested = false;
+            _maxParallelBackups.Release(_maxBackupLimit);
         }
 
 

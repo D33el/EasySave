@@ -27,8 +27,8 @@ namespace EasySave.Views
 
     public partial class MainWindow : Window
     {
-       
-        private delegate void  writeOnTextBlock(string textboxName, string value);
+
+        private delegate void writeOnTextBlock(string textboxName, string value);
 
 
 
@@ -64,7 +64,7 @@ namespace EasySave.Views
 
             SavesSize.Text = FormatFileSize(viewModel.GetAllSavesSize());
 
-            NumberOfEncrypted.Text = viewModel.statsEncryptedFilesNumber().ToString() ;
+            NumberOfEncrypted.Text = viewModel.statsEncryptedFilesNumber().ToString();
 
         }
 
@@ -88,14 +88,14 @@ namespace EasySave.Views
 
         public void displaySaveList()
         {
-                  
+
             SaveList.ItemsSource = viewModel.GetSaveList();
-            
+
             displayStats();
         }
 
 
-        public void displayAccessList() 
+        public void displayAccessList()
         {
             string[] Encryptable = viewModel.getAclEncryptableFiles();
             string[] Ignored = viewModel.getAclIgnoreFiles();
@@ -112,7 +112,7 @@ namespace EasySave.Views
             SettingLanguage.SelectedItem = FindComboBoxItemByTag(SettingLanguage, _config.Language);
             SettingTargetSave.Text = _config.TargetDir;
             SettingLogsPath.Text = _config.LogsDir;
-            SettingTypeLogs.SelectedItem = FindComboBoxItemByTag(SettingTypeLogs,_config.LogsType);
+            SettingTypeLogs.SelectedItem = FindComboBoxItemByTag(SettingTypeLogs, _config.LogsType);
         }
         private ComboBoxItem FindComboBoxItemByTag(ComboBox comboBox, string tag)
         {
@@ -123,12 +123,12 @@ namespace EasySave.Views
                     return item;
                 }
             }
-            return null; 
+            return null;
         }
 
         private void Commencer_Click(object sender, RoutedEventArgs e)
         {
-            ComboBoxItem selectedLanguage= LangueSetting.SelectedItem as ComboBoxItem;
+            ComboBoxItem selectedLanguage = LangueSetting.SelectedItem as ComboBoxItem;
             ComboBoxItem selectedType = LogsType.SelectedItem as ComboBoxItem;
 
             string Langue = selectedLanguage.Tag.ToString();
@@ -140,7 +140,7 @@ namespace EasySave.Views
             _config.LogsDir = targetlogs;
             _config.LogsType = logstype;
             _config.SaveConfig();
-            ShowHomePage() ;
+            ShowHomePage();
 
         }
         private void Home_Click(object sender, RoutedEventArgs e)
@@ -164,7 +164,7 @@ namespace EasySave.Views
         private void OpenExplorer_Click(object sender, RoutedEventArgs e)
         {
 
-                var dialog = new VistaFolderBrowserDialog();
+            var dialog = new VistaFolderBrowserDialog();
             string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             dialog.SelectedPath = desktopPath;
 
@@ -185,7 +185,7 @@ namespace EasySave.Views
                     {
                         associatedTextBox.Text = selectedFolderPath;
                     };
-                    
+
                 }
 
             }
@@ -196,15 +196,15 @@ namespace EasySave.Views
             string extensionsCrypt = SettingFilesCrypte.Text;
             string extensionsIgnore = SettingFilesIgnore.Text;
             string[] extensionsCryptArray = extensionsCrypt.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                            for (int i = 0; i<extensionsCryptArray.Length; i++)
-                            {
-                                extensionsCryptArray[i] = extensionsCryptArray[i].Trim();
-                            }
+            for (int i = 0; i < extensionsCryptArray.Length; i++)
+            {
+                extensionsCryptArray[i] = extensionsCryptArray[i].Trim();
+            }
             string[] extensionsIgnoreArray = extensionsIgnore.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                            for (int i = 0; i < extensionsIgnoreArray.Length; i++)
-                            {
-                                extensionsIgnoreArray[i] = extensionsIgnoreArray[i].Trim();
-                            }
+            for (int i = 0; i < extensionsIgnoreArray.Length; i++)
+            {
+                extensionsIgnoreArray[i] = extensionsIgnoreArray[i].Trim();
+            }
             viewModel.WriteAcl(extensionsCryptArray, extensionsIgnoreArray);
         }
 
