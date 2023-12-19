@@ -13,6 +13,8 @@ namespace EasySave.Models
         public string TargetPath { get; set; }
         public int FilesNumber { get; set; }
         public long FilesSize { get; set; }
+        public string FilesSizeString { get; set; }
+        public string SaveStateString { get; set; }
 
         private static readonly string StateFilePath = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName + @"/Assets/state.json";
 
