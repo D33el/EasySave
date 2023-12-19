@@ -14,7 +14,6 @@ namespace EasySave.Models
         private readonly int _maxBackupLimit = 2;
         private CancellationTokenSource _cancellationTokenSource;
         private ManualResetEventSlim _pauseEvent;
-        private bool _stopRequested = false;
 
         public BackupExecutor()
         {
@@ -99,7 +98,6 @@ namespace EasySave.Models
 
         public void StopAllBackups()
         {
-            _stopRequested = true;
 
             _pauseEvent.Set();
             _maxParallelBackups.Wait();
@@ -111,8 +109,6 @@ namespace EasySave.Models
             _cancellationTokenSource.Dispose();
             _cancellationTokenSource = new CancellationTokenSource();
 
-            // Reset the stop requested flag and semaphore
-            _stopRequested = false;
             _maxParallelBackups.Release(_maxBackupLimit);
         }
 
