@@ -11,10 +11,13 @@ namespace EasySave
         private Mutex _appMutex;
         private Timer _processMonitorTimer;
         private bool isBusinessAppRunning = false;
+        private Config _config = Config.GetConfig();
+
 
         private SaveViewModel _viewModel = new SaveViewModel();
         protected override void OnStartup(StartupEventArgs e)
         {
+
             bool createdNew;
             _appMutex = new Mutex(true, "Easysave_V3", out createdNew);
 
@@ -25,7 +28,7 @@ namespace EasySave
                 return;
             }
 
-            // Start process monitoring timer
+            // check for process every second
             _processMonitorTimer = new Timer(CheckBusinessApp, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
 
             base.OnStartup(e);
@@ -43,7 +46,7 @@ namespace EasySave
 
         private void CheckBusinessApp(object state)
         {
-            string processName = "Safari"; // Replace with your desired process name
+            string processName = _config.BlockingApp;
 
             Process[] processes = Process.GetProcessesByName(processName);
 

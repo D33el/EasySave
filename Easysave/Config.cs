@@ -15,6 +15,7 @@ namespace EasySave
         public string TargetDir { get; set; } = "";
         public string LogsDir { get; set; } = "";
         public string LogsType { get; set; } = "";
+        public string BlockingApp { get; set; } = "";
 
         private static Config ConfigInstance;
 
@@ -74,6 +75,8 @@ namespace EasySave
                 TargetDir = configObj.TargetDir;
                 LogsDir = configObj.LogsDir;
                 LogsType = configObj.LogsType;
+                LogsType = configObj.LogsType;
+                BlockingApp = configObj.BlockingApp;
             }
             catch (Exception ex)
             {
@@ -87,6 +90,7 @@ namespace EasySave
             public string TargetDir { get; set; }
             public string LogsDir { get; set; }
             public string LogsType { get; set; }
+            public string BlockingApp { get; set; }
         }
     }
 }
