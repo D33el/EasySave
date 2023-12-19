@@ -26,7 +26,7 @@ namespace EasySave.Models
         private Stopwatch Duration = new Stopwatch();
 
         private ConcurrentDictionary<int, double> _progressTracker;
-        
+
 
         public Save(ConcurrentDictionary<int, double> progressTracker)
         {
@@ -283,30 +283,20 @@ namespace EasySave.Models
 
 
 
-        public int GetFullSaveCount()
+        public static int[] GetSavesTypesNumber()
         {
             int fullSaveCount = 0;
-            State[] existingStates = State.GetStateArr();
-
-            foreach (var existingState in existingStates)
-            {
-
-                if (existingState.Type == "full") { fullSaveCount++; }
-            }
-
-            return fullSaveCount;
-        }
-
-        public int GetDiffSaveCount()
-        {
             int diffSaveCount = 0;
+
             State[] existingStates = State.GetStateArr();
+
             foreach (var existingState in existingStates)
             {
-                if (existingState.Type == "diff") { diffSaveCount++; }
+                if (existingState.Type == "full") { fullSaveCount++; }
+                else if (existingState.Type == "diff") { diffSaveCount++; }
             }
 
-            return diffSaveCount;
+            return new int[] { fullSaveCount, diffSaveCount };
         }
 
 
