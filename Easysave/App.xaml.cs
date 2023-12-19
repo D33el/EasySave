@@ -13,11 +13,10 @@ namespace EasySave
         private bool isBusinessAppRunning = false;
         private Config _config = Config.GetConfig();
 
-
         private SaveViewModel _viewModel = new SaveViewModel();
+
         protected override void OnStartup(StartupEventArgs e)
         {
-
             bool createdNew;
             _appMutex = new Mutex(true, "Easysave_V3", out createdNew);
 

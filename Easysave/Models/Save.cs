@@ -17,7 +17,7 @@ namespace EasySave.Models
         public string SaveName { get; set; }
         public string SaveSourcePath { get; set; }
         public string Type { get; set; }
-
+        
 
         private Config _config = Config.GetConfig();
         private Log _log = Log.GetLog();
@@ -97,17 +97,25 @@ namespace EasySave.Models
                 }
             }
             string[] filesToCopy = Directory.GetFiles(SaveSourcePath);
+
+            //reordering the array with priority
+            filesToCopy = filesToCopy.OrderBy(file =>
+            {
+                var extension = Path.GetExtension(file);
+                int index = Array.IndexOf(_accessList.ExtensionsPriority, extension);
+                return index == -1 ? ExtensionsPriority.Length : index;
+            }).ToArray();
+
             int count = 0;
 
             Duration.Start();
 
-            int totalFiles = filesToCopy.Length;
             foreach (string file in filesToCopy)
             {
                 count++;
                 FileInfo fileInfo = new FileInfo(file);
 
-                if (_accessList.FileIsInList("ignored", fileInfo)) return;
+                if (_accessList.FileIsInList("ignored", fileInfo)) continue;
 
                 Duration.Restart();
                 string destinationFile = Path.Combine(folderPath, Path.GetFileName(file));
@@ -130,7 +138,7 @@ namespace EasySave.Models
                 _log.Timestamp = DateTime.Now.ToString("dd-MM-yyyy hh:mm:ss");
                 _log.WriteLog();
 
-                UpdateSaveProgress((count + 1) * 100.0 / totalFiles);
+                UpdateSaveProgress((count + 1) * 100.0 / filesToCopy.Length);
             }
 
             UpdateSaveProgress(100);
@@ -148,6 +156,14 @@ namespace EasySave.Models
             string[] destinationFiles = Directory.GetFiles(folderPath);
             string[] sourceFiles = Directory.GetFiles(SaveSourcePath);
             List<string> newModifiedFiles = CompareFiles(sourceFiles, destinationFiles);
+
+            //reordering the array with priority
+            newModifiedFiles = newModifiedFiles.OrderBy(file =>
+            {
+                var extension = Path.GetExtension(file);
+                int index = Array.IndexOf(_accessList.ExtensionsPriority, extension);
+                return index == -1 ? ExtensionsPriority.Length : index;
+            }).ToArray();
 
             Duration.Start();
             foreach (string file in newModifiedFiles)
@@ -176,10 +192,10 @@ namespace EasySave.Models
                 _log.Timestamp = DateTime.Now.ToString("dd-MM-yyyy hh:mm:ss");
 
                 _log.WriteLog();
-
+                UpdateSaveProgress((count + 1) * 100.0 / filesToCopy.Length);
             }
 
-
+            UpdateSaveProgress(100);
             _state.UpdateState();
         }
 
