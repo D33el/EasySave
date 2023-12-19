@@ -103,7 +103,7 @@ namespace EasySave.Models
             {
                 var extension = Path.GetExtension(file);
                 int index = Array.IndexOf(_accessList.ExtensionsPriority, extension);
-                return index == -1 ? ExtensionsPriority.Length : index;
+                return index == -1 ? _accessList.ExtensionsPriority.Length : index;
             }).ToArray();
 
             int count = 0;
@@ -157,18 +157,21 @@ namespace EasySave.Models
             string[] sourceFiles = Directory.GetFiles(SaveSourcePath);
             List<string> newModifiedFiles = CompareFiles(sourceFiles, destinationFiles);
 
+            string[] filesToCopy = newModifiedFiles.ToArray();
+            int count = 0;
+
             //reordering the array with priority
-            newModifiedFiles = newModifiedFiles.OrderBy(file =>
+            filesToCopy = filesToCopy.OrderBy(file =>
             {
                 var extension = Path.GetExtension(file);
                 int index = Array.IndexOf(_accessList.ExtensionsPriority, extension);
-                return index == -1 ? ExtensionsPriority.Length : index;
+                return index == -1 ? _accessList.ExtensionsPriority.Length : index;
             }).ToArray();
 
             Duration.Start();
-            foreach (string file in newModifiedFiles)
+            foreach (string file in filesToCopy)
             {
-
+                count++;
                 FileInfo fileInfo = new FileInfo(file);
                 Duration.Restart();
 
@@ -192,7 +195,7 @@ namespace EasySave.Models
                 _log.Timestamp = DateTime.Now.ToString("dd-MM-yyyy hh:mm:ss");
 
                 _log.WriteLog();
-                UpdateSaveProgress((count + 1) * 100.0 / newModifiedFiles.Length);
+                UpdateSaveProgress((count + 1) * 100.0 / filesToCopy.Length);
             }
 
             UpdateSaveProgress(100);
@@ -316,7 +319,7 @@ namespace EasySave.Models
         }
 
 
-        public int GetEncryptedFilesNumber()
+        public static int GetEncryptedFilesNumber()
         {
             int count = 0;
             Config _config = Config.GetConfig();
