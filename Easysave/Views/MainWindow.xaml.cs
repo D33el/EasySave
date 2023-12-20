@@ -59,12 +59,17 @@ namespace EasySave.Views
 
         public void displayStats()
         {
-            NumberOfFull.Text = viewModel.statsNumberFull().ToString() + " Complètes";
-            NumberOfDiff.Text = viewModel.statsNumberDiff().ToString() + " Différentielles";
 
-            SavesSize.Text = FormatFileSize(viewModel.GetAllSavesSize());
+            Dictionary<string, int> stats = viewModel.GetSavesStats();
 
-            NumberOfEncrypted.Text = viewModel.statsEncryptedFilesNumber().ToString();
+           
+
+            NumberOfFull.Text = stats.GetValueOrDefault("FullSaveNb") + " Complètes";
+            NumberOfDiff.Text = stats.GetValueOrDefault("DiffSaveNb") + " Différentielles";
+
+            SavesSize.Text = FormatFileSize((long)stats.GetValueOrDefault("AllSaveSize"));
+
+            NumberOfEncrypted.Text = stats.GetValueOrDefault("EncryptedFilesNb").ToString() ;
 
         }
 
@@ -97,8 +102,11 @@ namespace EasySave.Views
 
         public void displayAccessList()
         {
-            string[] Encryptable = viewModel.getAclEncryptableFiles();
-            string[] Ignored = viewModel.getAclIgnoreFiles();
+
+            Dictionary<string, string[]> acls = SaveViewModel.GetAcls();
+
+            string[] Encryptable = acls.GetValueOrDefault("encryptableFiles");
+            string[] Ignored = acls.GetValueOrDefault("ignoredFiles");
 
             string extensionsEncryptable = string.Join(", ", Encryptable);
             string extensionsIgnored = string.Join(", ", Ignored);
@@ -205,7 +213,7 @@ namespace EasySave.Views
             {
                 extensionsIgnoreArray[i] = extensionsIgnoreArray[i].Trim();
             }
-            viewModel.WriteAcl(extensionsCryptArray, extensionsIgnoreArray);
+            SaveViewModel.WriteAcl(extensionsCryptArray, extensionsIgnoreArray);
         }
 
 
