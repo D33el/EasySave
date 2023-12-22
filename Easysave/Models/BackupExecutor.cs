@@ -13,7 +13,7 @@ namespace EasySave.Models
         private readonly SemaphoreSlim _maxParallelBackups;
         private readonly int _maxBackupLimit = 2;
         private CancellationTokenSource _cancellationTokenSource;
-        private ManualResetEventSlim _pauseEvent;
+        public static ManualResetEventSlim _pauseEvent;
         private bool _stopRequested = false;
 
         public BackupExecutor()
@@ -47,7 +47,8 @@ namespace EasySave.Models
         // Method to start executing backups
         public async Task ExecuteBackupsAsync(CancellationToken cancellationToken = default)
         {
-            Console.WriteLine($"+++ Model.BackupExecutor Number of backups to be done {_backupQueue.Count}");
+            try
+            {
             while (!_backupQueue.IsEmpty)
             {
                 if (cancellationToken.IsCancellationRequested)
@@ -66,6 +67,11 @@ namespace EasySave.Models
                     Task.Run(() => RunBackupAsync(saveTask, cancellationToken));
 
                 }
+            }
+            }
+            catch (Exception)
+            {
+
             }
         }
 
@@ -113,7 +119,7 @@ namespace EasySave.Models
 
             // Reset the stop requested flag and semaphore
             _stopRequested = false;
-            _maxParallelBackups.Release(_maxBackupLimit);
+            _maxParallelBackups.Release();
         }
 
 

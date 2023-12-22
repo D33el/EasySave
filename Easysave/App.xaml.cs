@@ -24,7 +24,7 @@ namespace EasySave
             server.StartServer();
 
             bool createdNew;
-            _appMutex = new Mutex(true, "Easysave_V3", out createdNew);
+            _appMutex = new Mutex(true, "Easysave", out createdNew);
 
             if (!createdNew)
             {
