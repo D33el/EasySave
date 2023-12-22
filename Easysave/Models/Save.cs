@@ -32,8 +32,7 @@ namespace EasySave.Models
         {
             _progressTracker = progressTracker;
         }
-
-        private void SetSaveState()
+        public void SetSaveState()
         {
             _state.SaveId = SaveId;
             _state.SaveName = SaveName;
@@ -43,6 +42,8 @@ namespace EasySave.Models
             _state.TargetPath = Path.Combine(_config.TargetDir, SaveName);
             _state.FilesSize = DirSize(new DirectoryInfo(SaveSourcePath));
             _state.FilesNumber = Directory.GetFiles(SaveSourcePath).Length;
+
+            _state.AddState();  
         }
 
         public void MarkAsCompleted()
@@ -297,10 +298,6 @@ namespace EasySave.Models
 
             return size;
         }
-
-
-
-
 
         public static int[] GetSavesTypesNumber()
         {

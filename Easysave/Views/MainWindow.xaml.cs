@@ -17,6 +17,9 @@ using System.Windows.Shapes;
 using System.Collections;
 using EasySave.ViewModels;
 using EasySave;
+using System.Windows.Markup.Localizer;
+using System.Threading;
+using System.ComponentModel;
 
 namespace EasySave.Views
 {
@@ -31,8 +34,6 @@ namespace EasySave.Views
         private delegate void writeOnTextBlock(string textboxName, string value);
 
 
-
-
         Config _config = Config.GetConfig();
         SaveViewModel viewModel = new SaveViewModel();
 
@@ -40,6 +41,7 @@ namespace EasySave.Views
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = viewModel;
             bool configExists = _config.CheckConfig();
             if (!configExists)
             {
@@ -62,13 +64,9 @@ namespace EasySave.Views
 
             Dictionary<string, int> stats = viewModel.GetSavesStats();
 
-           
-
             NumberOfFull.Text = stats.GetValueOrDefault("FullSaveNb") + " Complètes";
             NumberOfDiff.Text = stats.GetValueOrDefault("DiffSaveNb") + " Différentielles";
-
             SavesSize.Text = FormatFileSize((long)stats.GetValueOrDefault("AllSaveSize"));
-
             NumberOfEncrypted.Text = stats.GetValueOrDefault("EncryptedFilesNb").ToString() ;
 
         }
@@ -93,9 +91,7 @@ namespace EasySave.Views
 
         public void displaySaveList()
         {
-
-            SaveList.ItemsSource = viewModel.GetSaveList();
-
+            SaveList.ItemsSource = viewModel.Saves;
             displayStats();
         }
 
@@ -217,13 +213,18 @@ namespace EasySave.Views
         }
 
 
-        private void CreateSave_Click(object sender, RoutedEventArgs e)
+        private async void CreateSave_Click(object sender, RoutedEventArgs e)
         {
             ComboBoxItem selectedComboBoxItem = SaveType.SelectedItem as ComboBoxItem;
             string savename = SaveName.Text;
             string savetype = selectedComboBoxItem.Tag.ToString();
             string sourcepath = SourcePath.Text;
-            viewModel.InitializeSave(savename, savetype, sourcepath, 0);
+
+            viewModel.InitializeSave(savename, savetype, sourcepath);
+            viewModel.AreBackupsActive = true;
+            viewModel.MonitorProgress();
+            await viewModel.ExecuteEnqueuedBackupsAsync();
+
             SaveName.Clear();
             SaveType.SelectedItem = null;
             SourcePath.Clear();

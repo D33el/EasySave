@@ -12,11 +12,21 @@ using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 using EasySave.Models;
+using System.ComponentModel;
+using System.Collections.ObjectModel;
+using System.Windows;
 
 namespace EasySave.ViewModels
 {
-    public class SaveViewModel
+    public class SaveViewModel : INotifyPropertyChanged
     {
+        public ObservableCollection<SaveItem> Saves { get; private set; } = new ObservableCollection<SaveItem>();
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
         private BackupExecutor _backupExecutor = new BackupExecutor();
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
@@ -24,7 +34,9 @@ namespace EasySave.ViewModels
         public bool AreBackupsActive { get; set; }
         public bool AreBackupsPaused { get; private set; } = false;
 
-        public SaveViewModel() { }
+        public SaveViewModel() {
+            LoadExistingSaves();
+        }
 
         private Save SetSaveInfo(int saveId)
         {
@@ -40,17 +52,107 @@ namespace EasySave.ViewModels
             return _save;
         }
 
-        public void InitializeSave(string saveName, string saveType, string sourcePath, int saveId)
+        private void LoadExistingSaves()
         {
-            var save = new Save(_backupExecutor.BackupsProgress)
+            var statesArr = State.GetStateArr();
+
+            foreach (var state in statesArr)
+            {
+                if (state.Type == "full") { state.Type = "Complète"; } else { state.Type = "Diffèrentielle"; }
+                if (state.SaveState == true) { state.SaveStateString = "En cours"; } else { state.SaveStateString = "Terminée"; }
+
+                state.FilesSizeString = FormatFileSize(state.FilesSize);
+                Saves.Add(new SaveItem()
+                {
+                    SaveId = state.SaveId,
+                    TargetPath = state.TargetPath,
+                    SaveName = state.SaveName,
+                    Time=  state.Time,
+                    FilesSizeString= state.FilesSizeString,
+                    Type = state.Type,
+                    SaveStateString = state.SaveStateString,
+                    FilesNumber= state.FilesNumber
+                });
+            }
+        }
+
+
+        public void InitializeSave(string saveName, string saveType, string sourcePath)
+        {
+            int saveId = GetSavesNumber() + 1;
+        
+            Save save = new Save(_backupExecutor.BackupsProgress)
             {
                 SaveId = saveId,
                 SaveName = saveName,
                 SaveSourcePath = sourcePath,
                 Type = saveType
             };
+            save.SetSaveState();
+
+            AddSaveToObservable();
 
             _backupExecutor.EnqueueBackup(save);
+        }
+
+        public void AddSaveToObservable()
+        {
+            State[] statesArr = State.GetStateArr();
+
+            State state = statesArr[statesArr.Length - 1];
+            
+                if (state.Type == "full") { state.Type = "Complète"; } else { state.Type = "Diffèrentielle"; }
+                if (state.SaveState == true) { state.SaveStateString = "En cours"; } else { state.SaveStateString = "Terminée"; }
+
+                state.FilesSizeString = FormatFileSize(state.FilesSize);
+               // Saves.Clear();
+                Saves.Add(new SaveItem()
+                {
+                    SaveId = state.SaveId,
+                    TargetPath = state.TargetPath,
+                    SaveName = state.SaveName,
+                    Time = state.Time,
+                    FilesSizeString = state.FilesSizeString,
+                    Type = state.Type,
+                    SaveStateString = state.SaveStateString,
+                    FilesNumber = state.FilesNumber
+                });
+        }
+
+        public async Task MonitorProgress()
+        {
+            while (AreBackupsActive)
+            {
+                var backupProgress = GetBackupProgress();
+                foreach (var progress in backupProgress)
+                {
+                    Debug.WriteLine("========MONITOR PROGRESSS=========");
+                    Debug.WriteLine(progress.Key);
+                    Debug.WriteLine(progress.Value);
+                    UpdateProgress(progress.Key, progress.Value);
+                }
+
+                if (backupProgress.All(p => p.Value >= 100))
+                {
+                    AreBackupsActive = false;
+                }
+
+                await Task.Delay(100); 
+            }
+            Trace.WriteLine("============");
+            Trace.WriteLine("\nAll backups are completed.");
+        }
+
+        private void UpdateProgress(int saveId, double progress)
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                var saveItem = Saves.FirstOrDefault(s => s.SaveId == saveId);
+                if (saveItem != null)
+                {
+                    saveItem.Progress = progress;
+                }
+            });
         }
 
         public void InitializeDeleteSave(int saveId)
@@ -63,14 +165,14 @@ namespace EasySave.ViewModels
         public async Task ExecuteEnqueuedBackupsAsync()
         {
             await _backupExecutor.ExecuteBackupsAsync(_cancellationTokenSource.Token);
-            CheckAllBackupsCompleted(); // Additional method to confirm all backups are complete
+            CheckAllBackupsCompleted();
         }
 
         public async Task ReexecuteAllBackupsAsync()
         {
             State[] allBackups = State.GetStateArr();
             await _backupExecutor.ExecuteBackupsAsync(_cancellationTokenSource.Token);
-            AreBackupsActive = false;
+            AreBackupsActive = true;
             foreach (var backupState in allBackups)
             {
                 var saveTask = new Save(_backupExecutor.BackupsProgress)
@@ -84,7 +186,7 @@ namespace EasySave.ViewModels
                 _backupExecutor.EnqueueBackup(saveTask);
             }
 
-            AreBackupsActive = true;
+            AreBackupsActive = false;
         }
 
         public void CheckAllBackupsCompleted()
@@ -122,8 +224,6 @@ namespace EasySave.ViewModels
             return new Dictionary<int, double>(_backupExecutor.BackupsProgress);
         }
 
-
-
         public static int GetSavesNumber()
         {
             State[] statesArr = State.GetStateArr();
@@ -139,34 +239,6 @@ namespace EasySave.ViewModels
             }
 
             acl.WriteList();
-        }
-
-        public object[] GetSaveList()
-        {
-            State[] statesArr = State.GetStateArr();
-
-            List<object> saveList = new List<object>();
-
-            foreach (var state in statesArr)
-            {
-                if (state.Type == "full") { state.Type = "Complète"; } else { state.Type = "Diffèrentielle"; }
-                if (state.SaveState == true) { state.SaveStateString = "En cours"; } else { state.SaveStateString = "Terminée"; }
-
-                state.FilesSizeString = FormatFileSize(state.FilesSize);
-                saveList.Add(new
-                {
-                    state.SaveId,
-                    state.TargetPath,
-                    state.SaveName,
-                    state.Time,
-                    state.FilesSizeString,
-                    state.Type,
-                    state.SaveStateString,
-                    state.FilesNumber
-                });
-            }
-
-            return saveList.ToArray();
         }
 
         public static string FormatFileSize(long sizeInBytes)
@@ -225,6 +297,42 @@ namespace EasySave.ViewModels
             }
             return total;
         }
+    }
+}
+
+public class SaveItem : INotifyPropertyChanged
+{
+
+    public int SaveId { get; set; }
+    public string SaveName { get; set; }
+    public string Time { get; set; }
+    public string Type { get; set; }
+    public bool SaveState { get; set; }
+    public string SourcePath { get; set; }
+    public string TargetPath { get; set; }
+    public int FilesNumber { get; set; }
+    public long FilesSize { get; set; }
+    public string FilesSizeString { get; set; }
+    public string SaveStateString { get; set; }
+
+    private double _progress;
+    public double Progress
+    {
+        get { return _progress; }
+        set
+        {
+            _progress = value;
+            Debug.WriteLine("==============inside object set=================");
+            Debug.WriteLine(value);
+            OnPropertyChanged(nameof(Progress));
+        }
+    }
+  
+
+    public event PropertyChangedEventHandler PropertyChanged;
+    protected virtual void OnPropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }
 

@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="650" Width="1000">
 
-
+    
     <Grid>
 
         <!--Welcome grid-->
@@ -65,7 +65,7 @@
                 <StackPanel  Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center">
                     <TextBlock FontSize="16" FontWeight="Bold" Foreground="#318CE7" Margin="0,0,0,5"><Run Text="Types de"/><Run Language="fr-fr" Text="s"/><Run Text=" logs "/></TextBlock>
                     <ComboBox  x:Name="LogsType"  Width="285" Height="30" HorizontalAlignment="Left" >
-                        <ComboBoxItem Content="JSon" Tag="json"/>
+                        <ComboBoxItem Content="Json" Tag="json"/>
                         <ComboBoxItem Content="XML" Tag="xml"/>
                     </ComboBox>
                 </StackPanel>
@@ -374,11 +374,10 @@
                         </StackPanel>
                     </Grid>
 
-                    <ItemsControl  x:Name="SaveList"  Grid.Row="1" Margin="0,15,0,0">
+                    <ItemsControl  x:Name="SaveList" ItemsSource="{Binding Saves}"  Grid.Row="1" Margin="0,15,0,0">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-
-                                <Border Background="#f8f8f8">
+                                <Border Background="#f8f8f8" Tag="{Binding SaveId, Mode=OneWay}">
                             <Grid Margin="10">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition/>
@@ -389,7 +388,12 @@
                                     <RowDefinition/>
                                     <RowDefinition/>
                                 </Grid.RowDefinitions>
-                                        <TextBlock  FontWeight="DemiBold" FontSize="16" Grid.Row="0" Grid.Column="0"> <CheckBox Tag="{Binding SaveId, Mode=OneWay}"/> <Run Text="{Binding SaveName , Mode=OneWay}"/> - <Run  FontSize="14" Text="{Binding SaveStateString, Mode=OneWay}"/></TextBlock>
+                                        <TextBlock FontWeight="DemiBold" FontSize="16" Grid.Row="0" Grid.Column="0">
+                                            <CheckBox Tag="{Binding SaveId, Mode=OneWay}"/> 
+                                            <Run Text="{Binding SaveName, Mode=OneWay}"/> - 
+                                            <Run FontSize="14" Text="{Binding SaveStateString, Mode=OneWay}"/> 
+                                            <Run FontSize="14" Text="{Binding Progress, Mode=OneWay}"/> <!-- Progress Binding Here -->
+                                        </TextBlock>
                                         <TextBlock FontWeight="light" FontSize="14" Grid.Row="1" Grid.Column="0">Dossier source : <Run Text="{Binding TargetPath, Mode=OneWay}"/> </TextBlock>
                                         <TextBlock FontWeight="light" FontSize="14" Grid.Row="2" Grid.Column="0"><Run FontWeight="Medium" Text="{Binding FilesNumber,  Mode=OneWay}"/> Fichiers pour <Run FontWeight="Medium" Text="{Binding FilesSizeString, Mode=OneWay}"/> </TextBlock>
                                 <Border Grid.Column="2" Background="Green" Padding="5,0,5,2" CornerRadius="5">
