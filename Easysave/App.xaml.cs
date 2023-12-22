@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
@@ -9,15 +11,18 @@ namespace EasySave
 {
     public partial class App : Application
     {
+        private Cloud cloudServer;
         private Mutex _appMutex;
         private Timer _processMonitorTimer;
         private bool isBusinessAppRunning = false;
         private Config _config = Config.GetConfig();
-
         private SaveViewModel _viewModel = new SaveViewModel();
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            Cloud server = new Cloud();
+            server.StartServer();
+
             bool createdNew;
             _appMutex = new Mutex(true, "Easysave_V3", out createdNew);
 

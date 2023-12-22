@@ -12,6 +12,7 @@ using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 using EasySave.Models;
+using System.Text.Json;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
 using System.Windows;
@@ -101,8 +102,8 @@ namespace EasySave.ViewModels
 
             State state = statesArr[statesArr.Length - 1];
             
-                if (state.Type == "full") { state.Type = "Complète"; } else { state.Type = "Diffèrentielle"; }
-                if (state.SaveState == true) { state.SaveStateString = "En cours"; } else { state.SaveStateString = "Terminée"; }
+                if (state.Type == "full") { state.Type = "Complete"; } else { state.Type = "Differentielle"; }
+                if (state.SaveState == true) { state.SaveStateString = "En cours"; } else { state.SaveStateString = "Terminee"; }
 
                 state.FilesSizeString = FormatFileSize(state.FilesSize);
                // Saves.Clear();
