@@ -309,6 +309,11 @@
                         </ComboBox>
                     </StackPanel>
 
+                    <StackPanel  Grid.Row="3" Grid.Column="1" >
+                        <TextBlock FontSize="16" FontWeight="Bold" Foreground="#318CE7" Margin="0,0,0,5"><Run Text="Logiciel metier"/></TextBlock>
+                        <TextBox x:Name="SettingBlockingApp" Width="285" Height="30" HorizontalAlignment="Left" TextChanged="TextBox_TextChanged" />
+                    </StackPanel>
+
                 </Grid>
             </Grid>
         </Grid>
@@ -367,7 +372,19 @@
 
                         <TextBlock VerticalAlignment="Center" FontWeight="DemiBold" FontSize="20">Toutes les sauvegardes</TextBlock>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-
+                            
+                            <Button Margin="10,0,0,0" Grid.Column="5" Width="40" Height="30" Background="AliceBlue" BorderBrush="Transparent" Click="play_click">
+                                <Image Source="/Assets/icons/play.png" Width="20" Height="20"/>
+                            </Button>
+                            
+                            <Button Margin="10,0,0,0" Grid.Column="5" Width="40" Height="30" Background="AliceBlue" BorderBrush="Transparent" Click="pause_click">
+                                <Image Source="/Assets/icons/pause.png" Width="20" Height="20"/>
+                            </Button>
+                            
+                            <Button Margin="10,0,0,0" Grid.Column="5" Width="40" Height="30" Background="AliceBlue" BorderBrush="Transparent" Click="stop_click">
+                                <Image Source="/Assets/icons/stop.png" Width="20" Height="20"/>
+                            </Button>
+                            
                             <Button Margin="10,0,0,0" Grid.Column="5" Width="40" Height="30" Background="AliceBlue" BorderBrush="Transparent" Click="Delete_click">
                                 <Image Source="/Assets/icons/trash.png" Width="20" Height="20"/>
                             </Button>
@@ -390,9 +407,8 @@
                                 </Grid.RowDefinitions>
                                         <TextBlock FontWeight="DemiBold" FontSize="16" Grid.Row="0" Grid.Column="0">
                                             <CheckBox Tag="{Binding SaveId, Mode=OneWay}"/> 
-                                            <Run Text="{Binding SaveName, Mode=OneWay}"/> - 
-                                            <Run FontSize="14" Text="{Binding SaveStateString, Mode=OneWay}"/> 
-                                            <Run FontSize="14" Text="{Binding Progress, Mode=OneWay}"/> <!-- Progress Binding Here -->
+                                            <Run Text="{Binding SaveName, Mode=OneWay}"/> -
+                                            <Run FontSize="14" Text="{Binding Progress, Mode=OneWay}"/> 
                                         </TextBlock>
                                         <TextBlock FontWeight="light" FontSize="14" Grid.Row="1" Grid.Column="0">Dossier source : <Run Text="{Binding TargetPath, Mode=OneWay}"/> </TextBlock>
                                         <TextBlock FontWeight="light" FontSize="14" Grid.Row="2" Grid.Column="0"><Run FontWeight="Medium" Text="{Binding FilesNumber,  Mode=OneWay}"/> Fichiers pour <Run FontWeight="Medium" Text="{Binding FilesSizeString, Mode=OneWay}"/> </TextBlock>

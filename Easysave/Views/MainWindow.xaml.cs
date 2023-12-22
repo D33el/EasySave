@@ -33,7 +33,7 @@ namespace EasySave.Views
 
         private delegate void writeOnTextBlock(string textboxName, string value);
 
-
+        private bool backupsPaused;
         Config _config = Config.GetConfig();
         SaveViewModel viewModel = new SaveViewModel();
 
@@ -62,12 +62,12 @@ namespace EasySave.Views
         public void displayStats()
         {
 
-            Dictionary<string, int> stats = viewModel.GetSavesStats();
+            Dictionary<string, long> stats = viewModel.GetSavesStats();
 
-            NumberOfFull.Text = stats.GetValueOrDefault("FullSaveNb") + " Complètes";
-            NumberOfDiff.Text = stats.GetValueOrDefault("DiffSaveNb") + " Différentielles";
-            SavesSize.Text = FormatFileSize((long)stats.GetValueOrDefault("AllSaveSize"));
-            NumberOfEncrypted.Text = stats.GetValueOrDefault("EncryptedFilesNb").ToString() ;
+            NumberOfFull.Text = stats["FullSavesNb"] + " Complètes";
+            NumberOfDiff.Text = stats["DiffSavesNb"] + " Différentielles";
+            SavesSize.Text = FormatFileSize(stats["AllSavesSize"]);
+            NumberOfEncrypted.Text = stats["EncryptedFilesNb"].ToString() ;
 
         }
 
@@ -82,7 +82,9 @@ namespace EasySave.Views
             {
                 size /= 1024;
                 i++;
+
             }
+
 
             return $"{size:N2} {sizeSuffixes[i]}";
         }
@@ -116,6 +118,7 @@ namespace EasySave.Views
             SettingLanguage.SelectedItem = FindComboBoxItemByTag(SettingLanguage, _config.Language);
             SettingTargetSave.Text = _config.TargetDir;
             SettingLogsPath.Text = _config.LogsDir;
+            SettingBlockingApp.Text = _config.BlockingApp;  
             SettingTypeLogs.SelectedItem = FindComboBoxItemByTag(SettingTypeLogs, _config.LogsType);
         }
         private ComboBoxItem FindComboBoxItemByTag(ComboBox comboBox, string tag)
@@ -242,11 +245,13 @@ namespace EasySave.Views
             string filesCrypt = SettingFilesCrypte.Text;
             string filesIgnore = SettingFilesIgnore.Text;
             string LogsType = selectedTypeLogs.Tag.ToString();
+            string BlockingApp = SettingBlockingApp.Text;
 
             _config.Language = Langue;
             _config.TargetDir = savesPath;
             _config.LogsDir = logsPath;
             _config.LogsType = LogsType;
+            _config.BlockingApp = BlockingApp;
 
             _config.SaveConfig();
             AccessList();
@@ -256,6 +261,19 @@ namespace EasySave.Views
 
         private void Delete_click(object sender, RoutedEventArgs e)
         {
+            List<int> saveId = GetSelectedSaves();
+
+            foreach (var id in saveId)
+            {
+                viewModel.InitializeDeleteSave(id);
+            }
+            displaySaveList();
+        }
+
+        private List<int> GetSelectedSaves ()
+        {
+            List<int> idList = new List<int>();
+
             foreach (var item in SaveList.Items)
             {
                 var container = SaveList.ItemContainerGenerator.ContainerFromItem(item) as FrameworkElement;
@@ -263,16 +281,15 @@ namespace EasySave.Views
 
                 if (checkBox != null && checkBox.IsChecked == true)
                 {
-                    // Access the SaveId from the Tag property of the checked CheckBox
                     if (checkBox.Tag is int saveId)
                     {
-                        viewModel.InitializeDeleteSave(saveId);
+                        idList.Add(saveId);
                     }
                 }
             }
-            displaySaveList();
-        }
 
+            return idList;
+        }
         private T FindChild<T>(DependencyObject parent) where T : DependencyObject
         {
             if (parent == null) return null;
@@ -329,5 +346,29 @@ namespace EasySave.Views
             SavePage.Visibility = Visibility.Collapsed;
         }
 
+        private async void play_click(object sender, RoutedEventArgs e)
+        {
+            if (backupsPaused)
+            {
+            viewModel.ResumeBackups();
+                backupsPaused = false;
+            }else
+            {
+            List<int> saveids = GetSelectedSaves();
+            await viewModel.ReexecuteBackupsAsync(saveids);
+            viewModel.AreBackupsActive = true;
+            viewModel.MonitorProgress();
+
+            }
+        }
+        private void pause_click(object sender, RoutedEventArgs e)
+        {
+            viewModel.PauseBackups();
+            backupsPaused = true;
+        }
+        private void stop_click(object sender, RoutedEventArgs e)
+        {
+            viewModel.CancelAllBackups();
+        }
     }
 }

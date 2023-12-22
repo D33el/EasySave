@@ -15,6 +15,8 @@ using EasySave.Models;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
 using System.Windows;
+using System.Drawing;
+using System.Security.Policy;
 
 namespace EasySave.ViewModels
 {
@@ -160,6 +162,12 @@ namespace EasySave.ViewModels
             Save _save = new Save(_backupExecutor.BackupsProgress);
             _save = SetSaveInfo(saveId);
             _save.DeleteSave();
+
+            var itemToRemove = Saves.FirstOrDefault(s => s.SaveId == saveId); // Find the item with the matching saveId
+            if (itemToRemove != null)
+            {
+                Saves.Remove(itemToRemove); 
+            }
         }
 
         public async Task ExecuteEnqueuedBackupsAsync()
@@ -168,26 +176,35 @@ namespace EasySave.ViewModels
             CheckAllBackupsCompleted();
         }
 
-        public async Task ReexecuteAllBackupsAsync()
+        public async Task ReexecuteBackupsAsync(List<int> saveIds)
         {
             State[] allBackups = State.GetStateArr();
-            await _backupExecutor.ExecuteBackupsAsync(_cancellationTokenSource.Token);
             AreBackupsActive = true;
+
             foreach (var backupState in allBackups)
             {
-                var saveTask = new Save(_backupExecutor.BackupsProgress)
+                if (saveIds.Contains(backupState.SaveId))
                 {
-                    SaveName = backupState.SaveName,
-                    SaveSourcePath = backupState.SourcePath,
-                    Type = backupState.Type,
-                    SaveId = backupState.SaveId
-                };
+                    // Create a new save task for the backup to be re-executed
+                    var saveTask = new Save(_backupExecutor.BackupsProgress)
+                    {
+                        SaveName = backupState.SaveName,
+                        SaveSourcePath = backupState.SourcePath,
+                        Type = backupState.Type,
+                        SaveId = backupState.SaveId
+                    };
 
-                _backupExecutor.EnqueueBackup(saveTask);
+                    // Enqueue the save task for execution
+                    _backupExecutor.EnqueueBackup(saveTask);
+                }
             }
+
+            // Execute all enqueued backups
+            await _backupExecutor.ExecuteBackupsAsync(_cancellationTokenSource.Token);
 
             AreBackupsActive = false;
         }
+
 
         public void CheckAllBackupsCompleted()
         {
@@ -214,7 +231,6 @@ namespace EasySave.ViewModels
                 ResumeBackups();
             }
 
-            _cancellationTokenSource.Cancel();
             _backupExecutor.StopAllBackups();
             AreBackupsActive = false;
         }
@@ -274,16 +290,16 @@ namespace EasySave.ViewModels
             return aclList;
         }
 
-        public Dictionary<string, int> GetSavesStats()
+        public Dictionary<string, long> GetSavesStats()
         {
-            Dictionary<string, int> stats = new Dictionary<string, int>();
+            Dictionary<string, long> stats = new Dictionary<string, long>();
 
             int[] savesTypesNumber = Save.GetSavesTypesNumber();
             stats["FullSavesNb"] = savesTypesNumber[0];
             stats["DiffSavesNb"] = savesTypesNumber[1];
             stats["EncryptedFilesNb"] = Save.GetEncryptedFilesNumber();
-            stats["AllSavesSize"] = (int)GetAllSavesSize();
-
+            stats["AllSavesSize"] = GetAllSavesSize();
+            
             return stats;
         }
 
@@ -295,6 +311,8 @@ namespace EasySave.ViewModels
             {
                 total += state.FilesSize;
             }
+            Trace.WriteLine("==============================================");
+            Trace.WriteLine("Total = "+total);
             return total;
         }
     }
@@ -315,7 +333,7 @@ public class SaveItem : INotifyPropertyChanged
     public string FilesSizeString { get; set; }
     public string SaveStateString { get; set; }
 
-    private double _progress;
+    private double _progress = 100;
     public double Progress
     {
         get { return _progress; }

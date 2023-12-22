@@ -113,6 +113,7 @@ namespace EasySave.Models
 
             foreach (string file in filesToCopy)
             {
+                BackupExecutor._pauseEvent.Wait(cancellationToken);
                 count++;
                 FileInfo fileInfo = new FileInfo(file);
 
@@ -172,6 +173,7 @@ namespace EasySave.Models
             Duration.Start();
             foreach (string file in filesToCopy)
             {
+                BackupExecutor._pauseEvent.Wait(cancellationToken);
                 count++;
                 FileInfo fileInfo = new FileInfo(file);
                 Duration.Restart();
