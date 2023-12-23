@@ -23,6 +23,7 @@ namespace EasySave.ViewModels
 {
     public class SaveViewModel : INotifyPropertyChanged
     {
+        private Config _config = Config.GetConfig();
         public ObservableCollection<SaveItem> Saves { get; private set; } = new ObservableCollection<SaveItem>();
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -61,8 +62,15 @@ namespace EasySave.ViewModels
 
             foreach (var state in statesArr)
             {
-                if (state.Type == "full") { state.Type = "Complète"; } else { state.Type = "Diffèrentielle"; }
-                if (state.SaveState == true) { state.SaveStateString = "En cours"; } else { state.SaveStateString = "Terminée"; }
+                if (state.Type == "full") 
+                { 
+                    if(_config.Language == "fr") { state.Type = "Complète"; } else { state.Type = "Full"; } 
+                } 
+                else 
+                {
+                    if (_config.Language == "fr") { state.Type = "Diffèrentielle"; } else { state.Type = "Differential"; }
+                }
+
 
                 state.FilesSizeString = FormatFileSize(state.FilesSize);
                 Saves.Add(new SaveItem()
@@ -103,11 +111,17 @@ namespace EasySave.ViewModels
             State[] statesArr = State.GetStateArr();
 
             State state = statesArr[statesArr.Length - 1];
-            
-                if (state.Type == "full") { state.Type = "Complete"; } else { state.Type = "Differentielle"; }
-                if (state.SaveState == true) { state.SaveStateString = "En cours"; } else { state.SaveStateString = "Terminee"; }
 
-                state.FilesSizeString = FormatFileSize(state.FilesSize);
+            if (state.Type == "full")
+            {
+                if (_config.Language == "fr") { state.Type = "Complète"; } else { state.Type = "Full"; }
+            }
+            else
+            {
+                if (_config.Language == "fr") { state.Type = "Diffèrentielle"; } else { state.Type = "Differential"; }
+            }
+
+            state.FilesSizeString = FormatFileSize(state.FilesSize);
                // Saves.Clear();
                 Saves.Add(new SaveItem()
                 {
@@ -274,11 +288,12 @@ namespace EasySave.ViewModels
             return $"{size:N2} {sizeSuffixes[i]}";
         }
 
-        public static void WriteAcl(string[] listCrypt, string[] listIgnore)
+        public static void WriteAcl(string[] listCrypt, string[] listIgnore, string[] listPriority)
         {
             AccessList acl = AccessList.GetAccessList();
             acl.EncryptableFiles = listCrypt;
             acl.IgnoredFiles = listIgnore;
+            acl.ExtensionsPriority = listPriority;
             acl.WriteList();
         }
 
@@ -288,6 +303,7 @@ namespace EasySave.ViewModels
             Dictionary<string, string[]> aclList = new Dictionary<string, string[]>();
             aclList["encryptableFiles"] = acl.EncryptableFiles;
             aclList["ignoredFiles"] = acl.IgnoredFiles;
+            aclList["extensionsPriority"] = acl.ExtensionsPriority;
             return aclList;
         }
 

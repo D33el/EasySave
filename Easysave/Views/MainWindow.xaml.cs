@@ -20,6 +20,7 @@ using EasySave;
 using System.Windows.Markup.Localizer;
 using System.Threading;
 using System.ComponentModel;
+using System.Globalization;
 
 namespace EasySave.Views
 {
@@ -28,11 +29,11 @@ namespace EasySave.Views
     /// </summary>
     /// 
 
+    public class Langue
+    {
+    }
     public partial class MainWindow : Window
     {
-
-        private delegate void writeOnTextBlock(string textboxName, string value);
-
         private bool backupsPaused;
         Config _config = Config.GetConfig();
         SaveViewModel viewModel = new SaveViewModel();
@@ -49,23 +50,41 @@ namespace EasySave.Views
             }
             else
             {
-                ShowHomePage();
-            }
-
+                if(!App.LanguageSet) { ChangeLanguage(_config.Language); }
+            ShowHomePage();
             displaySaveList();
             displayParameters();
             displayAccessList();
+            }
+
         }
 
+        public static void ChangeLanguage(string cultureCode)
+        {
+            try
+            {
+                CultureInfo newCulture = new CultureInfo(cultureCode);
+                CultureInfo.DefaultThreadCurrentCulture = newCulture;
+                CultureInfo.DefaultThreadCurrentUICulture = newCulture;
 
+                App.ChangeCulture(newCulture);
+            }
+            catch (Exception ex)
+            {
+                // Handle the exception, e.g., log it
+                Console.WriteLine($"Error changing language: {ex.Message}");
+            }
+        }
+
+        
 
         public void displayStats()
         {
 
             Dictionary<string, long> stats = viewModel.GetSavesStats();
 
-            NumberOfFull.Text = stats["FullSavesNb"] + " Complètes";
-            NumberOfDiff.Text = stats["DiffSavesNb"] + " Différentielles";
+            NumberOfFull.Text = stats["FullSavesNb"].ToString();
+            NumberOfDiff.Text = stats["DiffSavesNb"].ToString() ;
             SavesSize.Text = FormatFileSize(stats["AllSavesSize"]);
             NumberOfEncrypted.Text = stats["EncryptedFilesNb"].ToString() ;
 
@@ -105,12 +124,16 @@ namespace EasySave.Views
 
             string[] Encryptable = acls.GetValueOrDefault("encryptableFiles");
             string[] Ignored = acls.GetValueOrDefault("ignoredFiles");
+            string[] Priority = acls.GetValueOrDefault("extensionsPriority");
 
             string extensionsEncryptable = string.Join(", ", Encryptable);
             string extensionsIgnored = string.Join(", ", Ignored);
+            string extensionsPriority = string.Join(", ", Priority);
+
 
             SettingFilesCrypte.Text = extensionsEncryptable;
             SettingFilesIgnore.Text = extensionsIgnored;
+            PrioritaryFiles.Text = extensionsPriority;
 
         }
         public void displayParameters()
@@ -120,6 +143,7 @@ namespace EasySave.Views
             SettingLogsPath.Text = _config.LogsDir;
             SettingBlockingApp.Text = _config.BlockingApp;  
             SettingTypeLogs.SelectedItem = FindComboBoxItemByTag(SettingTypeLogs, _config.LogsType);
+            SizeLimit.Text = _config.SizeLimit.ToString();
         }
         private ComboBoxItem FindComboBoxItemByTag(ComboBox comboBox, string tag)
         {
@@ -202,17 +226,27 @@ namespace EasySave.Views
         {
             string extensionsCrypt = SettingFilesCrypte.Text;
             string extensionsIgnore = SettingFilesIgnore.Text;
+            string priorityFiles = PrioritaryFiles.Text;
+
             string[] extensionsCryptArray = extensionsCrypt.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
             for (int i = 0; i < extensionsCryptArray.Length; i++)
             {
                 extensionsCryptArray[i] = extensionsCryptArray[i].Trim();
             }
+
             string[] extensionsIgnoreArray = extensionsIgnore.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
             for (int i = 0; i < extensionsIgnoreArray.Length; i++)
             {
                 extensionsIgnoreArray[i] = extensionsIgnoreArray[i].Trim();
             }
-            SaveViewModel.WriteAcl(extensionsCryptArray, extensionsIgnoreArray);
+
+            string[] priorityFilesArray = priorityFiles.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            for (int i = 0; i < priorityFilesArray.Length; i++)
+            {
+                priorityFilesArray[i] = priorityFilesArray[i].Trim();
+            }
+
+            SaveViewModel.WriteAcl(extensionsCryptArray, extensionsIgnoreArray,priorityFilesArray);
         }
 
 
@@ -246,14 +280,18 @@ namespace EasySave.Views
             string filesIgnore = SettingFilesIgnore.Text;
             string LogsType = selectedTypeLogs.Tag.ToString();
             string BlockingApp = SettingBlockingApp.Text;
+            long MaxSize = long.Parse(SizeLimit.Text);
 
             _config.Language = Langue;
             _config.TargetDir = savesPath;
             _config.LogsDir = logsPath;
             _config.LogsType = LogsType;
             _config.BlockingApp = BlockingApp;
+            _config.SizeLimit = MaxSize;
 
             _config.SaveConfig();
+
+            ChangeLanguage(_config.Language);
             AccessList();
             displayParameters();
             displayAccessList();
@@ -370,5 +408,8 @@ namespace EasySave.Views
         {
             viewModel.CancelAllBackups();
         }
+
+
+
     }
 }

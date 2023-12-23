@@ -117,11 +117,16 @@ namespace EasySave.Models
                 count++;
                 FileInfo fileInfo = new FileInfo(file);
 
+
+                //check if file is ignored
                 if (_accessList.FileIsInList("ignored", fileInfo)) continue;
+
+                //check if file is above size limit
+                if (fileInfo.Length > (_config.SizeLimit * 1024 * 1024)) continue;
 
                 Duration.Restart();
                 string destinationFile = Path.Combine(folderPath, Path.GetFileName(file));
-
+                //check if file has to be crypted
                 if (_accessList.FileIsInList("encryptable", fileInfo))
                 {
                     _log.EncryptionTime = EncryptedCopy(file, destinationFile);
