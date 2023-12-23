@@ -41,7 +41,7 @@
 
                 <StackPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center">
                     <TextBlock FontSize="16" FontWeight="Bold" Foreground="#318CE7" Margin="0,0,0,5"><Run Language="fr-fr" Text="{x:Static p:Resource.welcome_lang}"/></TextBlock>
-                    <ComboBox x:Name="LangueSetting" Width="285" Height="30" HorizontalAlignment="Left" SelectionChanged="LangueSetting_SelectionChanged">
+                    <ComboBox x:Name="LangueSetting" Width="285" Height="30" HorizontalAlignment="Left" >
                         <ComboBoxItem Content="Français" Tag="fr"/>
                         <ComboBoxItem Content="English" Tag="en"/>
                     </ComboBox>
