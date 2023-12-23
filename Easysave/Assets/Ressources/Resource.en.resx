@@ -175,7 +175,7 @@
     <value>App language</value>
   </data>
   <data name="settings_logsdir" xml:space="preserve">
-    <value>Logs Path</value>
+    <value>Logs path</value>
   </data>
   <data name="settings_logstype" xml:space="preserve">
     <value>Logs type</value>

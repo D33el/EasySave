@@ -297,6 +297,15 @@ namespace EasySave.Views
             displayAccessList();
         }
 
+        private void LangueSetting_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ComboBoxItem selectedItem = LangueSetting.SelectedItem as ComboBoxItem;
+            if (selectedItem != null)
+            {
+                string selectedValue = selectedItem.Tag.ToString(); 
+                ChangeLanguage(selectedValue);
+            }
+        }
         private void Delete_click(object sender, RoutedEventArgs e)
         {
             List<int> saveId = GetSelectedSaves();

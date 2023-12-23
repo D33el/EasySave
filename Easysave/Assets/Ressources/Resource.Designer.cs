@@ -304,7 +304,7 @@ namespace Easysave.Assets.Ressources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to  des logs.
+        ///   Looks up a localized string similar to Emplacement des logs.
         /// </summary>
         public static string welcome_logsdir {
             get {

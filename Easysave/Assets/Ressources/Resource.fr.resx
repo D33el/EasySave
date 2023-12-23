@@ -199,7 +199,7 @@
     <value>Langue de l'application</value>
   </data>
   <data name="welcome_logsdir" xml:space="preserve">
-    <value> des logs</value>
+    <value>Emplacement des logs</value>
   </data>
   <data name="welcome_logstype" xml:space="preserve">
     <value>Types des logs</value>
