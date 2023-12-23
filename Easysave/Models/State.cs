@@ -18,16 +18,12 @@ namespace EasySave.Models
         public string TargetPath { get; set; }
         public int FilesNumber { get; set; }
         public long FilesSize { get; set; }
-        public double Progress { get; set; }
-        public long RemainingFiles { get; set; }
-        public long RemainingFilesSize { get; set; }
-
-        public string FilesSizeString {  get; set; }
-
+        public string FilesSizeString { get; set; }
         public string SaveStateString { get; set; }
 
-        //private Config _config = Config.GetConfig();
-        private static string StateFilePath = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName + @"/Assets/state.json";
+        private static readonly string StateFilePath = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName + @"/Assets/state.json";
+
+        private static readonly object _stateLock = new object();
 
         public State()
         {
@@ -44,21 +40,24 @@ namespace EasySave.Models
 
         public void AddState()
         {
-            string jsonString = File.ReadAllText(StateFilePath);
+            lock (_stateLock)
+            {
+                string jsonString = File.ReadAllText(StateFilePath);
 
-            State[] statesArr = JsonSerializer.Deserialize<State[]>(jsonString);
-            List<State> stateList = new List<State>();
+                State[] statesArr = JsonSerializer.Deserialize<State[]>(jsonString);
+                List<State> stateList = new List<State>();
 
-            // Adding the old state entries to the list
-            stateList.AddRange(statesArr);
+                // Adding the old state entries to the list
+                stateList.AddRange(statesArr);
 
-            if (stateList.Any(s => s.SaveId == SaveId)) { return; }
+                if (stateList.Any(s => s.SaveId == SaveId)) { return; }
 
-            // Adding the new state entry to the list
-            stateList.Add(this);
+                // Adding the new state entry to the list
+                stateList.Add(this);
 
-            string serializedJSON = JsonSerializer.Serialize(stateList) + Environment.NewLine;
-            File.WriteAllText(StateFilePath, serializedJSON);
+                string serializedJSON = JsonSerializer.Serialize(stateList) + Environment.NewLine;
+                File.WriteAllText(StateFilePath, serializedJSON);
+            }
         }
 
         public void UpdateState()
@@ -69,21 +68,27 @@ namespace EasySave.Models
 
         public void DeleteState()
         {
-            string jsonString = File.ReadAllText(StateFilePath);
-            List<State> stateList = JsonSerializer.Deserialize<List<State>>(jsonString);
+            lock (_stateLock)
+            {
+                string jsonString = File.ReadAllText(StateFilePath);
+                List<State> stateList = JsonSerializer.Deserialize<List<State>>(jsonString);
 
-            stateList.RemoveAll(save => save.SaveId == SaveId);
+                stateList.RemoveAll(save => save.SaveId == SaveId);
 
-            string serializedJSON = JsonSerializer.Serialize(stateList.ToArray()) + Environment.NewLine;
-            File.WriteAllText(StateFilePath, serializedJSON);
+                string serializedJSON = JsonSerializer.Serialize(stateList.ToArray()) + Environment.NewLine;
+                File.WriteAllText(StateFilePath, serializedJSON);
+            }
         }
 
         public static State[] GetStateArr()
         {
+            lock (_stateLock)
+            {
             string jsonString = File.ReadAllText(StateFilePath);
             State[] stateArr = JsonSerializer.Deserialize<State[]>(jsonString);
 
             return stateArr ??= Array.Empty<State>();
+            }
         }
 
     }

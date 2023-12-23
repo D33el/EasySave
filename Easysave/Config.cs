@@ -15,6 +15,9 @@ namespace EasySave
         public string TargetDir { get; set; } = "";
         public string LogsDir { get; set; } = "";
         public string LogsType { get; set; } = "";
+        public string BlockingApp { get; set; } = "";
+
+        public long SizeLimit { get; set; } =  0;
 
         private static Config ConfigInstance;
 
@@ -54,6 +57,8 @@ namespace EasySave
             {
                 string JSONtext = File.ReadAllText(FilePath);
                 int fileLength = JSONtext.Length;
+                Trace.WriteLine("========");
+                Trace.WriteLine(fileLength);
                 if (fileLength > 32) { return true; } else { return false; }
             }
             catch (Exception ex)
@@ -74,6 +79,9 @@ namespace EasySave
                 TargetDir = configObj.TargetDir;
                 LogsDir = configObj.LogsDir;
                 LogsType = configObj.LogsType;
+                LogsType = configObj.LogsType;
+                BlockingApp = configObj.BlockingApp;
+                SizeLimit = configObj.SizeLimit;
             }
             catch (Exception ex)
             {
@@ -87,6 +95,8 @@ namespace EasySave
             public string TargetDir { get; set; }
             public string LogsDir { get; set; }
             public string LogsType { get; set; }
+            public string BlockingApp { get; set; }
+            public long SizeLimit { get; set; }
         }
     }
 }

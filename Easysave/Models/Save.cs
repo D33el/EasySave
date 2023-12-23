@@ -6,6 +6,8 @@ using System.Xml.Serialization;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using System.Threading;
+using System.Collections.Concurrent;
 
 namespace EasySave.Models
 {
@@ -15,7 +17,7 @@ namespace EasySave.Models
         public string SaveName { get; set; }
         public string SaveSourcePath { get; set; }
         public string Type { get; set; }
-
+        
 
         private Config _config = Config.GetConfig();
         private Log _log = Log.GetLog();
@@ -23,9 +25,14 @@ namespace EasySave.Models
         private State _state = new State();
         private Stopwatch Duration = new Stopwatch();
 
-        public Save() { }
+        private ConcurrentDictionary<int, double> _progressTracker;
 
-        private void SetSaveState()
+
+        public Save(ConcurrentDictionary<int, double> progressTracker)
+        {
+            _progressTracker = progressTracker;
+        }
+        public void SetSaveState()
         {
             _state.SaveId = SaveId;
             _state.SaveName = SaveName;
@@ -35,9 +42,16 @@ namespace EasySave.Models
             _state.TargetPath = Path.Combine(_config.TargetDir, SaveName);
             _state.FilesSize = DirSize(new DirectoryInfo(SaveSourcePath));
             _state.FilesNumber = Directory.GetFiles(SaveSourcePath).Length;
+
+            _state.AddState();  
         }
 
-        public void CreateSave()
+        public void MarkAsCompleted()
+        {
+            UpdateSaveProgress(100); // Ensure 100% progress on completion
+        }
+
+        public void CreateSave(CancellationToken cancellationToken)
         {
             string saveTargetPath = Path.Combine(_config.TargetDir, SaveName);
             SetSaveState();
@@ -48,18 +62,18 @@ namespace EasySave.Models
                 {
                     if (!Directory.Exists(saveTargetPath)) { Directory.CreateDirectory(saveTargetPath); }
 
-                    if (Type == "full") {
-                        FullSave(saveTargetPath);
+                    if (Type == "full")
+                    {
+                        FullSave(saveTargetPath, cancellationToken);
                     }
-                    else {
-                        DiffSave(saveTargetPath);
+                    else
+                    {
+                        DiffSave(saveTargetPath, cancellationToken);
                     }
-
-                    Console.WriteLine($"Sauvegarde '{SaveName}' créée avec succès.");
                 }
                 else
                 {
-                    Console.WriteLine($"Source directory '{SaveSourcePath}' not found.");
+                    Console.WriteLine($"Error : Source directory '{SaveSourcePath}' not found.");
                 }
             }
             catch (Exception ex)
@@ -68,8 +82,13 @@ namespace EasySave.Models
             }
         }
 
-        private void FullSave(string folderPath)
+        private void FullSave(string folderPath, CancellationToken cancellationToken)
         {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                Console.WriteLine("Backup operation was canceled.");
+                return; 
+            }
             if (Directory.Exists(folderPath) && Directory.GetFiles(folderPath).Length != 0)
             {
                 string[] files = Directory.GetFiles(folderPath);
@@ -80,14 +99,34 @@ namespace EasySave.Models
             }
             string[] filesToCopy = Directory.GetFiles(SaveSourcePath);
 
+            //reordering the array with priority
+            filesToCopy = filesToCopy.OrderBy(file =>
+            {
+                var extension = Path.GetExtension(file);
+                int index = Array.IndexOf(_accessList.ExtensionsPriority, extension);
+                return index == -1 ? _accessList.ExtensionsPriority.Length : index;
+            }).ToArray();
+
+            int count = 0;
+
             Duration.Start();
+
             foreach (string file in filesToCopy)
             {
+                BackupExecutor._pauseEvent.Wait(cancellationToken);
+                count++;
                 FileInfo fileInfo = new FileInfo(file);
+
+
+                //check if file is ignored
+                if (_accessList.FileIsInList("ignored", fileInfo)) continue;
+
+                //check if file is above size limit
+                if (fileInfo.Length > (_config.SizeLimit * 1024 * 1024)) continue;
 
                 Duration.Restart();
                 string destinationFile = Path.Combine(folderPath, Path.GetFileName(file));
-
+                //check if file has to be crypted
                 if (_accessList.FileIsInList("encryptable", fileInfo))
                 {
                     _log.EncryptionTime = EncryptedCopy(file, destinationFile);
@@ -105,21 +144,42 @@ namespace EasySave.Models
                 _log.TargetDir = destinationFile;
                 _log.Timestamp = DateTime.Now.ToString("dd-MM-yyyy hh:mm:ss");
                 _log.WriteLog();
+
+                UpdateSaveProgress((count + 1) * 100.0 / filesToCopy.Length);
             }
-            // Updating state.json file by adding a new entry
-            _state.AddState();
+
+            UpdateSaveProgress(100);
+            _state.UpdateState();
         }
 
-        private void DiffSave(string folderPath)
+        //TODO ajouter le progress
+        private void DiffSave(string folderPath, CancellationToken cancellationToken)
         {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                Console.WriteLine("Backup operation was canceled.");
+                return;
+            }
             string[] destinationFiles = Directory.GetFiles(folderPath);
             string[] sourceFiles = Directory.GetFiles(SaveSourcePath);
             List<string> newModifiedFiles = CompareFiles(sourceFiles, destinationFiles);
 
-            Duration.Start();
-            foreach (string file in newModifiedFiles)
-            {
+            string[] filesToCopy = newModifiedFiles.ToArray();
+            int count = 0;
 
+            //reordering the array with priority
+            filesToCopy = filesToCopy.OrderBy(file =>
+            {
+                var extension = Path.GetExtension(file);
+                int index = Array.IndexOf(_accessList.ExtensionsPriority, extension);
+                return index == -1 ? _accessList.ExtensionsPriority.Length : index;
+            }).ToArray();
+
+            Duration.Start();
+            foreach (string file in filesToCopy)
+            {
+                BackupExecutor._pauseEvent.Wait(cancellationToken);
+                count++;
                 FileInfo fileInfo = new FileInfo(file);
                 Duration.Restart();
 
@@ -143,9 +203,10 @@ namespace EasySave.Models
                 _log.Timestamp = DateTime.Now.ToString("dd-MM-yyyy hh:mm:ss");
 
                 _log.WriteLog();
-
+                UpdateSaveProgress((count + 1) * 100.0 / filesToCopy.Length);
             }
-            // Updating state.json file by adding a new entry
+
+            UpdateSaveProgress(100);
             _state.UpdateState();
         }
 
@@ -181,7 +242,6 @@ namespace EasySave.Models
 
             return newModifiedFiles;
         }
-
 
         public void DeleteSave()
         {
@@ -219,36 +279,10 @@ namespace EasySave.Models
             }
         }
 
-        public void GetSaveProgress()
+        public void UpdateSaveProgress(double progress)
         {
-            string lang = _config.Language;
-            try
-            {
-                string[] filesToCopy = Directory.GetFiles(SaveSourcePath);
-                string saveFolderPath = Path.Combine(_config.TargetDir, SaveName);
-
-                int totalFiles = filesToCopy.Length;
-                int remainingFiles = totalFiles - Directory.GetFiles(saveFolderPath).Length;
-
-                // Calculate the total size of files to be copied
-                long totalSize = filesToCopy.Sum(file => new FileInfo(file).Length);
-
-                // Calculate the remaining size to be copied
-                long remainingSize = filesToCopy
-                    .Where(file => !File.Exists(Path.Combine(saveFolderPath, Path.GetFileName(file))))
-                    .Sum(file => new FileInfo(file).Length);
-
-                double progress = 100.0 * (totalFiles - remainingFiles) / totalFiles;
-
-                _state.Progress = progress;
-                _state.RemainingFiles = remainingFiles;
-                _state.RemainingFilesSize = remainingSize;
-            }
-            catch (Exception ex)
-            {
-                if (lang == "fr") { Console.WriteLine($"Erreur lors du calcul du progres: {ex.Message}"); }
-                else { Console.WriteLine($"Error calculating save progress: {ex.Message}"); }
-            }
+            progress = Math.Min(progress, 100.0); // Cap the progress at 100%
+            _progressTracker[SaveId] = progress;
         }
 
         private static long DirSize(DirectoryInfo d)
@@ -272,38 +306,24 @@ namespace EasySave.Models
             return size;
         }
 
-
-
-
-
-        public int GetFullSaveCount()
+        public static int[] GetSavesTypesNumber()
         {
             int fullSaveCount = 0;
+            int diffSaveCount = 0;
+
             State[] existingStates = State.GetStateArr();
 
             foreach (var existingState in existingStates)
             {
                 if (existingState.Type == "full") { fullSaveCount++; }
+                else if (existingState.Type == "diff") { diffSaveCount++; }
             }
 
-            return fullSaveCount;
-        }
-
-        public int GetDiffSaveCount()
-        {
-            int diffSaveCount = 0;
-            State[] existingStates = State.GetStateArr();
-
-            foreach (var existingState in existingStates)
-            {
-                if (existingState.Type == "diff") { diffSaveCount++; }
-            }
-
-            return diffSaveCount;
+            return new int[] { fullSaveCount, diffSaveCount };
         }
 
 
-        public int GetEncryptedFilesNumber()
+        public static int GetEncryptedFilesNumber()
         {
             int count = 0;
             Config _config = Config.GetConfig();
@@ -329,7 +349,6 @@ namespace EasySave.Models
             try
             {
                 EncryptionDuration.Start();
-
                 using Process process = new Process();
 
                 process.StartInfo.FileName = Path.Combine(appDir, "Cryptosoft.exe");
@@ -353,5 +372,6 @@ namespace EasySave.Models
 
 
         }
+
     }
 }
