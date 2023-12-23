@@ -1,3 +1,15 @@
 [
-
+  {
+    "SaveId": 4,
+    "SaveName": "fdfsdfsdfsdf",
+    "Time": "22-12-2023 15:35:46",
+    "Type": "full",
+    "SaveState": false,
+    "SourcePath": "C:\\Users\\DELL\\Desktop\\Nouveau0\\D2",
+    "TargetPath": "C:\\Users\\DELL\\Desktop\\backups\\fdfsdfsdfsdf",
+    "FilesNumber": 32,
+    "FilesSize": 3355443200,
+    "FilesSizeString": null,
+    "SaveStateString": null
+  }
 ]
